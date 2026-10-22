@@ -1,0 +1,116 @@
+# ---------------------------------------------------------------
+# Claude Code (contexto local, no se versiona)
+# ---------------------------------------------------------------
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+
+info.md
+# ---------------------------------------------------------------
+# Secretos y configuración local
+# ---------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+appsettings.*.local.json
+appsettings.Development.local.json
+secrets.json
+
+# ---------------------------------------------------------------
+# Backend: .NET / ASP.NET Core
+# ---------------------------------------------------------------
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+[Ll]og/
+[Ll]ogs/
+*.user
+*.suo
+*.userprefs
+*.rsuser
+.vs/
+TestResults/
+[Tt]est[Rr]esult*/
+coverage/
+*.coverage
+*.coveragexml
+coverage*.json
+coverage*.xml
+*.nupkg
+*.snupkg
+.nuget/packages/
+project.lock.json
+artifacts/
+
+# ---------------------------------------------------------------
+# Frontend: Node / Vite / React
+# ---------------------------------------------------------------
+node_modules/
+dist/
+dist-ssr/
+build/
+.vite/
+*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+vite.config.*.timestamp-*
+
+# ---------------------------------------------------------------
+# Docker / infraestructura local
+# ---------------------------------------------------------------
+docker-compose.override.yml
+compose.override.yaml
+.docker-data/
+volumes/
+pgdata/
+
+# Exportaciones de Keycloak con datos sensibles (versionar solo las saneadas)
+infrastructure/keycloak/*-secrets*.json
+infrastructure/keycloak/export-local/
+
+# Terraform / AWS (por si se usan)
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+.aws-sam/
+
+# ---------------------------------------------------------------
+# Editores e IDE
+# ---------------------------------------------------------------
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+*~
+
+# ---------------------------------------------------------------
+# Sistema operativo
+# ---------------------------------------------------------------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ---------------------------------------------------------------
+# Varios
+# ---------------------------------------------------------------
+*.log
+tmp/
+temp/

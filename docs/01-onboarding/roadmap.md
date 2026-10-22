@@ -49,7 +49,7 @@ Cada fase tendrá un resultado, evidencias y un punto de aprobación del respons
 
 **Documentación requerida para cerrar la fase:** completar la [visión general del sistema](../03-architecture/system-overview.md) y crear `docs/03-architecture/backend.md`, `frontend.md`, `database.md`, `authentication.md` y `deployment-aws.md`; crear también `docs/05-api/api-contracts.md`, al menos un ADR en `docs/03-architecture/adr/` y `CONTRIBUTING.md`.
 
-Estas rutas describen entregables pendientes; actualmente solo existe `system-overview.md` dentro de la documentación de arquitectura.
+Estado actual: existen en borrador `system-overview.md`, [`database.md`](../03-architecture/database.md), [`authentication.md`](../03-architecture/authentication.md), [`deployment-aws.md`](../03-architecture/deployment-aws.md), [`frontend.md`](../03-architecture/frontend.md), los ADR [0001 y 0002](../03-architecture/adr/README.md) y [`api-contracts.md`](../05-api/api-contracts.md). El borrador de `backend.md` está en la raíz del repositorio pendiente de completar y mover; falta `CONTRIBUTING.md`.
 
 **Aprobación de fase 0:** arquitectura viable y comprensible; modelo de datos y límites de seguridad coherentes; contrato suficiente para trabajar en paralelo; presupuesto máximo y plan de retirada de AWS definidos; comentarios bloqueantes resueltos. Después comenzará la implementación.
 
@@ -82,13 +82,15 @@ Estas rutas describen entregables pendientes; actualmente solo existe `system-ov
 
 **Backend**
 
-- Implementar creación, consulta, edición y archivado de proyectos, sin introducir borrado de proyectos fuera del alcance.
-- Implementar creación, consulta, edición, borrado y asignación de tareas, con proyecto, estado y prioridad.
+- Implementar el modelo `AppUser`, `Project`, `AppUser_Project` y `Task` con sus migraciones, incluida la clave foránea compuesta de asignación.
+- Implementar creación, consulta, edición, archivado, restauración y eliminación de proyectos, con alta automática del creador como miembro.
+- Implementar creación, consulta, edición, borrado y asignación de tareas, con proyecto, estado y prioridad, y alta de pertenencia al asignar a un no miembro.
+- Hasta la fase 3, las reglas de visibilidad por pertenencia se cubren con pruebas de casos de uso; el filtrado con la identidad real del token se activa en la fase 3.
 - Añadir filtros y ordenación exigidos; acordar la paginación si es necesaria, errores coherentes y pruebas relevantes.
 
 **Frontend**
 
-- Implementar listas y formularios de proyectos y tareas, archivado de proyectos, borrado de tareas y asignación.
+- Implementar listas y formularios de proyectos y tareas, miembros del proyecto, archivado, restauración y eliminación de proyectos, borrado de tareas y asignación.
 - Añadir validación, confirmaciones, filtros y estados de carga, vacío y error.
 - Sustituir las respuestas simuladas por llamadas reales y coordinar los cambios de contrato.
 
@@ -105,23 +107,23 @@ Estas rutas describen entregables pendientes; actualmente solo existe `system-ov
 **Backend**
 
 - Validar firma, emisor, audiencia y vigencia de los tokens de acceso de Keycloak; configurar la audiencia de la API en Keycloak.
-- Aplicar los permisos de `Admin` y `Member`, incluidas las comprobaciones de asignación para los cambios de estado de `Member`.
+- Aplicar los permisos de `Admin` y `User`: visibilidad por pertenencia y proyecto activo en todas las consultas de `User` (HTTP 404 para recursos no visibles) y operaciones de archivado, restauración y eliminación reservadas a `Admin` (HTTP 403).
 - Denegar operaciones a identidades sin un rol admitido.
 - Probar solicitudes sin autenticar, con tokens caducados o inválidos y sin permisos suficientes.
 
 **Frontend**
 
 - Integrar OIDC Authorization Code + PKCE con un cliente público de SPA; inicio y cierre de sesión y retorno a la aplicación.
-- Gestionar la caducidad de sesión, las rutas protegidas y los controles según el rol.
-- Implementar «Mis tareas» y el panel de proyectos activos y tareas abiertas, completadas y vencidas con datos reales.
+- Gestionar la caducidad de sesión, las rutas protegidas y los controles según el rol, incluida la vista de archivados solo para `Admin`.
+- Implementar «Mis tareas» y el panel de proyectos activos y tareas abiertas, completadas y vencidas con datos reales, acotados a los proyectos visibles de cada usuario.
 
 **Trabajo compartido**
 
 - Acordar orígenes CORS, URL, manejo de tokens y zona horaria para los vencimientos.
 - Mantener los secretos de clientes confidenciales fuera de los archivos de la SPA.
-- Probar los recorridos de `Admin` y `Member`, incluidas las llamadas directas a la API que deben denegarse.
+- Probar los recorridos de `Admin` y `User` (A, B, C y E de los requisitos), incluidas las llamadas directas a la API que deben denegarse.
 
-**Aprobación de fase 3:** accesos legítimos operativos, respuestas 401/403 coherentes, permisos aplicados en la API y panel integrado. Los proyectos archivados y sus tareas quedan excluidos de las vistas activas y los recuentos.
+**Aprobación de fase 3:** accesos legítimos operativos, respuestas 401/403/404 coherentes, permisos y visibilidad por pertenencia aplicados en la API y panel integrado. Los proyectos archivados y sus tareas quedan excluidos de las vistas activas y los recuentos, y no son visibles para `User`.
 
 ## Fase 4 — Calidad, CI y versión candidata (semana 5)
 

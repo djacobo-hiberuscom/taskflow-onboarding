@@ -20,11 +20,11 @@ El responsable técnico define el problema de negocio, las restricciones y los c
 
 El producto mínimo viable (MVP) permitirá:
 
-- Consultar proyectos activos y sus tareas con un usuario autenticado y un rol admitido.
-- Crear, editar y archivar proyectos con el rol `Admin`.
-- Crear, asignar, editar y eliminar tareas con el rol `Admin`.
-- Actualizar el estado de cualquier tarea activa como `Admin`, o de las tareas propias como `Member`.
-- Filtrar tareas por proyecto, estado y prioridad, y ordenarlas por fecha de vencimiento o creación.
+- Crear proyectos con cualquier rol admitido; el creador pasa a ser miembro del proyecto.
+- Consultar únicamente los proyectos activos de los que se es miembro (creados o con alguna tarea asignada) con el rol `User`, o todos los proyectos con el rol `Admin`.
+- Crear, editar, asignar, eliminar y cambiar el estado de cualquier tarea de los proyectos visibles; asignar una tarea a un usuario lo convierte en miembro del proyecto.
+- Archivar, restaurar y eliminar proyectos, y consultar los archivados, con el rol `Admin`.
+- Filtrar tareas por proyecto, estado, prioridad y usuario asignado, y ordenarlas por fecha de vencimiento o creación.
 - Consultar las tareas asignadas al usuario actual.
 - Ver un panel con el número de proyectos activos y tareas abiertas, completadas y vencidas.
 - Aplicar los permisos en la API y reflejarlos en la interfaz.
@@ -33,12 +33,12 @@ El producto mínimo viable (MVP) permitirá:
 
 | Rol | Acciones permitidas |
 |---|---|
-| `Admin` | Gestionar proyectos, tareas y asignaciones; consultar todos los datos de los proyectos activos |
-| `Member` | Consultar todos los proyectos activos y sus tareas; actualizar únicamente el estado de las tareas que tenga asignadas |
+| `Admin` | Acceso completo: consultar y gestionar todos los proyectos, incluidos los archivados, sus tareas y asignaciones; archivar, restaurar y eliminar proyectos |
+| `User` | Crear proyectos; consultar y editar los proyectos activos de los que es miembro; gestionar todas sus tareas (crear, editar, eliminar, asignar y cambiar estado) |
 
-El MVP no incluye permisos de lectura específicos por proyecto. La consulta administrativa de proyectos archivados y sus tareas se concretará en la fase 0; su restauración es opcional. Los registros archivados se excluyen de las vistas activas y del panel.
+La visibilidad de `User` se basa en la pertenencia a proyectos (`AppUser_Project`), que se adquiere al crear un proyecto o al recibir una tarea asignada en él. Los proyectos archivados se excluyen de las vistas activas y del panel, y dejan de ser visibles para `User`. El detalle está en los [requisitos funcionales §3](../02-requirements/functional-requirements.md).
 
-Las dudas o propuestas de funcionalidad se registrarán como incidencias antes de implementarse. Quedan fuera del MVP: comentarios, notificaciones, colaboración en tiempo real, archivos adjuntos, facturación, gestión de múltiples organizaciones, aplicación móvil y gestión avanzada de miembros por proyecto.
+Las dudas o propuestas de funcionalidad se registrarán como incidencias antes de implementarse. Quedan fuera del MVP: comentarios, notificaciones, colaboración en tiempo real, archivos adjuntos, facturación, gestión de múltiples organizaciones, aplicación móvil, roles dentro de un proyecto y gestión manual de miembros.
 
 ## 3. Tecnologías previstas
 

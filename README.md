@@ -21,20 +21,21 @@ Desarrollar TaskFlow permitirá practicar el ciclo completo de entrega de softwa
 
 El producto mínimo viable (MVP) incluirá:
 
-- **Proyectos:** creación, consulta, edición y archivado sin eliminar sus datos.
-- **Tareas:** creación, consulta, edición, eliminación y asignación a usuarios.
+- **Proyectos:** creación, consulta, edición, archivado y restauración; eliminación definitiva reservada a `Admin`.
+- **Pertenencia:** cada usuario ve los proyectos que ha creado o en los que tiene tareas asignadas; asignar una tarea añade al usuario como miembro.
+- **Tareas:** creación, consulta, edición, eliminación, asignación y cambio de estado por cualquier miembro del proyecto.
 - **Seguimiento:** estados Pendiente, En curso y Completada; prioridades Baja, Media y Alta; fecha de vencimiento opcional.
-- **Búsqueda de trabajo:** filtros por proyecto, estado y prioridad, y ordenación por fecha de vencimiento o creación.
+- **Búsqueda de trabajo:** filtros por proyecto, estado, prioridad y usuario asignado, y ordenación por fecha de vencimiento o creación.
 - **Mis tareas:** vista de las tareas asignadas al usuario actual.
-- **Panel de indicadores:** proyectos activos y tareas abiertas, completadas y vencidas.
+- **Panel de indicadores:** proyectos activos y tareas abiertas, completadas y vencidas, acotados a lo que cada usuario puede ver.
 - **Acceso por roles:** inicio y cierre de sesión con Keycloak y permisos aplicados en la API.
 
 | Rol | Permisos principales |
 |---|---|
-| `Admin` | Gestionar proyectos, tareas y asignaciones; cambiar el estado de cualquier tarea de un proyecto activo |
-| `Member` | Consultar proyectos activos y sus tareas; cambiar únicamente el estado de las tareas que tenga asignadas |
+| `Admin` | Acceso completo a todos los proyectos, incluidos los archivados, y a sus tareas; archivar, restaurar y eliminar proyectos |
+| `User` | Crear proyectos; ver y editar los proyectos activos de los que es miembro (creados o con tareas asignadas) y gestionar todas sus tareas |
 
-Ambos roles podrán consultar el panel y su vista de tareas propias. El detalle del alcance y los criterios de aceptación se recoge en los [requisitos funcionales](docs/02-requirements/functional-requirements.md).
+Ambos roles podrán consultar el panel y su vista de tareas propias. Los proyectos archivados no son visibles para `User`. El detalle del alcance y los criterios de aceptación se recoge en los [requisitos funcionales](docs/02-requirements/functional-requirements.md).
 
 ## Tecnologías previstas
 
@@ -75,6 +76,12 @@ Cada fase contará con entregables, evidencias y revisión del responsable técn
 | [Seguimiento y evolución](docs/01-onboarding/evolution.md) | Evidencias de progreso y plantillas de revisión |
 | [Requisitos funcionales](docs/02-requirements/functional-requirements.md) | Funcionalidades, reglas de negocio y criterios de aceptación |
 | [Visión general del sistema](docs/03-architecture/system-overview.md) | Arquitectura propuesta, componentes, datos, seguridad y despliegue |
+| [Modelo de datos](docs/03-architecture/database.md) | Entidades, relaciones, integridad, borrado e índices |
+| [Autenticación y permisos](docs/03-architecture/authentication.md) | Flujo OIDC, Keycloak, roles, vigencia de tokens y autorización por pertenencia |
+| [Frontend](docs/03-architecture/frontend.md) | Estructura de la SPA, páginas y rutas, consultas, vencimiento y recorridos de usuario |
+| [Despliegue en AWS](docs/03-architecture/deployment-aws.md) | Comparación de opciones, propuesta, seguridad, costes y retirada |
+| [Decisiones arquitectónicas (ADR)](docs/03-architecture/adr/README.md) | Índice, plantilla y decisiones propuestas |
+| [Contrato de la API](docs/05-api/api-contracts.md) | Endpoints, datos, validaciones, códigos HTTP y errores |
 
 ## Estado actual
 

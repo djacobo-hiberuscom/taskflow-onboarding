@@ -2,6 +2,8 @@
 
 > **Estado:** propuesta inicial pendiente de revisión y aprobación
 >
+> **Última revisión:** 2026-10-22 — roles `Admin`/`User`, pertenencia a proyectos (`AppUser_Project`) y nuevo modelo de datos
+>
 > **Fase:** 0 — análisis y diseño
 >
 > **Responsables:** desarrolladores de backend y frontend; revisión del responsable técnico
@@ -12,7 +14,7 @@
 
 Este documento propone la arquitectura de TaskFlow, una aplicación web de gestión de proyectos y tareas para el programa de incorporación técnica. Describe responsabilidades, comunicaciones, seguridad, persistencia y organización prevista del repositorio.
 
-**Actualmente solo existen el README y la documentación de planificación.** Todavía no hay código de backend o frontend, manifiestos de infraestructura, migraciones, pruebas ni flujos de CI. Las carpetas, componentes y decisiones que se proponen a continuación no deben interpretarse como funcionalidades implementadas o como una arquitectura ya aprobada.
+**Actualmente solo existen el README y la documentación de planificación y diseño** (requisitos, esta visión general, [modelo de datos](database.md), [autenticación](authentication.md), [despliegue AWS](deployment-aws.md), [frontend](frontend.md), [ADR](adr/README.md) y [contrato de API](../05-api/api-contracts.md), todos en borrador). Todavía no hay código de backend o frontend, manifiestos de infraestructura, migraciones, pruebas ni flujos de CI. Las carpetas, componentes y decisiones que se proponen a continuación no deben interpretarse como funcionalidades implementadas o como una arquitectura ya aprobada.
 
 La fase 0 debe cerrar las decisiones pendientes de la sección 11 y completar los documentos indicados en el [plan de trabajo](../01-onboarding/roadmap.md) antes de comenzar la implementación.
 
@@ -24,7 +26,7 @@ Se propone una SPA React y una única API ASP.NET Core, organizada en capas, con
 |---|---|---|
 | SPA React + TypeScript | Pantallas, formularios, navegación, sesión en el navegador y llamadas a la API | No accede a PostgreSQL ni determina los permisos efectivos |
 | API ASP.NET Core | Validación de solicitudes, casos de uso, autorización, consultas y persistencia de negocio | No almacena contraseñas ni emite sus propios tokens de usuario |
-| PostgreSQL de TaskFlow | Proyectos, tareas y referencias locales a usuarios asignables | Accesible por la API; sin acceso directo desde el navegador |
+| PostgreSQL de TaskFlow | Proyectos, tareas, pertenencias a proyectos y referencias locales a usuarios | Accesible por la API; sin acceso directo desde el navegador |
 | Keycloak | Autenticación, sesión de identidad, roles y emisión de tokens | Su administración queda fuera de la interfaz del MVP |
 | Base de datos de Keycloak | Configuración e información persistente del proveedor de identidad | Separada lógicamente de los datos de negocio y gestionada por Keycloak |
 
@@ -52,6 +54,7 @@ La SPA se ejecuta en el navegador. Vite se usará para desarrollo y compilación
 ```text
 taskflow-onboarding/
 ├── README.md
+├── backend.md              # borrador de backend (pendiente de mover a docs/03-architecture/)
 └── docs/
     ├── 01-onboarding/
     │   ├── overview.md
@@ -60,8 +63,18 @@ taskflow-onboarding/
     │   └── evolution.md
     ├── 02-requirements/
     │   └── functional-requirements.md
-    └── 03-architecture/
-        └── system-overview.md
+    ├── 03-architecture/
+    │   ├── system-overview.md
+    │   ├── database.md
+    │   ├── authentication.md
+    │   ├── deployment-aws.md
+    │   ├── frontend.md
+    │   └── adr/
+    │       ├── README.md
+    │       ├── 0001-pertenencia-a-proyectos.md
+    │       └── 0002-borrado-fisico.md
+    └── 05-api/
+        └── api-contracts.md
 ```
 
 ### Estructura de implementación propuesta
@@ -114,7 +127,7 @@ Estas capas podrán agruparse en menos proyectos si el equipo justifica que redu
 ### Frontend
 
 - **`app/`:** arranque, proveedores de autenticación y consultas, navegación con TanStack Router y estructura general.
-- **`features/`:** proyectos, tareas, vista «Mis tareas» y panel, con sus pantallas, formularios y consultas.
+- **`features/`:** proyectos (incluida la vista de archivados para `Admin`), tareas, vista «Mis tareas» y panel, con sus pantallas, formularios y consultas.
 - **`components/`:** componentes visuales reutilizables, incluidos los basados en shadcn/ui.
 - **`lib/`:** cliente HTTP tipado, configuración pública y utilidades compartidas.
 
@@ -138,45 +151,123 @@ La identidad para comprobar asignaciones procederá del `sub` del token validado
 
 ## 5. Autorización y reglas de acceso
 
-| Operación | `Admin` | `Member` |
+La autorización combina dos comprobaciones en el servidor:
+
+1. **Por rol:** el token validado debe contener `Admin` o `User`; algunas operaciones exigen `Admin`.
+2. **Por recurso (pertenencia):** para `User`, el proyecto debe estar activo y el usuario debe figurar en `AppUser_Project` para ese proyecto. Las tareas heredan la visibilidad de su proyecto.
+
+| Operación | `Admin` | `User` |
 |---|---|---|
-| Consultar proyectos activos, tareas y panel | Permitida | Permitida |
-| Crear, editar o archivar proyectos | Permitida | Denegada |
-| Crear, editar, eliminar o asignar tareas | Permitida | Denegada |
-| Cambiar estado de una tarea de un proyecto activo | Permitida | Solo si está asignada a su identidad |
+| Listar y consultar proyectos activos y sus tareas | Todos | Solo proyectos de los que es miembro |
+| Consultar y restaurar proyectos archivados | Permitida | Denegada (403 en la operación; 404 al leer el proyecto) |
+| Crear proyecto | Permitida | Permitida; queda como creador y miembro |
+| Editar nombre y descripción de un proyecto | Cualquiera | Proyectos activos de los que es miembro |
+| Archivar o eliminar proyecto | Permitida | Denegada (403) |
+| Crear, editar, eliminar, asignar y cambiar estado de tareas | Cualquier proyecto | Proyectos activos de los que es miembro |
 | Consultar «Mis tareas» | Sus tareas | Sus tareas |
+| Panel | Todos los proyectos activos | Sus proyectos visibles |
 
-No se propone una entidad de pertenencia a proyectos para el MVP, dado que ambos roles pueden leer todos los proyectos activos. Las tareas sin asignar son visibles, pero `Member` no puede cambiar su estado. Las identidades sin un rol admitido no ejecutarán operaciones de negocio.
+Se propone resolver la visibilidad **en la propia consulta** y no filtrando después en memoria: las consultas de `User` partirán de sus pertenencias (`AppUser_Project` unido a `Project` no archivado), de modo que un identificador ajeno no devuelva datos. Un caso de uso de `Application` cargará el proyecto ya filtrado por visibilidad; si no existe para ese usuario, devolverá «no encontrado» (HTTP 404), sin distinguir entre «no existe» y «no eres miembro». Para operaciones reservadas a `Admin` sobre proyectos visibles se devolverá HTTP 403. Esta convención está pendiente de confirmación (§11).
 
-La comprobación de asignación se realizará en el servidor, comparando la identidad autenticada con la referencia almacenada de la tarea. Los DTO de actualización de estado solo admitirán ese cambio; no se reutilizará un DTO de edición general que permita a `Member` alterar título, prioridad o asignación.
+La identidad para cualquier comprobación procede del `sub` del token validado, resuelto a su `AppUser`. Nunca se aceptará un identificador de usuario o de creador enviado por la SPA como prueba de identidad. Las altas de pertenencia (al crear un proyecto o al asignar una tarea a un no miembro) se harán en el servidor, en la misma transacción que la operación que las origina.
 
-La API distinguirá HTTP 401 para autenticación ausente o inválida, HTTP 403 para un usuario autenticado sin permisos y HTTP 404 para registros inexistentes. El contrato definirá la respuesta de validación y los errores de reglas de negocio. CORS limitará los orígenes del navegador autorizados a llamar a la API; no sustituirá la autenticación ni la autorización.
+Se mantendrán DTO específicos por operación: el cambio de estado tendrá su propia operación y su propio DTO, separada de la edición general y de la asignación. Ya no es una barrera de seguridad entre roles —`User` puede editar todos los campos de las tareas de sus proyectos—, pero simplifica validación, pruebas e invalidación de consultas en la interfaz.
+
+La API distinguirá HTTP 401 para autenticación ausente o inválida, HTTP 403 para un usuario autenticado sin el rol o permiso requerido sobre un recurso visible y HTTP 404 para registros inexistentes o no visibles. El contrato definirá la respuesta de validación y los errores de reglas de negocio. CORS limitará los orígenes del navegador autorizados a llamar a la API; no sustituirá la autenticación ni la autorización.
 
 ## 6. Modelo de datos propuesto
 
-| Entidad | Campos principales previstos | Relaciones y reglas |
+El modelo consta de cuatro entidades. Los nombres de columnas en `snake_case` son la propuesta inicial; tipos concretos, longitudes, índices y convenciones de nombres de tablas se desarrollan en [database.md](database.md).
+
+```mermaid
+erDiagram
+    AppUser ||--o{ AppUser_Project : "es miembro"
+    Project ||--o{ AppUser_Project : "tiene miembros"
+    Project ||--o{ Task : "contiene"
+    AppUser ||--o{ Project : "crea"
+    AppUser_Project |o--o{ Task : "asignada a"
+
+    AppUser {
+        id id PK
+        string keycloak_sub UK
+        string display_name
+        string email "opcional"
+    }
+    Project {
+        id id PK
+        string name
+        string description "opcional"
+        id created_by FK
+        instant archived_at "nulo si activo"
+        instant created_at
+        instant updated_at
+    }
+    AppUser_Project {
+        id user_id PK, FK
+        id project_id PK, FK
+        instant created_at
+    }
+    Task {
+        id id PK
+        id project_id FK
+        id assigned_id FK "opcional"
+        string title
+        string description "opcional"
+        enum status
+        enum priority
+        date end_at "opcional"
+        instant created_at
+        instant updated_at
+    }
+```
+
+### 6.1. Entidades
+
+| Entidad | Campos | Reglas |
 |---|---|---|
-| `Project` | Identificador, nombre, descripción, indicador de archivado, marcas de creación y modificación | Un proyecto tiene muchas tareas; archivar no elimina registros |
-| `Task` | Identificador, proyecto, título, descripción, estado, prioridad, usuario asignado opcional, vencimiento opcional y marcas temporales | Proyecto obligatorio; asignación opcional; valores de estado y prioridad limitados |
-| `ApplicationUser` | Identificador local, identificador de Keycloak (`sub`), nombre visible y correo opcional | Referencia local para asignaciones; no contiene contraseñas ni sustituye a Keycloak |
+| `AppUser` | `id`, `keycloak_sub`, `display_name`, `email` (opcional) | Referencia local a una identidad de Keycloak. `keycloak_sub` único. No contiene contraseñas ni roles. `display_name` y `email` se proponen para mostrar miembros y elegir asignados. |
+| `Project` | `id`, `name`, `description`, `created_by`, `archived_at`, `created_at`, `updated_at` | `name` obligatorio y no vacío. `created_by` → `AppUser`, lo fija el servidor. `archived_at` nulo = activo; con valor = archivado (y cuándo). |
+| `AppUser_Project` | `user_id`, `project_id`, `created_at` | Pertenencia usuario-proyecto (relación N:M). Clave primaria compuesta (`user_id`, `project_id`), que impide duplicados (BR-013). |
+| `Task` | `id`, `project_id`, `assigned_id`, `title`, `description`, `status`, `priority`, `end_at`, `created_at`, `updated_at` | `project_id` obligatorio. `assigned_id` opcional e identifica al `AppUser` asignado. `status` ∈ {`To Do`, `In Progress`, `Done`}; `priority` ∈ {`Low`, `Medium`, `High`}. `end_at` es la fecha de vencimiento. |
 
-Se propone una relación uno a muchos de `Project` a `Task` y otra de `ApplicationUser` a las tareas asignadas. `Task.ProjectId` será una clave foránea obligatoria y `Task.AssigneeId` una clave foránea opcional. No se añadirá borrado de proyectos al MVP.
+### 6.2. Relaciones
 
-Para el único emisor y realm previstos, el identificador `sub` será único en las referencias locales a usuarios. Si se admitieran varios emisores en el futuro, habría que identificar al usuario mediante la pareja emisor y sujeto. Los roles efectivos procederán de la identidad validada y no de datos enviados por la SPA.
+- **`AppUser` N:M `Project`** a través de `AppUser_Project`. Es la base de la visibilidad de `User` (BR-011).
+- **`Project` 1:N `Task`** mediante `Task.project_id`, obligatorio.
+- **`AppUser_Project` 1:N `Task`** para la asignación: la pareja (`Task.project_id`, `Task.assigned_id`) es una clave foránea compuesta hacia (`AppUser_Project.project_id`, `AppUser_Project.user_id`). Así la base de datos garantiza que una tarea solo puede asignarse a un miembro de su propio proyecto (BR-012). Con la semántica `MATCH SIMPLE` predeterminada de PostgreSQL, la restricción no se evalúa cuando `assigned_id` es nulo, lo que permite tareas sin asignar sin reglas adicionales.
+- **`AppUser` 1:N `Project`** mediante `Project.created_by`, solo como dato de autoría; la visibilidad del creador procede de su fila en `AppUser_Project`.
 
-Como solución inicial para FR-013 se propone cargar un conjunto conocido de usuarios de demostración, con correspondencia verificada entre Keycloak y `ApplicationUser`. La API expondrá a `Admin` la lista mínima necesaria para asignar tareas. Crear una referencia solo cuando un usuario inicia sesión no sería suficiente para asignarle trabajo antes de su primer acceso. La sincronización dinámica con Keycloak queda pendiente de justificar; no se accederá directamente a sus tablas internas desde la API de negocio.
+### 6.3. Integridad y ciclo de vida
+
+| Operación | Efecto propuesto en datos |
+|---|---|
+| Crear proyecto | Inserta `Project` y la fila de pertenencia del creador en una transacción. |
+| Asignar tarea a un no miembro | Inserta la pertenencia si no existe (operación idempotente, p. ej. inserción que ignora el conflicto de clave) y actualiza `Task.assigned_id` en la misma transacción. |
+| Desasignar o reasignar | Actualiza `assigned_id`; la pertenencia anterior se conserva (§8 de requisitos, cuestión 10). |
+| Archivar / restaurar proyecto | Fija o anula `archived_at`; no toca tareas ni pertenencias. |
+| Eliminar tarea | Borrado físico, sin marca de borrado ([ADR-0002](adr/0002-borrado-fisico.md), propuesto). |
+| Eliminar proyecto | Borrado físico; `ON DELETE CASCADE` desde `Project` hacia tareas y pertenencias ([database.md §4](database.md)). |
+| Eliminar una pertenencia con tareas asignadas | Restringido por la clave compuesta; no es una operación del MVP. |
+
+Para el único emisor y realm previstos, `keycloak_sub` será único. Si se admitieran varios emisores en el futuro, habría que identificar al usuario mediante la pareja emisor y sujeto. Los roles efectivos procederán de la identidad validada y no de datos almacenados en `AppUser` ni enviados por la SPA.
+
+Como solución inicial para FR-013 se propone cargar un conjunto conocido de usuarios de demostración, con correspondencia verificada entre Keycloak y `AppUser`. La API expondrá a `Admin` y a `User` la lista mínima necesaria para asignar tareas (identificador y nombre visible). Crear una referencia solo cuando un usuario inicia sesión no sería suficiente para asignarle trabajo antes de su primer acceso. La sincronización dinámica con Keycloak queda pendiente de justificar; no se accederá directamente a sus tablas internas desde la API de negocio.
+
+Índices previstos a validar en `database.md`: `AppUser.keycloak_sub` (único), `AppUser_Project.project_id` (miembros de un proyecto; la clave primaria ya cubre las consultas por usuario), `Task.project_id`, `Task.assigned_id` (para «Mis tareas») y `Project.archived_at`.
 
 **Reglas que deben cubrir implementación y pruebas:**
 
 - Rechazar nombres de proyecto y títulos vacíos o compuestos solo por espacios.
-- Crear tareas únicamente en proyectos existentes y activos.
+- Crear tareas únicamente en proyectos existentes y visibles para quien las crea.
 - Admitir solo los tres estados y las tres prioridades definidos en BR-003 y BR-004.
-- Rechazar asignaciones a usuarios desconocidos.
+- Rechazar asignaciones a usuarios desconocidos y dar de alta la pertenencia al asignar a un no miembro.
+- No duplicar pertenencias, tampoco ante asignaciones concurrentes.
+- Filtrar por pertenencia y proyecto activo todas las consultas de `User`, incluidas las de detalle, filtros, «Mis tareas» y panel.
 - Excluir proyectos archivados y sus tareas de las vistas activas, «Mis tareas» y el panel.
-- Excluir tareas eliminadas de las consultas normales y del panel, tanto si el borrado elegido es físico como lógico.
-- Conservar las asignaciones y los datos de negocio tras reiniciar los procesos o contenedores.
+- Excluir tareas y proyectos eliminados de las consultas normales y del panel, tanto si el borrado elegido es físico como lógico.
+- Conservar asignaciones, pertenencias y datos de negocio tras reiniciar los procesos o contenedores.
 
-Las marcas temporales de creación y modificación representarán instantes en UTC. Para el vencimiento se propone una fecha de calendario sin hora; la zona horaria de negocio se acordará en fase 0. Una tarea estará vencida si su fecha es anterior a la fecha de negocio actual y no está completada. Las tareas sin fecha no estarán vencidas. El modelo definitivo, tipos, longitudes, índices y concurrencia se concretarán en el futuro `database.md`.
+Las marcas temporales `created_at`, `updated_at` y `archived_at` representarán instantes en UTC. Para `end_at` se propone una fecha de calendario sin hora, pese al sufijo `_at`; se valorará renombrarla a `due_date` ([database.md §7](database.md)) para evitar confundirla con un instante. La zona horaria de negocio es `Europe/Madrid`. Una tarea estará vencida si su fecha es anterior a la fecha de negocio actual y no está completada. Las tareas sin fecha no estarán vencidas. Concurrencia optimista y demás detalles se concretarán en [database.md](database.md).
 
 ## 7. Contrato de API y trazabilidad
 
@@ -185,7 +276,9 @@ El contrato OpenAPI se acordará antes del trabajo paralelo y se versionará con
 | Área | Operaciones previstas | Requisitos |
 |---|---|---|
 | Identidad | Inicio y cierre de sesión mediante Keycloak; perfil actual y roles mediante datos validados | FR-001 a FR-003 |
-| Proyectos | Listar activos, consultar detalle, crear, editar y archivar | FR-004 a FR-008 |
+| Proyectos | Listar visibles, consultar detalle con miembros, crear, editar y archivar | FR-004 a FR-008, FR-023 |
+| Administración de proyectos | Listar archivados, restaurar y eliminar (solo `Admin`) | FR-021 y FR-022 |
+| Usuarios asignables | Lista mínima (identificador y nombre visible) para elegir asignado | FR-013 |
 | Tareas | Crear, listar, consultar, editar, eliminar, asignar y cambiar estado | FR-009 a FR-014 |
 | Consultas de tareas | Filtros, ordenación y vista del usuario actual | FR-015 y FR-016 |
 | Panel | Recuentos coherentes de proyectos y tareas visibles | FR-017 |
@@ -211,7 +304,7 @@ Los comandos concretos de arranque y pruebas se añadirán cuando exista una imp
 
 ## 9. Despliegue previsto en AWS
 
-El diseño definitivo, región, presupuesto y recursos se aprobarán antes de aprovisionar. Se compararán estas opciones en el futuro `deployment-aws.md`:
+El diseño definitivo, región, presupuesto y recursos se aprobarán antes de aprovisionar. La comparación detallada y la propuesta (opción sencilla) están en [deployment-aws.md](deployment-aws.md):
 
 | Opción | Servicios y distribución | Ventajas y costes operativos que evaluar |
 |---|---|---|
@@ -228,14 +321,15 @@ La estimación incluirá todos los recursos seleccionados, las alertas de presup
 
 La estrategia prevista utilizará xUnit para backend y Vitest con React Testing Library para frontend, además de pruebas de integración de ASP.NET Core. Se comprobarán, al menos:
 
-- Reglas de nombres, estados, prioridades, asignación y archivado.
-- Persistencia y relaciones con PostgreSQL, incluidas migraciones desde una base vacía.
-- HTTP 401 para tokens ausentes o inválidos, y HTTP 403 para roles o asignaciones insuficientes.
+- Reglas de nombres, estados, prioridades, asignación, pertenencia, archivado y eliminación.
+- Persistencia y relaciones con PostgreSQL, incluidas migraciones desde una base vacía, la clave foránea compuesta de asignación y el borrado de proyectos con sus tareas y pertenencias.
+- HTTP 401 para tokens ausentes o inválidos, HTTP 403 para operaciones de `Admin` invocadas por `User` y HTTP 404 para proyectos o tareas no visibles.
 - Rechazo de tokens con firma, emisor o audiencia incorrectos y de tokens caducados.
-- Creación y asignación por `Admin` y cambio de estado propio por `Member`.
-- Denegación del cambio de estado de tareas ajenas o sin asignar y de la edición de otros campos por `Member`.
+- Creación de proyectos por `User` con alta automática como miembro; asignación a un no miembro con alta de pertenencia y sin duplicados.
+- Gestión completa de tareas por cualquier miembro, y denegación a no miembros por todas las vías (detalle, listas, filtros, panel, edición directa por identificador).
+- Pérdida de visibilidad al archivar y recuperación al restaurar; consulta de archivados solo por `Admin`.
 - Formularios, errores, estados de carga y vacío, y limpieza de datos de la sesión.
-- Filtros, ordenación, «Mis tareas» e indicadores, incluidos límites de fecha y exclusión de datos archivados o eliminados.
+- Filtros, ordenación, «Mis tareas» e indicadores por rol, incluidos límites de fecha y exclusión de datos archivados o eliminados.
 - Recorridos de aceptación completos con los servicios locales y en AWS, sin respuestas simuladas en la entrega.
 
 GitHub Actions deberá compilar y probar ambos componentes y generar los artefactos de entrega. El despliegue se realizará con una versión identificable y una guía reproducible. Estas comprobaciones son trabajo previsto: actualmente no existen pruebas ni CI que permitan acreditar una implementación.
@@ -247,9 +341,10 @@ GitHub Actions deberá compilar y probar ambos componentes y generar los artefac
 | Versiones y capas | Elegir versiones compatibles y con soporte; confirmar distribución de proyectos | Ambos desarrolladores |
 | Contrato HTTP | Rutas, DTO, validación, errores y representación de estados y prioridades | Backend, con revisión de frontend |
 | Identidad y roles | Realm, clientes, audiencia, mapeo de roles, duración de tokens y garantías de cierre de sesión | Backend, con revisión de frontend |
-| Usuarios asignables | Confirmar datos de demostración y su correspondencia con Keycloak, o justificar otra fuente | Backend |
-| Archivado y borrado | Resolver consulta y modificación de registros archivados y borrado físico o lógico de tareas | Ambos desarrolladores y responsable técnico |
-| Datos y fechas | Modelo entidad-relación, tipos, índices, concurrencia, fecha de vencimiento y zona horaria de negocio | Backend, con revisión de frontend |
+| Usuarios asignables | Confirmar datos de demostración y su correspondencia con Keycloak, o justificar otra fuente; qué datos de usuario se exponen a `User` | Backend |
+| Pertenencia y visibilidad | Confirmar HTTP 404 para recursos no visibles; si la pertenencia se retira al quedarse sin tareas; alta idempotente ante concurrencia | Backend, con revisión de frontend y responsable técnico |
+| Archivado y borrado | Propuesto borrado físico de tareas y proyectos con cascada ([ADR-0002](adr/0002-borrado-fisico.md)); pendiente de aprobación | Ambos desarrolladores y responsable técnico |
+| Datos y fechas | Tipos de identificador, longitudes, índices, concurrencia, tipo y nombre de `end_at` (zona horaria de negocio decidida: `Europe/Madrid`) | Backend, con revisión de frontend |
 | Entorno | Puertos, resolución del emisor OIDC, configuración y comandos reproducibles | Ambos desarrolladores |
 | AWS | Comparación de opciones, arquitectura elegida, presupuesto, operación, reversión y retirada | Ambos desarrolladores y responsable técnico |
 

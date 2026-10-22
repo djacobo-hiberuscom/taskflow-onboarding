@@ -95,7 +95,7 @@ La puntuación ponderada es opcional: suma de cada puntuación multiplicada por 
 | Fase 0: arquitectura | Capas, modelo entidad-relación y propuesta de API | Estructura de interfaz, navegación y autenticación | Diagramas, ADR y comparación de opciones AWS | ☐ |
 | Fase 1: bases técnicas | API, migraciones y base de datos local | Estructura de SPA y navegación | Entorno local reproducible | ☐ |
 | Fase 2: MVP | Endpoints de proyectos y tareas con pruebas | Pantallas de gestión con datos reales | Demostración integrada con persistencia | ☐ |
-| Fase 3: seguridad | Pruebas de JWT, roles y recursos | OIDC y controles de acceso en la interfaz | Recorridos de `Admin` y `Member` | ☐ |
+| Fase 3: seguridad | Pruebas de JWT, roles y recursos | OIDC y controles de acceso en la interfaz | Recorridos de `Admin` y `User`, incluida la visibilidad por pertenencia | ☐ |
 | Fase 4: calidad | Pruebas de integración e imagen de contenedor | Pruebas de interfaz y compilación | CI y lista de comprobaciones de entrega | ☐ |
 | Fase 5: AWS | API, base de datos y registros desplegados | Interfaz desplegada y retorno de OIDC | Demostración HTTPS, reversión y retirada | ☐ |
 
