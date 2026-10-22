@@ -20,7 +20,7 @@ Se escribe un ADR cuando una decisión:
 - **Estados:** `Propuesto` → `Aceptado` o `Rechazado`; más adelante, `Sustituido por ADR-NNNN` u `Obsoleto`.
 - Un ADR aceptado no se reescribe: si la decisión cambia, se crea uno nuevo que lo sustituye y se actualiza el estado del anterior.
 - La aprobación la da el responsable técnico en la PR que cambia el estado a `Aceptado`.
-- Al aceptar un ADR se actualizan en la misma PR la [visión general del sistema](../system-overview.md), los requisitos si afectan al producto y [CLAUDE.md](../../../CLAUDE.md).
+- Al aceptar un ADR se actualizan en la misma PR la [visión general del sistema](../system-overview.md) y los requisitos si afectan al producto.
 
 ## 3. Índice
 

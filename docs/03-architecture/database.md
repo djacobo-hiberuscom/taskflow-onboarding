@@ -19,7 +19,7 @@ Decisiones recogidas del análisis (propuestas, pendientes de aprobación del re
 - La visibilidad de `User` se basa en la pertenencia a proyectos (`AppUser_Project`), que se adquiere al crear el proyecto o al recibir una tarea asignada ([ADR-0001](adr/0001-pertenencia-a-proyectos.md)).
 - Una tarea solo puede asignarse a un miembro de su proyecto, y la base de datos lo garantiza con una clave foránea compuesta (§4).
 - El borrado de tareas y de proyectos es **físico**; eliminar un proyecto elimina en cascada sus tareas y pertenencias ([ADR-0002](adr/0002-borrado-fisico.md)).
-- Al eliminar un usuario local, sus tareas se conservan y quedan sin asignar (§5).
+- Se bloquea la eliminación de un usuario local si es el último miembro de algún proyecto, activo o archivado. Cuando se permite eliminarlo, sus tareas se conservan y quedan sin asignar (§5).
 - `isOverdue` no se persiste: es un dato derivado del estado, del vencimiento y de la fecha actual de negocio (§6).
 
 **Ajuste respecto al borrador anterior:** la eliminación de tareas ya no está limitada a `Admin`; cualquier miembro de un proyecto activo puede eliminar sus tareas (FR-012, BR-007). Ahora existe la eliminación de proyectos como funcionalidad, solo para `Admin` (FR-021).
@@ -29,7 +29,7 @@ Decisiones recogidas del análisis (propuestas, pendientes de aprobación del re
 ```mermaid
 erDiagram
     APP_USER ||--o{ APP_USER_PROJECT : "es miembro"
-    PROJECT ||--o{ APP_USER_PROJECT : "tiene miembros"
+    PROJECT ||--|{ APP_USER_PROJECT : "tiene miembros"
     PROJECT ||--o{ TASK : contiene
     APP_USER |o--o{ PROJECT : crea
     APP_USER_PROJECT |o--o{ TASK : "asignada a"
@@ -76,7 +76,7 @@ erDiagram
 
 | Relación | Cardinalidad y regla |
 |---|---|
-| `AppUser` ↔ `Project` | N:M a través de `AppUser_Project`. Un usuario es miembro de cero o muchos proyectos; un proyecto tiene uno o más miembros (al menos su creador, mientras exista). |
+| `AppUser` ↔ `Project` | N:M a través de `AppUser_Project`. Un usuario es miembro de cero o muchos proyectos; todo proyecto existente tiene uno o más miembros. Se bloquea la eliminación de un usuario si dejaría algún proyecto sin miembros. |
 | `Project` → `Task` | Un proyecto tiene cero o muchas tareas. Cada tarea pertenece exactamente a un proyecto y no puede cambiar de proyecto (BR-001). |
 | `AppUser_Project` → `Task` | Una pertenencia tiene cero o muchas tareas asignadas. Cada tarea está sin asignar o asignada a un único miembro de su proyecto (BR-012). |
 | `AppUser` → `Project` (`created_by`) | Dato de autoría. No determina la visibilidad: la da la fila de pertenencia del creador. |
@@ -177,8 +177,12 @@ No se añade `created_by` a `Task`, ya que los requisitos no lo exigen. La tarea
 | Archivar proyecto | `archived_at = ahora (UTC)`. | No toca tareas ni pertenencias. |
 | Restaurar proyecto | `archived_at = NULL`. | Los miembros vuelven a verlo. |
 | Eliminar tarea | `DELETE` físico de la fila. | Sin `deleted_at`. No afecta a la pertenencia del asignado. |
-| Eliminar proyecto | `DELETE` físico del proyecto; cascada a tareas y pertenencias. | Solo `Admin`. Se verificará en pruebas que la cascada simultánea sobre `task` y `app_user_project` termina sin violar la FK compuesta. |
-| Eliminar usuario local | Cascada a sus pertenencias; sus tareas quedan sin asignar; `created_by` de sus proyectos pasa a `NULL`. | No es una operación del MVP; documenta la integridad si se ejecuta. |
+| Eliminar proyecto | `DELETE` físico del proyecto; cascada a tareas y pertenencias. | Solo `Admin`, tanto activo como archivado. Puede eliminarse aunque tenga un único miembro: el mínimo de miembros no bloquea el borrado del propio proyecto. Se verificará la cascada con tareas asignadas. |
+| Eliminar usuario local | Si es el último miembro de algún proyecto, se rechaza toda la operación y se informa de que no puede eliminarse hasta incorporar otro miembro. En otro caso, se eliminan sus pertenencias, sus tareas quedan sin asignar y `created_by` de sus proyectos pasa a `NULL`. | No se añade un endpoint al MVP. El procedimiento de borrado local debe garantizar la comprobación y los cambios de forma atómica, también ante borrados concurrentes. |
+
+La comprobación del último miembro se aplica a todos los proyectos existentes del usuario, incluidos los archivados. Si alguno quedaría sin miembros, no se elimina el usuario ni se modifica ninguna de sus tareas, autorías o pertenencias. Primero deberá incorporarse otro miembro por un mecanismo permitido y después repetirse la eliminación.
+
+Las claves foráneas y sus cascadas no garantizan por sí solas el mínimo de un miembro. Falta concretar la protección transaccional o de base de datos que impedirá dejar un proyecto existente sin miembros, también si se eliminan usuarios concurrentemente. Esta protección debe distinguir la eliminación de usuario de la eliminación del propio proyecto para no impedir la cascada autorizada de este último.
 
 Eliminar una identidad en Keycloak no borra la fila de `AppUser`: son almacenes independientes. Falta definir el tratamiento de identidades eliminadas o deshabilitadas en Keycloak (§7).
 
@@ -241,6 +245,7 @@ Se validarán con los planes de ejecución de las consultas reales; no se añadi
 | Fechas | Confirmar `end_at` como fecha sin hora y su posible renombrado a `due_date`. Zona horaria de negocio decidida: `Europe/Madrid`. |
 | Versión de PostgreSQL | Confirmar soporte de `ON DELETE SET NULL (columna)` (PostgreSQL 15 o posterior) o la alternativa. |
 | Usuarios | Preparación y actualización de referencias de demostración; identidades eliminadas o deshabilitadas en Keycloak. |
+| Protección del último miembro | Regla decidida: bloquear el borrado del usuario si dejaría un proyecto sin miembros. Falta concretar el mecanismo de garantía transaccional o de base de datos, sin bloquear la eliminación del propio proyecto. |
 | Pertenencias | Si se retiran al quedarse sin tareas un usuario que no creó el proyecto (requisitos §8, cuestión 10). |
 | Concurrencia | Ediciones simultáneas y uso de un token de concurrencia (p. ej. `xmin` de PostgreSQL con EF Core). |
 | Migraciones | Esquema físico y su aplicación con migraciones de EF Core, incluidas pruebas desde base vacía. |
