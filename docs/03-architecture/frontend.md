@@ -6,7 +6,9 @@
 >
 > **Estado:** borrador de fase 0; propuesta pendiente de revisión. No hay código de frontend implementado.
 >
-> **Última revisión:** 2026-10-22 — registro mediante Keycloak, Archivados como popup, zona horaria `Europe/Madrid`, paginación, mensajes en `es-ES`, Bruno para comprobar la API
+> **Última revisión:** 2026-10-23 — acuerdos de autenticación con sesión máxima de 10 horas, contrato, validadores, reintentos y desarrollo con Aspire
+>
+> **Coherencia:** los documentos del manager permanecen sin cambios hasta su aprobación; diferencias y seguimiento en [documentation-alignment.md](documentation-alignment.md).
 >
 > **Fuentes:** [requisitos funcionales](../02-requirements/functional-requirements.md) · [visión general del sistema §3](system-overview.md) · [autenticación](authentication.md) · [contrato de API](../05-api/api-contracts.md)
 
@@ -51,7 +53,7 @@ frontend/
     │   └── common/             # ConfirmDialog, EmptyState, ErrorState, Loading, badges de estado/prioridad
     └── lib/
         ├── api/                # cliente HTTP tipado, tipos del contrato, mapeo de errores Problem Details
-        ├── auth/               # integración con Keycloak (keycloak-js u otra biblioteca OIDC aprobada)
+        ├── auth/               # integración con Keycloak mediante keycloak-js
         ├── query-keys.ts       # claves de consulta centralizadas
         ├── dates.ts            # fecha de negocio e isOverdue
         └── config.ts           # lectura de variables VITE_* públicas
@@ -68,7 +70,9 @@ Cada carpeta de `features/` agrupa sus pantallas, formularios, hooks de consulta
 | `VITE_KEYCLOAK_REALM` | Realm |
 | `VITE_KEYCLOAK_CLIENT_ID` | Cliente público de la SPA |
 
-Ningún secreto puede ir en estas variables.
+Ningún secreto puede ir en estas variables. En desarrollo, Aspire AppHost iniciará Vite e inyectará sus valores públicos; estos deben apuntar a las URL accesibles desde el navegador. La configuración del entorno está en [environment-setup.md](../04-development/environment-setup.md).
+
+Acuerdos de integración: SPA `http://localhost:5173`, callback `/callback`, retorno del logout a `/`, API `http://localhost:5080` y Keycloak `http://localhost:8080`; realm `taskflow`, cliente `taskflow-spa` y audiencia de API `taskflow-api`. Se utilizará `keycloak-js`, con tokens solo en memoria, access token de 5 minutos, sesión SSO con 30 minutos de inactividad de sesión y 10 horas máximas. Se activa rotación y renovación coordinada antes de las peticiones cuando queden menos de 30 segundos de token. El logout finaliza la sesión en Keycloak y limpia tokens y caché de la SPA. La API comprueba la revocación mediante introspección en cada petición protegida, según [authentication.md §5](authentication.md); el cliente confidencial y su secreto permanecen en backend.
 
 ## 3. Mapa de páginas
 
@@ -220,7 +224,8 @@ El rol se obtiene de `GET /api/v1/me`.
 
 `lib/api` expone funciones tipadas según el [contrato](../05-api/api-contracts.md):
 
-- Añade `Authorization: Bearer <access token>` y, si el token está a punto de caducar, lo renueva antes de enviar.
+- Añade `Authorization: Bearer <access token>` y renueva antes de enviar si quedan menos de 30 segundos; comparte una sola renovación simultánea por instancia de SPA y conserva el refresh token nuevo.
+- Consulta `GET /api/v1/me` después del login y tras renovar el token, para actualizar perfil y roles. Los UUID se tratan como identificadores opacos.
 - Convierte las respuestas de error (Problem Details) en un error tipado con `status` y, en los 400, `errors` por campo.
 - Mientras el backend no esté listo, se pueden usar **simulaciones tipadas** del contrato, que se retiran antes de la entrega.
 
@@ -237,7 +242,7 @@ El rol se obtiene de `GET /api/v1/me`.
 | `['my-tasks', { filtros, sort, page }]` | `GET /api/v1/me/tasks` | MisTask |
 | `['users', 'assignable']` | `GET /api/v1/users/assignable` | Selector de asignado |
 
-**Paginación.** Las listas de proyectos y tareas están paginadas ([contrato §6](../05-api/api-contracts.md)). Se usa `placeholderData: keepPreviousData` para que la tabla no parpadee al cambiar de página, y la interfaz muestra el total (`totalCount`) y los controles de página. Si tras eliminar el último elemento de una página esta queda vacía, se vuelve a la anterior.
+**Paginación.** Las listas de proyectos y tareas usan `page` desde 1, tamaño predeterminado de 20 y máximo de 100 ([contrato §6](../05-api/api-contracts.md)). El backend filtra y ordena el conjunto completo antes de paginar; la SPA solicita el nuevo orden al servidor. Se usa `placeholderData: keepPreviousData` para que la tabla no parpadee al cambiar de página, y la interfaz muestra el total (`totalCount`) y los controles de página. Si tras eliminar el último elemento de una página esta queda vacía, se vuelve a la anterior.
 
 ### 4.3. Invalidación tras mutaciones
 
@@ -256,12 +261,15 @@ Para el cambio de estado se puede aplicar una actualización optimista con rever
 | Respuesta | Comportamiento |
 |---|---|
 | 400 | Mostrar los errores en los campos del formulario |
-| 401 | Intentar renovar el token una vez; si falla, ir a Timeout |
+| 401 | Para lecturas, renovar una vez y repetir si procede; las escrituras enviadas no se reenvían automáticamente. Si ya no se puede renovar la sesión, ir a Timeout y ofrecer login |
 | 403 | Aviso en la pantalla actual; si es por falta de rol, ir a `/403` |
 | 404 | Al cargar un detalle, página 404; tras una mutación, aviso y volver a la lista |
-| 5xx / red | Mensaje genérico con opción de reintentar, sin detalles técnicos (FR-018) |
+| 503 por introspección | Mostrar indisponibilidad temporal de autenticación, sin tratarla como una sesión caducada ni borrar la sesión por ese código. La operación protegida no se ha ejecutado; las escrituras no se reenvían automáticamente. |
+| Otros 5xx / red | Mensaje genérico; reintento limitado para lecturas. En escrituras, informar del resultado incierto y comprobar los datos antes de repetir una creación |
 
-Los 4xx no se reintentan automáticamente; los errores de red sí, con pocos reintentos. Al **cerrar sesión** o caducar la sesión se ejecuta `queryClient.clear()` además de borrar los tokens (FR-002).
+No se configura un reintento general de mutaciones. Los reintentos automáticos limitados de red se reservan a lecturas; los errores 4xx mantienen el tratamiento específico anterior. Al **cerrar sesión** o caducar la sesión se ejecuta `queryClient.clear()` además de borrar los tokens (FR-002).
+
+La API aplica 404 antes de exigir permisos administrativos sobre un recurso que no es visible; la SPA muestra el mismo mensaje de recurso no encontrado. Listar archivados como `User` devuelve 403; una lista ordinaria vacía sigue siendo 200. Para ediciones se acepta última escritura gana, sin diálogo de conflicto basado en versiones.
 
 ## 5. Tareas vencidas y zona horaria
 
@@ -274,10 +282,13 @@ isOverdue = dueDate tiene valor y dueDate < fechaDeNegocio y status != Done
 - `dueDate` es una fecha de calendario (`YYYY-MM-DD`): se compara como texto o como fecha sin hora, **nunca** convirtiéndola a un instante con la zona del navegador.
 - `fechaDeNegocio` es la fecha actual en la zona horaria de negocio **`Europe/Madrid`**, independientemente de la zona del navegador del usuario (p. ej. con `Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Madrid' })`, que devuelve `YYYY-MM-DD`). Coincide con la `businessDate` que devuelve `GET /api/v1/dashboard`.
 - Los instantes (`createdAt`, `updatedAt`, `archivedAt`) llegan en UTC y se muestran convertidos a `Europe/Madrid` con formato `es-ES`.
+- Al cambiar el día de negocio y al recuperar el foco se actualiza la fecha de referencia, se recalculan los indicadores por tarea y se refresca el panel. El temporizador se calcula para `Europe/Madrid`, no para la medianoche del navegador.
 
 ## 6. Formularios y estados de la interfaz
 
-- Validación en el cliente con las mismas reglas que la API (nombre y título obligatorios y no vacíos; valores de estado y prioridad cerrados); la API sigue siendo la autoridad y sus errores 400 se muestran en los campos tal como llegan, porque la API ya los devuelve en español (`es-ES`).
+- Validación con las reglas del [contrato §5](../05-api/api-contracts.md): nombre de proyecto de 1–150 caracteres, título de tarea de 1–200 y descripciones opcionales de hasta 5.000, tras recortar espacios. Nombres y títulos pueden repetirse.
+- El estado inicial es `ToDo` si se omite al crear; prioridad obligatoria; vencimiento y asignado opcionales. Una tarea tiene como máximo un asignado. La fecha usa `YYYY-MM-DD` y admite fechas pasadas.
+- En PUT de edición se envían los obligatorios y `null` para opcionales vacíos; no se envían propiedades protegidas o desconocidas porque la API las rechaza con 400. La API mantiene la autoridad y sus mensajes por campo llegan en `es-ES`.
 - Toda la interfaz está en `es-ES`: textos, fechas (`dd/mm/aaaa`) y números.
 - Botones de envío desactivados mientras la mutación está en curso, para evitar envíos duplicados.
 - Estados claros en todas las listas: carga, vacío (con acción sugerida, p. ej. «Crea tu primer proyecto») y error.
@@ -305,7 +316,7 @@ Correspondencia de los recorridos de aceptación ([requisitos §6](../02-require
 
 ## 9. Decisiones pendientes
 
-### Decididas (2026-10-22)
+### Decididas durante el análisis
 
 | Decisión | Resultado |
 |---|---|
@@ -315,10 +326,15 @@ Correspondencia de los recorridos de aceptación ([requisitos §6](../02-require
 | Paginación de listas | Sí ([contrato §6](../05-api/api-contracts.md)) |
 | Idioma de la interfaz y de los mensajes de validación | `es-ES` |
 | Comprobación de la API | Bruno |
+| Biblioteca OIDC | `keycloak-js`, PKCE `S256`, tokens en memoria y renovación coordinada |
+| Sesión | Access token 5 minutos; SSO inactiva 30 minutos y máxima 10 horas |
+| Perfil | Consultar `/me` tras login y renovación; roles recibidos de la API |
+| Revocación | Finalizar sesión en Keycloak; la API usa introspección por petición protegida. Inactivo → 401; fallo de comprobación → 503 |
+| Desarrollo | Aspire AppHost inicia Vite, API y contenedores de dependencias |
+| Edición y reintentos | Última escritura gana; no reintentar automáticamente escrituras ya enviadas |
 
 ### Pendientes
 
 | Decisión | Propuesta actual |
 |---|---|
-| Biblioteca OIDC | `keycloak-js` (adaptador oficial de Keycloak): soporta PKCE, `check-sso`, registro, renovación y cierre de sesión |
-| Simulación de la API en pruebas unitarias de componentes | Pendiente |
+| Simulación de la API en pruebas unitarias de componentes | Elegir al implementar las pruebas |
