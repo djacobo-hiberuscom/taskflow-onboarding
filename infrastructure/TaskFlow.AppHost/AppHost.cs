@@ -1,10 +1,4 @@
-var builder = DistributedApplication.CreateBuilder(args);using YamlDotNet.Serialization;
-
-var pgPassword = builder.AddParameter("pgPassword", secret: true);
-var appPassword = builder.AddParameter("appPassword", secret: true);
-var migratorPassword = builder.AddParameter("migratorPassword", secret: true);
-var keycloakDbPassword = builder.AddParameter("keycloakDbPassword", secret: true);
-
+var builder = DistributedApplication.CreateBuilder(args);
 
 //Base de datos
 var postgres = builder.AddPostgres("postgres")
