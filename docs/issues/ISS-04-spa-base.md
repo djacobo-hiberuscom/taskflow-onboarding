@@ -1,5 +1,6 @@
 # ISS-04 — SPA base: Vite, TanStack, shadcn, navegación, cliente tipado y simulaciones
 
+
 | Campo | Valor |
 |---|---|
 | **Épica** | [EPIC-01](../epics/EPIC-01-entorno-y-bases.md) — Entorno Aspire y bases técnicas |
