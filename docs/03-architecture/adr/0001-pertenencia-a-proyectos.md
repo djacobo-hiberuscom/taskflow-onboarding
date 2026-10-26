@@ -1,6 +1,6 @@
 # ADR-0001 — Visibilidad de proyectos por pertenencia (`AppUser_Project`)
 
-> **Estado:** Propuesto
+> **Estado:** Aprobada
 >
 > **Fecha:** 2026-10-22
 >

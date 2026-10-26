@@ -1,6 +1,6 @@
 # ADR-0002 — Borrado físico de tareas y proyectos
 
-> **Estado:** Propuesto
+> **Estado:** Aprobada
 >
 > **Fecha:** 2026-10-22
 >
