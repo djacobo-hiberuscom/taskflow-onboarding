@@ -9,4 +9,76 @@ public class Project
     public DateTimeOffset? ArchivedAt { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt  { get; private set; }
+
+    public Project(string name, string? description, Guid createdBy)
+    {
+        name = ValidateName(name);
+
+        description = ValidateDescription(description);
+
+        if (createdBy == Guid.Empty)
+        {
+            throw new ArgumentException(
+                "Se debe asignar un creador.", nameof(createdBy)
+            );
+        }
+
+        Id = Guid.NewGuid();
+        Name = name;
+        Description = description;
+        CreatedBy = createdBy;
+        CreatedAt = DateTimeOffset.UtcNow;
+        UpdatedAt = CreatedAt;
+    }
+
+    private static string ValidateName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException(
+                "El nombre del proyecto es obligatorio.", nameof(name)
+            );
+        }
+
+        name = name.Trim();
+        if(name.Length > 150)
+        {
+            throw new ArgumentException(
+                "El nombre del proyecto es demasiado largo.", nameof(name)
+            );
+        }
+
+        return name;
+    }
+
+    private static string? ValidateDescription(string? description)
+    {
+        if (string.IsNullOrWhiteSpace(description))
+        {
+            description = null;
+        }
+        else
+        {
+            description = description.Trim();
+            if(description.Length > 5000)
+            {
+                throw new ArgumentException(
+                    "La descripción es demasiado larga.", nameof(description)
+                );
+            }
+        }
+
+        return description;
+    }
+
+    public void UpdateDetails(string name, string? description)
+    {
+        name = ValidateName(name);
+        description = ValidateDescription(description);
+
+        Name = name;
+        Description = description;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
 }
+
