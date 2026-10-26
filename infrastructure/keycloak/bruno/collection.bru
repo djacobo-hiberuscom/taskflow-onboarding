@@ -1,0 +1,42 @@
+auth {
+  mode: oauth2
+}
+
+auth:oauth2 {
+  grant_type: authorization_code
+  callback_url: {{callbackUrl}}
+  authorization_url: {{keycloakUrl}}/realms/{{realm}}/protocol/openid-connect/auth
+  access_token_url: {{keycloakUrl}}/realms/{{realm}}/protocol/openid-connect/token
+  refresh_token_url: 
+  client_id: {{spaClientId}}
+  client_secret: 
+  scope: openid
+  state: 
+  pkce: true
+  credentials_placement: body
+  credentials_id: credentials
+  token_source: access_token
+  token_placement: header
+  token_header_prefix: Bearer
+  auto_fetch_token: true
+  auto_refresh_token: false
+}
+
+vars:pre-request {
+  keycloakUrl: http://localhost:8080
+  realm: taskflow
+  spaClientId: taskflow-spa
+  callbackUrl: http://localhost:5173/callback
+  apiClientId: taskflow-api
+}
+
+docs {
+  # TaskFlow — colección Bruno
+  
+  Entorno `local`. Sin secretos versionados: el secreto de `taskflow-api` se lee de
+  `bruno/.env` (copia de `.env.example`, ignorado por Git).
+  
+  El token se obtiene con OIDC Authorization Code + PKCE `S256` como cliente público
+  `taskflow-spa` (configuración OAuth 2.0 de la colección). Para cambiar de usuario,
+  cierra la sesión en Keycloak (realm `taskflow` → Sessions → Sign out) y pide otro token.
+}
