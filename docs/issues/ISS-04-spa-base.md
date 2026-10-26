@@ -11,7 +11,7 @@
 | **Requisitos** | FR-018 |
 | **Etiquetas** | `epic:EPIC-01` `area:frontend` `type:feature` `priority:P0` |
 | **Estado** | Pendiente |
-| **Issue de GitHub** | #— |
+| **Issue de GitHub** | [#6](https://github.com/djacobo-hiberuscom/taskflow-onboarding/issues/6) |
 | **Rama sugerida** | `feature/ISS-04-spa-base` |
 
 ## Contexto

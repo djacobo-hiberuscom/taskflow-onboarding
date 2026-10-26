@@ -11,7 +11,7 @@
 | **Requisitos** | FR-009, FR-010, FR-011, FR-012, FR-013, FR-014, FR-023 |
 | **Etiquetas** | `epic:EPIC-02` `area:backend` `type:feature` `priority:P0` |
 | **Estado** | Pendiente |
-| **Issue de GitHub** | #— |
+| **Issue de GitHub** | [#9](https://github.com/djacobo-hiberuscom/taskflow-onboarding/issues/9) |
 | **Rama sugerida** | `feature/ISS-07-tasks-api` |
 
 ## Contexto

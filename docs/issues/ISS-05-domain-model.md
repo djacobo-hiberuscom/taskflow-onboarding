@@ -11,7 +11,7 @@
 | **Requisitos** | FR-019, FR-013, FR-021 |
 | **Etiquetas** | `epic:EPIC-02` `area:database` `type:feature` `priority:P0` |
 | **Estado** | Pendiente |
-| **Issue de GitHub** | #— |
+| **Issue de GitHub** | [#7](https://github.com/djacobo-hiberuscom/taskflow-onboarding/issues/7) |
 | **Rama sugerida** | `feature/ISS-05-domain-model` |
 
 ## Contexto

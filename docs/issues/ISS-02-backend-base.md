@@ -11,7 +11,7 @@
 | **Requisitos** | — |
 | **Etiquetas** | `epic:EPIC-01` `area:backend` `type:feature` `priority:P0` |
 | **Estado** | Pendiente |
-| **Issue de GitHub** | #— |
+| **Issue de GitHub** | [#4](https://github.com/djacobo-hiberuscom/taskflow-onboarding/issues/4) |
 | **Rama sugerida** | `feature/ISS-02-backend-base` |
 
 ## Contexto

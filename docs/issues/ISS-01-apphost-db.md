@@ -11,7 +11,7 @@
 | **Requisitos** | FR-019 |
 | **Etiquetas** | `epic:EPIC-01` `area:infrastructure` `type:feature` `priority:P0` |
 | **Estado** | Pendiente |
-| **Issue de GitHub** | #— |
+| **Issue de GitHub** | [#3](https://github.com/djacobo-hiberuscom/taskflow-onboarding/issues/3) |
 | **Rama sugerida** | `feature/ISS-01-apphost-db` |
 
 ## Contexto

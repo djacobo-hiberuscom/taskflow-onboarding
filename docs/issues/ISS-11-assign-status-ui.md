@@ -11,7 +11,7 @@
 | **Requisitos** | FR-013, FR-014, FR-016, FR-023 |
 | **Etiquetas** | `epic:EPIC-02` `area:frontend` `type:feature` `priority:P0` |
 | **Estado** | Pendiente |
-| **Issue de GitHub** | #— |
+| **Issue de GitHub** | [#13](https://github.com/djacobo-hiberuscom/taskflow-onboarding/issues/13) |
 | **Rama sugerida** | `feature/ISS-11-assign-status-ui` |
 
 ## Contexto

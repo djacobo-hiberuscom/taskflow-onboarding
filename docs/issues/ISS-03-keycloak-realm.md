@@ -11,7 +11,7 @@
 | **Requisitos** | FR-001, FR-003 |
 | **Etiquetas** | `epic:EPIC-01` `area:identity` `type:feature` `priority:P0` |
 | **Estado** | Pendiente |
-| **Issue de GitHub** | #— |
+| **Issue de GitHub** | [#5](https://github.com/djacobo-hiberuscom/taskflow-onboarding/issues/5) |
 | **Rama sugerida** | `feature/ISS-03-keycloak-realm` |
 
 ## Contexto

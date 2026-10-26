@@ -11,7 +11,7 @@
 | **Requisitos** | FR-015, FR-016, FR-020 |
 | **Etiquetas** | `epic:EPIC-02` `area:backend` `type:feature` `priority:P0` |
 | **Estado** | Pendiente |
-| **Issue de GitHub** | #— |
+| **Issue de GitHub** | [#10](https://github.com/djacobo-hiberuscom/taskflow-onboarding/issues/10) |
 | **Rama sugerida** | `feature/ISS-08-task-queries` |
 
 ## Contexto
