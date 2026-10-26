@@ -1,14 +1,12 @@
-﻿using System.Data.Common;
-
-namespace TaskFlow.Domain;
+﻿namespace TaskFlow.Domain;
 
 public class Project
 {
-    private Guid Id { get; set; }
-    private string Name { get; set; }
-    private string? Description { get; set; }
-    private Guid CreatedBy { get; set; }
-    private DateTimeOffset ArchivedAt { get; set; }
-    private DateTimeOffset CreatedAt { get; set; }
-    private DateTimeOffset UpdatedAt  { get; set; }
+    public Guid Id { get; private set; }
+    public string Name { get; private set; }
+    public string? Description { get; private set; }
+    public Guid? CreatedBy { get; private set; }
+    public DateTimeOffset? ArchivedAt { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; }
+    public DateTimeOffset UpdatedAt  { get; private set; }
 }
