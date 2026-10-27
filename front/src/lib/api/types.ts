@@ -4,23 +4,23 @@ export interface Project{
     name: string
     description: string
     created_by: string
-    archived_at?: Date | null
-    created_at: Date
-    updated_at: Date
+    archived_at?: string | null
+    created_at: string
+    updated_at: string
 }
 
 // TAREAS
 export interface Task {
     id:string
     project_id: string
-    assigned_id:string
+    assigned_id: string
     title:string
     description: string
     status: string
     priority: string
-    due_date: Date
-    created_at: Date
-    update_at: Date
+    due_date: string
+    created_at: string
+    update_at: string
 }
 
 // USER
