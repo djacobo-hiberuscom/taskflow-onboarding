@@ -11,7 +11,7 @@ export const ProjectColum = columnHelper.columns([
     header: ({
       column
     }) => (
-      <Button variant="ghost" onClick={column.getToggleSortingHandler()}>
+      <Button variant="ghost" onClick={column.getToggleSortingHandler()} className="-ml-2.5">
         Nombre
         {column.getIsSorted() === "asc" &&  " ↑"}
         {column.getIsSorted() === "desc" && " ↓"}
@@ -22,7 +22,7 @@ export const ProjectColum = columnHelper.columns([
     header: ({
       column
     }) => (
-      <Button variant="ghost" onClick={column.getToggleSortingHandler()}>
+      <Button variant="ghost" onClick={column.getToggleSortingHandler()} className="-ml-2.5">
         Descripcion
         {column.getIsSorted() === "asc" &&  " ↑"}
         {column.getIsSorted() === "desc" && " ↓"}
@@ -36,7 +36,7 @@ export const ProjectColum = columnHelper.columns([
     header: ({
       column
     }) => (
-      <Button variant="ghost" onClick={column.getToggleSortingHandler()}>
+      <Button variant="ghost" onClick={column.getToggleSortingHandler()} className="-ml-2.5">
         Fecha de creacion 
         {column.getIsSorted() === "asc" &&  " ↑"}
         {column.getIsSorted() === "desc" && " ↓"}
@@ -47,7 +47,7 @@ export const ProjectColum = columnHelper.columns([
     header: ({
       column
     }) => (
-      <Button variant="ghost" onClick={column.getToggleSortingHandler()}>
+      <Button variant="ghost" onClick={column.getToggleSortingHandler()} className="-ml-2.5">
         Ultimo cambio
         {column.getIsSorted() === "asc" &&  " ↑"}
         {column.getIsSorted() === "desc" && " ↓"}
