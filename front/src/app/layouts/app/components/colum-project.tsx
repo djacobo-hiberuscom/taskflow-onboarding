@@ -2,23 +2,56 @@ import { createColumnHelper } from "@tanstack/react-table";
 
 import { type DataTableFeatures } from "@/components/ui/data-table/data-table-features";
 import type { Project } from "@/lib/api/types";
+import { Button } from "#components/ui/button";
 
 const columnHelper = createColumnHelper<DataTableFeatures, Project>();
 
 export const ProjectColum = columnHelper.columns([
   columnHelper.accessor("name", {
-    header: "Name",
+    header: ({
+      column
+    }) => (
+      <Button variant="ghost" onClick={column.getToggleSortingHandler()}>
+        Nombre
+        {column.getIsSorted() === "asc" &&  " ↑"}
+        {column.getIsSorted() === "desc" && " ↓"}
+      </Button>
+    ),
   }),
   columnHelper.accessor("description", {
-    header: "Description",
+    header: ({
+      column
+    }) => (
+      <Button variant="ghost" onClick={column.getToggleSortingHandler()}>
+        Descripcion
+        {column.getIsSorted() === "asc" &&  " ↑"}
+        {column.getIsSorted() === "desc" && " ↓"}
+      </Button>
+    ),
     cell: (info) => (
-      <span className="block max-w-[300px] truncate">{info.getValue()}</span>
+      <button className="block max-w-[300px] truncate" onClick={() => console.log("clic")}>{info.getValue()}</button>
     ),
   }),
   columnHelper.accessor("created_at", {
-    header: "CreatedAt",
+    header: ({
+      column
+    }) => (
+      <Button variant="ghost" onClick={column.getToggleSortingHandler()}>
+        Fecha de creacion 
+        {column.getIsSorted() === "asc" &&  " ↑"}
+        {column.getIsSorted() === "desc" && " ↓"}
+      </Button>
+    ),
   }),
   columnHelper.accessor("updated_at", {
-    header: "LastChange",
+    header: ({
+      column
+    }) => (
+      <Button variant="ghost" onClick={column.getToggleSortingHandler()}>
+        Ultimo cambio
+        {column.getIsSorted() === "asc" &&  " ↑"}
+        {column.getIsSorted() === "desc" && " ↓"}
+      </Button>
+    ),
   }),
 ]);
