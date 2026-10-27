@@ -1,7 +1,5 @@
-"use client"
-
-import { useTable, type ColumnDef, type RowData } from "@tanstack/react-table"
-
+import { useTable, type ColumnDef, type RowData } from "@tanstack/react-table";
+import { Button } from "../button";
 import {
   Table,
   TableBody,
@@ -9,13 +7,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../../components/ui/table"
+} from "../../../components/ui/table";
 
-import { features, type DataTableFeatures } from "./data-table-features"
+import { features, type DataTableFeatures } from "./data-table-features";
 
 interface DataTableProps<TData extends RowData> {
-  columns: ColumnDef<DataTableFeatures, TData>[]
-  data: TData[]
+  columns: ColumnDef<DataTableFeatures, TData>[];
+  data: TData[];
 }
 
 export function DataTable<TData extends RowData>({
@@ -26,7 +24,7 @@ export function DataTable<TData extends RowData>({
     features,
     data,
     columns,
-  })
+  });
 
   return (
     <div className="overflow-hidden rounded-md border">
@@ -41,7 +39,7 @@ export function DataTable<TData extends RowData>({
                       <table.FlexRender header={header} />
                     )}
                   </TableHead>
-                )
+                );
               })}
             </TableRow>
           ))}
@@ -69,6 +67,30 @@ export function DataTable<TData extends RowData>({
           )}
         </TableBody>
       </Table>
+      <div className="flex items-center justify-end gap-2 p-2">
+        <span className="text-xs text-muted-foreground">
+          Página {table.state.pagination.pageIndex + 1} de{" "}
+          {table.getPageCount()}
+        </span>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          Anterior
+        </Button>
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          Siguiente
+        </Button>
+      </div>
     </div>
-  )
+  );
 }
