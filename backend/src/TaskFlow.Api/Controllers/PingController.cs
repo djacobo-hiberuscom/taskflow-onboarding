@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace TaskFlow.Api.Controllers;
 
 [ApiController]
-[Route("api/ping")]
+[Route("api/v1/ping")]
 public class PingController : ControllerBase
 {
     [HttpGet]
