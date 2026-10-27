@@ -42,7 +42,7 @@ const today = new Intl.DateTimeFormat("es-ES", {
   timeZone: "Europe/Madrid",
 }).format(new Date());
 
-/** Marca: tres barras con relleno creciente, una por estado (To Do → In Progress → Done). */
+
 function BrandMark() {
   return (
     <span
@@ -106,7 +106,6 @@ export function AppLayout() {
   return (
     <SidebarProvider>
       <Sidebar>
-        {/* Fondo explícito: también aplica en el panel móvil, que se renderiza en un portal */}
         <div className="flex size-full flex-col bg-[#101826] text-[#E8ECF4]">
           <SidebarHeader className="px-4 pt-5 pb-4">
             <div className="flex items-center gap-3 px-1">

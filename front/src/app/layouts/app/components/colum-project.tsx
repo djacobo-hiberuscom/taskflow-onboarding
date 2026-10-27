@@ -1,9 +1,9 @@
-import { createColumnHelper } from "@tanstack/react-table"
+import { createColumnHelper } from "@tanstack/react-table";
 
-import { type DataTableFeatures } from "@/components/ui/data-table/data-table-features"
-import type { Project } from "@/lib/api/types"
+import { type DataTableFeatures } from "@/components/ui/data-table/data-table-features";
+import type { Project } from "@/lib/api/types";
 
-const columnHelper = createColumnHelper<DataTableFeatures, Project>()
+const columnHelper = createColumnHelper<DataTableFeatures, Project>();
 
 export const ProjectColum = columnHelper.columns([
   columnHelper.accessor("name", {
@@ -11,11 +11,14 @@ export const ProjectColum = columnHelper.columns([
   }),
   columnHelper.accessor("description", {
     header: "Description",
+    cell: (info) => (
+      <span className="block max-w-[300px] truncate">{info.getValue()}</span>
+    ),
   }),
   columnHelper.accessor("created_at", {
     header: "CreatedAt",
   }),
   columnHelper.accessor("updated_at", {
-    header: "LastChange"
-  })
-])
+    header: "LastChange",
+  }),
+]);
