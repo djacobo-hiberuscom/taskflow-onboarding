@@ -5,14 +5,15 @@ import {
 } from '@tanstack/react-router'
 
 // Routes
-import { DashBoardRoute } from "./routes/index.route"
+import { DashBoardRoute, DetailProjectRoute } from "./routes/index.route"
+
 // Pages
 
 export const rootRoute = createRootRoute({
     component: () => <Outlet />
 })
 
-const routeTree = rootRoute.addChildren([DashBoardRoute])
+const routeTree = rootRoute.addChildren([DashBoardRoute, DetailProjectRoute])
 
 export const router = createRouter({routeTree})
 

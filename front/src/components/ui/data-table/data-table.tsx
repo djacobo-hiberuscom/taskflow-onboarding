@@ -8,9 +8,16 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table";
-
+import {useNavigate} from "@tanstack/react-router"
 import { features, type DataTableFeatures } from "./data-table-features";
 
+const nav = useNavigate()
+
+export const navToDetail = (id:string) => {
+  nav({
+    to: "/project/$id", params: {id: id}
+  })
+}
 interface DataTableProps<TData extends RowData> {
   columns: ColumnDef<DataTableFeatures, TData>[];
   data: TData[];
@@ -50,6 +57,7 @@ export function DataTable<TData extends RowData>({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                onClick={navToDetail}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
