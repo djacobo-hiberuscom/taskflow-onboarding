@@ -31,8 +31,15 @@ var back = builder.AddProject<Projects.TaskFlow_Api>("api", launchProfileName: "
     .WithExternalHttpEndpoints();
 
 // FRONT
+const string KEYCLOAK_REALM = "taskflow"; // realm
+const string KEYCLOAK_CLIENT_ID = "taskflow-spa"; // CLient id
+
 var front = builder.AddViteApp("front", "../../front")
     .WithReference(back).WaitFor(back)
+    .WithEnvironment("VITE_API_BASE_URL", back.GetEndpoint("http"))
+    .WithEnvironment("VITE_KEYCLOAK_URL", keycloak.GetEndpoint("http"))
+    .WithEnvironment("VITE_KEYCLOAK_REALM", KEYCLOAK_REALM)
+    .WithEnvironment("VITE_KEYCLOAK_CLIENT_ID", KEYCLOAK_CLIENT_ID)
     .WithEndpoint("http", e => e.Port = 5173);
 
 builder.Build().Run();
