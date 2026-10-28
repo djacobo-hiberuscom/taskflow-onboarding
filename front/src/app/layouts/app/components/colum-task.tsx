@@ -2,7 +2,7 @@ import { createColumnHelper } from "@tanstack/react-table"
 import { Button } from "#components/ui/button"
 import { type DataTableFeatures } from "@/components/ui/data-table/data-table-features"
 import type { Task } from "@/lib/api/types"
-import { getUsernameById } from "@/features/dashboard/getUsername"
+import { getUsernameById } from "@/tools/getUsername"
 
 const columnHelper = createColumnHelper<DataTableFeatures, Task>()
 
