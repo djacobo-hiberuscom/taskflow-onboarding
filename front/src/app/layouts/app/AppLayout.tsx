@@ -26,6 +26,7 @@ import {
   AvatarImage
 } from "../../../components/index.comp";
 import { DashboardFeat } from "@/features/index.featues";
+import { useNavigate } from "@tanstack/react-router";
 
 type NavItem = { id: string; label: string; icon: LucideIcon };
 
@@ -104,6 +105,7 @@ function NavSection({
 }
 
 export function AppLayout() {
+  
   const [active, setActive] = useState("dashboard");
   const current = [...personalNav, ...globalNav].find((i) => i.id === active);
 
