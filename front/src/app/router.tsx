@@ -5,15 +5,16 @@ import {
 } from '@tanstack/react-router'
 
 // Routes
-import { DashBoardRoute, DetailProjectRoute,  } from "./routes/index.route"
+import { DashBoardRoute, ProjectsRoute, TasksRoute, ProfileRoute } from "./routes"
+// Layouts
+import { AppLayoutRoute } from "./routes"
 
-// Pages
 
 export const rootRoute = createRootRoute({
     component: () => <Outlet />
 })
 
-const routeTree = rootRoute.addChildren([DashBoardRoute, DetailProjectRoute, ])
+const routeTree = rootRoute.addChildren([AppLayoutRoute.addChildren([DashBoardRoute, ProjectsRoute, TasksRoute, ProfileRoute])])
 
 export const router = createRouter({routeTree})
 

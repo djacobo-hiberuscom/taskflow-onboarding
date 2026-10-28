@@ -1,1 +1,4 @@
-export { DashboardFeat } from "./dashboard/dashboard.feat";
+export * from "./dashboard/dashboard.feat";
+export * from "./projects/project.feat";
+export * from "./task/task.feat";
+export * from "./profile/myprofile.feat"
