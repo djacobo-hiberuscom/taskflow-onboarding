@@ -1,0 +1,2 @@
+# Secretos locales (process.env en Bruno); nunca se versionan
+.env
