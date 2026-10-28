@@ -8,5 +8,5 @@ export * from "./ui/skeleton"
 export * from "./ui/table"
 export * from "./ui/tooltip"
 export * from "./ui/avatar"
-
+export * from "./ui/drawer"
 export * from "./ui/data-table/data-table"

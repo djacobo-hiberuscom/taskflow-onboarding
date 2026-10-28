@@ -1,67 +1,53 @@
-import { DataTable, Input } from "@/components/index.comp";
-import {
-  ProjectColum,
-  TaskColum,
-} from "@/app/layouts/app/components/index.comp";
+
 import Proyectos from "@/assets/tempdata/projects.json";
 import Tareas from "@/assets/tempdata/tasks.json";
-import { useState } from "react";
-import { SearchByProject, SearchByTask } from "./search";
-import { useNavigate } from "@tanstack/react-router";
 
-const PROYECTOS = Proyectos
-const TAREAS = Tareas
+
+
+// COMPONENTS
+
+import {StatCard, ChartPieDonutText} from "./components/index.comp"
+
+// ---
+
+const PROYECTOS = Proyectos;
+const TAREAS = Tareas;
+
+
 
 export function DashboardFeat() {
-  const [searchProject, setSeachProject] = useState("");
-  const [searchTask, setSeachTask] = useState("");
-
-  const proyectos = SearchByProject(PROYECTOS, searchProject)
-  const tareas = SearchByTask(TAREAS, searchTask)
-
-  const nav = useNavigate()
-    const navToDetailProject = (id:string) => {
-      nav({
-        to: "/project/$id", params: {id: id}
-      })
-    }
-    const navToDetailTask = (id:string) => {
-      nav({
-        to: "/task/$id", params: {id: id}
-      })
-    }
-    
+  // (Start proyectos activos)
+  const proyectosActivos = PROYECTOS.filter(
+    (p) => p.archived_at !== null,
+  ).length;
+  // ----------
+  // (Start ToDo)
+  const tareasToDo = TAREAS.filter((t) => t.status === "ToDo").length;
+  // ---------
+  // (Start tareas completadas)
+  const tareasCompletadas = TAREAS.filter((t) => t.status === "Done").length
+  // -----------
+  // (Start tareas inprogres)
+  const tareasInProgress = TAREAS.filter((t) => t.status === "In Progress").length
+  // ----
+  // (Start tareas incompletas) 
+  const tareasIncompletas = tareasInProgress + tareasToDo
+  // -----
+  // (Start tareas vencidas)
+  // 
+  // -------
   return (
     <div className="p-5 h-full">
-      <div className="flex flex-col gap-5">
-        <div className="flex flex-col gap-3">
-          <h2>Proyectos</h2>
-          <div className="flex gap-3">
-            <Input
-              placeholder="Buscar proyectos por nombre......"
-              value={searchProject}
-              onChange={(e) => {
-                setSeachProject(e.target.value);
-              }}
-            />
-          </div>
-
-          <div id="tabla-project" className="overflow-hidden rounded-md border">
-            <DataTable columns={ProjectColum} data={proyectos} onClic={(p) => navToDetailProject(p.id)}/>
-          </div>
+      <div id="title" className="flex flex-col gap-5"></div>
+      <div id="body" className="flex flex-col gap-4">
+        <div id="stats-contenedors" className="flex gap-5 justify-between">
+          <StatCard name="Proyectos Activos" number={proyectosActivos}/>
+          <StatCard name="Tareas abiertas" number={tareasIncompletas}/>
+          <StatCard name="Tareas completadas" number={tareasCompletadas}/>
+          <StatCard name="Proyectos Activos" number={12}/>
         </div>
-        <div className="flex flex-col gap-3">
-          <h2>Tareas</h2>
-          <div className="flex gap-3">
-            <Input
-              placeholder="Buscar tareas por nombre......"
-              onChange={(e) => setSeachTask(e.target.value)}
-            />
-          </div>
-
-          <div id="tabla-task" className="overflow-hidden rounded-md border">
-            <DataTable columns={TaskColum} data={tareas} onClic={(t) => navToDetailTask(t.id)}/>
-          </div>
+        <div id="barra-tareas-estado">
+          <ChartPieDonutText todo={tareasToDo} inProgress={tareasInProgress} done={tareasCompletadas}/>
         </div>
       </div>
     </div>
