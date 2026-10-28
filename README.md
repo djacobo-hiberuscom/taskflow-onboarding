@@ -47,7 +47,7 @@ Ambos roles podrán consultar el panel y su vista de tareas propias. Los proyect
 | Interfaz visual | Tailwind CSS y shadcn/ui |
 | Persistencia | PostgreSQL |
 | Identidad | Keycloak, OpenID Connect y tokens de acceso JWT |
-| Entorno local | Docker y Docker Compose |
+| Entorno local | Aspire AppHost y Docker |
 | Pruebas | xUnit, pruebas de integración de ASP.NET Core, Vitest y React Testing Library |
 | Automatización y despliegue | GitHub Actions y AWS en un entorno aislado de producción |
 
@@ -82,7 +82,10 @@ Cada fase contará con entregables, evidencias y revisión del responsable técn
 | [Despliegue en AWS](docs/03-architecture/deployment-aws.md) | Comparación de opciones, propuesta, seguridad, costes y retirada |
 | [Decisiones arquitectónicas (ADR)](docs/03-architecture/adr/README.md) | Índice, plantilla y decisiones propuestas |
 | [Contrato de la API](docs/05-api/api-contracts.md) | Endpoints, datos, validaciones, códigos HTTP y errores |
+| [Entorno de desarrollo](docs/04-development/environment-setup.md) | Requisitos, arranque con Aspire, configuración, comandos de migraciones y pruebas |
 
 ## Estado actual
 
-El proyecto se encuentra en fase de análisis y documentación. La implementación de la aplicación, la infraestructura ejecutable y las pruebas están pendientes. Las instrucciones de instalación, ejecución y despliegue se incorporarán a medida que se completen y verifiquen los componentes.
+La base del backend ya incluye los proyectos `Domain`, `Application`, `Infrastructure` y `Api`, conexión EF Core a PostgreSQL, comprobación de salud, Problem Details, OpenAPI y pruebas de integración con Testcontainers. El AppHost de Aspire describe el arranque local de PostgreSQL, Keycloak, API y Vite.
+
+La implementación completa del modelo de datos, su migración inicial, los casos de uso y la autenticación de la API siguen pendientes. Consulta la [guía de entorno](docs/04-development/environment-setup.md) para arrancar los recursos, comprobar el backend y aplicar explícitamente las migraciones cuando existan.
