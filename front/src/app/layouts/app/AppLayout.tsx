@@ -20,10 +20,6 @@ import {
   SidebarProvider,
   SidebarTrigger,
   Separator,
-
-  // Avatar
-  Avatar,
-  AvatarImage
 } from "../../../components/index.comp";
 import { DashboardFeat } from "@/features/index.featues";
 
@@ -51,11 +47,11 @@ function BrandMark() {
   return (
     <span
       aria-hidden
-      className="flex size-8 shrink-0 flex-col justify-center gap-0.75 rounded-lg bg-white/[0.07] px-1.5 ring-1 ring-white/10"
+      className="flex size-8 shrink-0 flex-col justify-center gap-[3px] rounded-lg bg-white/[0.07] px-1.5 ring-1 ring-white/10"
     >
-      <span className="h-0.75 w-1/3 rounded-full bg-[#6F8BFF]/50" />
-      <span className="0.75 w-2/3 rounded-full bg-[#6F8BFF]/80" />
-      <span className="0.75 w-full rounded-full bg-[#6F8BFF]" />
+      <span className="h-[3px] w-1/3 rounded-full bg-[#6F8BFF]/50" />
+      <span className="h-[3px] w-2/3 rounded-full bg-[#6F8BFF]/80" />
+      <span className="h-[3px] w-full rounded-full bg-[#6F8BFF]" />
     </span>
   );
 }
@@ -80,11 +76,11 @@ function NavSection({
               onClick={() => onSelect(id)}
               className={[
                 "relative h-9 gap-3 rounded-lg px-3 text-[13.5px] font-normal text-[#A7B2C6] transition-colors",
-                "hover:bg-white/6 hover:text-white",
-                "data-active:bg-white/9 data-active:font-medium data-active:text-white",
+                "hover:bg-white/[0.06] hover:text-white",
+                "data-active:bg-white/[0.09] data-active:font-medium data-active:text-white",
                 "focus-visible:ring-2 focus-visible:ring-[#6F8BFF]",
                 // indicador lateral del elemento activo
-                "before:absolute before:-left-2 before:top-2 before:bottom-2 before:w-0.75 before:rounded-full before:bg-[#6F8BFF] before:opacity-0 before:transition-opacity",
+                "before:absolute before:-left-2 before:top-2 before:bottom-2 before:w-[3px] before:rounded-full before:bg-[#6F8BFF] before:opacity-0 before:transition-opacity",
                 "data-active:before:opacity-100",
               ].join(" ")}
             >
@@ -131,11 +127,14 @@ export function AppLayout() {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   size="lg"
-                  className="h-12 gap-3 rounded-xl px-2 text-[#E8ECF4] ring-1 ring-white/10 hover:bg-white/6 hover:text-white focus-visible:ring-[#6F8BFF]"
+                  className="h-12 gap-3 rounded-xl px-2 text-[#E8ECF4] ring-1 ring-white/10 hover:bg-white/[0.06] hover:text-white focus-visible:ring-[#6F8BFF]"
                 >
-                  <Avatar className="p-1">
-                    <AvatarImage src="https://www.svgrepo.com/show/452030/avatar-default.svg"/>
-                  </Avatar>
+                  <span
+                    aria-hidden
+                    className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#6F8BFF] text-xs font-semibold text-[#101826]"
+                  >
+                    TU
+                  </span>
                   <span className="flex min-w-0 flex-1 flex-col text-left leading-tight">
                     <span className="truncate text-[13px] font-medium">Mi perfil</span>
                     <span className="truncate text-xs text-[#8793AA]">Cuenta y sesión</span>
@@ -160,7 +159,7 @@ export function AppLayout() {
           </time>
         </header>
 
-        <div className="mx-auto w-full max-w-350 flex-1">
+        <div className="mx-auto w-full max-w-[1400px] flex-1">
           <DashboardFeat />
         </div>
       </SidebarInset>
