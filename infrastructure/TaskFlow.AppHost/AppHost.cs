@@ -19,7 +19,7 @@ var keycloak = builder.AddKeycloak("keycloak", port: 8080)
 // BACK
 var back = builder.AddProject<Projects.TaskFlow_Api>("api", launchProfileName: "http")
     .WithReference(taskFlowDb).WaitFor(taskFlowDb)
-    .WithReference(keycloakDb).WaitFor(keycloakDb)
+    .WithReference(keycloak).WaitFor(keycloak)
     .WithExternalHttpEndpoints();
 
 // FRONT
