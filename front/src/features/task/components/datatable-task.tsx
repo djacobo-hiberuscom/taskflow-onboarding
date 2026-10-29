@@ -11,7 +11,6 @@ export function DataTableTask() {
 
   return (
     <div className="flex flex-col gap-3">
-      <h2>Tareas</h2>
       <div className="flex gap-3">
         <Input
           placeholder="Buscar proyectos por nombre......"

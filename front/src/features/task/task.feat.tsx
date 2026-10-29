@@ -1,6 +1,10 @@
+import { DataTableTask } from "./components/index.comp"
+
 
 export function TaskFeat () {
     return (
-        <h1>Tareas</h1>
+        <div>
+            <DataTableTask />
+        </div>
     )
 }
