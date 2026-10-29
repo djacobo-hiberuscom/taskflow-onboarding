@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using TaskFlow.Domain;
 using TaskFlow.Infrastructure.Persistence.Configurations;
+using TaskFlow.Application.Abstractions;
 namespace TaskFlow.Infrastructure.Persistence;
 
 
-public class TaskFlowDbContext : DbContext
+public class TaskFlowDbContext : DbContext, IUnitOfWork
 {
     public DbSet<AppUser> Users => Set<AppUser>();
     public DbSet<Project> Projects => Set<Project>();
