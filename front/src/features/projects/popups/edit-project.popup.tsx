@@ -1,15 +1,34 @@
 import type { Project } from "#lib/api/types";
-import { Button, Input } from "@/components/index.comp";
-import { X } from "lucide-react";
+// COMPONENTES
+import {
+  Dialog,
+  DialogContent,
+  Button, Input
+} from "@/components/index.comp";
 
-interface parameters {
-
-    proyecto: Project
+interface popParameters {
+  isOpen: boolean,
+  onOpenChange: (opne: boolean) => void
+  proyecto?: Project
+}
+export function EditProjectPopUp({isOpen, onOpenChange, proyecto}:popParameters) {
+  return (
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col p-4 gap-3">
+        <EditProjectContainer proyecto={proyecto} />
+      </DialogContent>
+    </Dialog>
+  );
 }
 
-export function EditProjectPopUp({proyecto}: parameters) {
+interface parameters {
+    proyecto?: Project
+}
+function EditProjectContainer ({proyecto} : parameters) {
+  if (!proyecto) return <h1>Error al obtener proyecto</h1>
   return (
-    <div className="flex flex-col gap-4 border rounded-2xl p-4 bg-background max-w-2xl">
+    
+    <div className="flex flex-col gap-4 rounded-2xl p-4 max-w-2xl">
       <div id="Header" className="flex justify-between gap-2">
         <div className="flex flex-col gap-3">
           <h1 className="text-2xl font-bold">Editar proyecto</h1>
@@ -19,7 +38,6 @@ export function EditProjectPopUp({proyecto}: parameters) {
           onClick={() => {}}
           className="p-1 bg-background rounded-full hover:brightness-80 hover:cursor-pointer size-fit"
         >
-          <X />
         </div>
       </div>
       <div id="body" className="flex flex-col gap-4">
@@ -47,5 +65,5 @@ export function EditProjectPopUp({proyecto}: parameters) {
         </Button>
       </div>
     </div>
-  );
+  )
 }

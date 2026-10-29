@@ -1,8 +1,7 @@
 import { getUsernameById, getUsernameByProjectId } from "@/tools/getUsername";
 import { useNavigate, useParams } from "@tanstack/react-router";
 // popups
-import {ArchivedPopUp} from "./popups/index.popup"
-
+import { EditProjectPopUp } from "./popups/index.popup";
 // HOOKS
 import { useState } from "react";
 
@@ -14,7 +13,7 @@ import {
   Separator,
   Badge,
 } from "@/components/index.comp";
-import { FilterSeletor } from "./components/index.comp";
+import { FilterSeletor, DeailTaskDrawer } from "./components/index.comp";
 
 // ICONS
 import {
@@ -24,7 +23,7 @@ import {
   Trash,
   Plus,
   CircleUserRound,
-  X
+  X,
 } from "lucide-react";
 
 // TYPES
@@ -43,6 +42,8 @@ export function DetailProject() {
   const [status, setStatus] = useState<string | null>(null);
   const [priority, setPriority] = useState<string | null>(null);
   const [member, setMember] = useState<string | null>(null);
+  const [editProjectOpen, setEditProjectOpen] = useState(false);
+
   const proyecto = PROYECTOS.find((p) => p.id === id);
   if (proyecto === null) return <h1>Error proyecto no encontrado</h1>;
 
@@ -52,12 +53,16 @@ export function DetailProject() {
       (!status || t.status === status) &&
       (!priority || t.priority === priority) &&
       (!member || t.assigned_id === member) &&
-      (t.title.startsWith(busqueda))
+      t.title.toLowerCase().startsWith(busqueda.toLowerCase()),
   );
   const navBack = () => {
     nav({
       to: "/projects",
     });
+  };
+
+  const openEditProjecft = () => {
+    setEditProjectOpen(!editProjectOpen);
   };
 
   const item_f1 = [
@@ -76,13 +81,28 @@ export function DetailProject() {
   }));
 
   const quitarFilters = () => {
-    setStatus(null)
-    setPriority(null)
-    setMember(null)
-  }
+    setStatus(null);
+    setPriority(null);
+    setMember(null);
+  };
+
   return (
-    <div className="">
-        <ArchivedPopUp />
+    <div>
+      <EditProjectPopUp
+        isOpen={editProjectOpen}
+        onOpenChange={(open) => {
+          if (!open) setEditProjectOpen(false);
+        }}
+        proyecto={proyecto}
+      />
+      <DeailTaskDrawer
+        isOpen={selectTask !== null}
+        tarea={selectTask}
+        onOpenChange={(open) => {
+          if (!open) setSelectTask(null);
+        }}
+      />
+
       <div
         className="absolute top-3 left-17 p-1 rounded-full  border shadow-black z-50"
         onClick={navBack}
@@ -103,16 +123,16 @@ export function DetailProject() {
           <div id="botonera" className="flex flex-col justify-end items gap-3">
             <div className="flex flex-row gap-5 justify-end">
               <h3 className="flex gap-2 text-xl items-center">
-                <CircleUserRound />
                 {getUsernameById(proyecto?.created_by)}
+                <CircleUserRound />
               </h3>
             </div>
             <div className="flex gap-2 h-fit">
-              <Button variant="outline">
+              <Button variant="outline" onClick={openEditProjecft}>
                 <Pen />
                 Editar
               </Button>
-              <Button variant="outline">
+              <Button variant="outline" onClick={() => {}}>
                 <Archive />
                 Archivar
               </Button>
@@ -157,8 +177,13 @@ export function DetailProject() {
                 value={member}
                 onChange={setMember}
               />
-              <Button variant="ghost" className="flex justify-center items-center" onClick={quitarFilters}>
-                <X/>Quitar filtro
+              <Button
+                variant="ghost"
+                className="flex justify-center items-center"
+                onClick={quitarFilters}
+              >
+                <X />
+                Quitar filtro
               </Button>
               <Input
                 placeholder="Buscar por nombre"
@@ -170,10 +195,12 @@ export function DetailProject() {
           <DataTable
             columns={TaskColum}
             data={filterTask}
-            onClic={(t) => setSelectTask(t === selectTask ? null : t)}
+            onClic={(t) => {
+              setSelectTask(t === selectTask ? null : t);
+              openDrawer();
+            }}
           />
         </div>
-        
       </div>
     </div>
   );

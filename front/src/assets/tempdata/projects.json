@@ -4,6 +4,7 @@
     "name": "Portal de clientes 1",
     "description": "Proyecto de prueba 1 creado por Lucía García.",
     "created_by": "98ebcb82-034f-4ba5-91ed-d74d0cfc15a0",
+    "archived_at": null,
     "created_at": "2026-09-10T10:00:00.000Z",
     "updated_at": "2026-09-10T10:00:00.000Z"
   },
@@ -12,6 +13,7 @@
     "name": "Migración de base de datos 2",
     "description": "Proyecto de prueba 2 creado por Lucía García.",
     "created_by": "98ebcb82-034f-4ba5-91ed-d74d0cfc15a0",
+    "archived_at": null,
     "created_at": "2026-09-11T10:00:00.000Z",
     "updated_at": "2026-09-19T10:00:00.000Z"
   },
@@ -20,6 +22,7 @@
     "name": "App de inventario 3",
     "description": "Proyecto de prueba 3 creado por Lucía García.",
     "created_by": "98ebcb82-034f-4ba5-91ed-d74d0cfc15a0",
+    "archived_at": null,
     "created_at": "2026-09-12T10:00:00.000Z",
     "updated_at": "2026-09-21T10:00:00.000Z"
   },
@@ -37,6 +40,7 @@
     "name": "Integración de pagos 5",
     "description": "Proyecto de prueba 5 creado por Hugo Martínez.",
     "created_by": "9141ef3d-3610-4258-b665-a60c6d2a8ca7",
+    "archived_at": null,
     "created_at": "2026-09-11T10:00:00.000Z",
     "updated_at": "2026-09-16T10:00:00.000Z"
   },
@@ -45,6 +49,7 @@
     "name": "Panel de métricas 6",
     "description": "Proyecto de prueba 6 creado por Hugo Martínez.",
     "created_by": "9141ef3d-3610-4258-b665-a60c6d2a8ca7",
+    "archived_at": null,
     "created_at": "2026-09-12T10:00:00.000Z",
     "updated_at": "2026-09-13T10:00:00.000Z"
   },
@@ -53,6 +58,7 @@
     "name": "Automatización de informes 7",
     "description": "Proyecto de prueba 7 creado por Hugo Martínez.",
     "created_by": "9141ef3d-3610-4258-b665-a60c6d2a8ca7",
+    "archived_at": "2026-10-01T10:00:00.000Z",
     "created_at": "2026-09-13T10:00:00.000Z",
     "updated_at": "2026-09-21T10:00:00.000Z"
   },
@@ -61,6 +67,7 @@
     "name": "Gestión de incidencias 8",
     "description": "Proyecto de prueba 8 creado por Hugo Martínez.",
     "created_by": "9141ef3d-3610-4258-b665-a60c6d2a8ca7",
+    "archived_at": null,
     "created_at": "2026-09-14T10:00:00.000Z",
     "updated_at": "2026-09-23T10:00:00.000Z"
   },
@@ -69,6 +76,7 @@
     "name": "Campaña de marketing 9",
     "description": "Proyecto de prueba 9 creado por Martina López.",
     "created_by": "87f0fe99-8783-4315-ba3b-4be418ca3cf2",
+    "archived_at": null,
     "created_at": "2026-09-12T10:00:00.000Z",
     "updated_at": "2026-09-12T10:00:00.000Z"
   },
@@ -77,6 +85,7 @@
     "name": "API pública 10",
     "description": "Proyecto de prueba 10 creado por Martina López.",
     "created_by": "87f0fe99-8783-4315-ba3b-4be418ca3cf2",
+    "archived_at": null,
     "created_at": "2026-09-13T10:00:00.000Z",
     "updated_at": "2026-09-14T10:00:00.000Z"
   },
@@ -85,6 +94,7 @@
     "name": "Onboarding de empleados 11",
     "description": "Proyecto de prueba 11 creado por Martina López.",
     "created_by": "87f0fe99-8783-4315-ba3b-4be418ca3cf2",
+    "archived_at": "2026-10-04T10:00:00.000Z",
     "created_at": "2026-09-14T10:00:00.000Z",
     "updated_at": "2026-09-16T10:00:00.000Z"
   },
@@ -93,6 +103,7 @@
     "name": "Sistema de reservas 12",
     "description": "Proyecto de prueba 12 creado por Martina López.",
     "created_by": "87f0fe99-8783-4315-ba3b-4be418ca3cf2",
+    "archived_at": null,
     "created_at": "2026-09-15T10:00:00.000Z",
     "updated_at": "2026-09-17T10:00:00.000Z"
   },
@@ -101,6 +112,7 @@
     "name": "Portal de clientes 13",
     "description": "Proyecto de prueba 13 creado por Daniel Sánchez.",
     "created_by": "01e89edd-d066-407a-adaa-0d942202b12a",
+    "archived_at": null,
     "created_at": "2026-09-13T10:00:00.000Z",
     "updated_at": "2026-09-18T10:00:00.000Z"
   },
@@ -109,6 +121,7 @@
     "name": "Migración de base de datos 14",
     "description": "Proyecto de prueba 14 creado por Daniel Sánchez.",
     "created_by": "01e89edd-d066-407a-adaa-0d942202b12a",
+    "archived_at": null,
     "created_at": "2026-09-14T10:00:00.000Z",
     "updated_at": "2026-09-22T10:00:00.000Z"
   },
@@ -117,6 +130,7 @@
     "name": "App de inventario 15",
     "description": "Proyecto de prueba 15 creado por Daniel Sánchez.",
     "created_by": "01e89edd-d066-407a-adaa-0d942202b12a",
+    "archived_at": null,
     "created_at": "2026-09-15T10:00:00.000Z",
     "updated_at": "2026-09-24T10:00:00.000Z"
   },
@@ -134,6 +148,7 @@
     "name": "Integración de pagos 17",
     "description": "Proyecto de prueba 17 creado por Sofía Romero.",
     "created_by": "e1b1f8b4-9bf1-4184-9392-4963771abd0d",
+    "archived_at": null,
     "created_at": "2026-09-14T10:00:00.000Z",
     "updated_at": "2026-09-19T10:00:00.000Z"
   },
@@ -142,6 +157,7 @@
     "name": "Panel de métricas 18",
     "description": "Proyecto de prueba 18 creado por Sofía Romero.",
     "created_by": "e1b1f8b4-9bf1-4184-9392-4963771abd0d",
+    "archived_at": null,
     "created_at": "2026-09-15T10:00:00.000Z",
     "updated_at": "2026-09-15T10:00:00.000Z"
   },
@@ -150,6 +166,7 @@
     "name": "Automatización de informes 19",
     "description": "Proyecto de prueba 19 creado por Sofía Romero.",
     "created_by": "e1b1f8b4-9bf1-4184-9392-4963771abd0d",
+    "archived_at": "2026-10-08T10:00:00.000Z",
     "created_at": "2026-09-16T10:00:00.000Z",
     "updated_at": "2026-09-23T10:00:00.000Z"
   },
@@ -158,6 +175,7 @@
     "name": "Gestión de incidencias 20",
     "description": "Proyecto de prueba 20 creado por Sofía Romero.",
     "created_by": "e1b1f8b4-9bf1-4184-9392-4963771abd0d",
+    "archived_at": null,
     "created_at": "2026-09-17T10:00:00.000Z",
     "updated_at": "2026-09-21T10:00:00.000Z"
   },
@@ -166,6 +184,7 @@
     "name": "Campaña de marketing 21",
     "description": "Proyecto de prueba 21 creado por Pablo Navarro.",
     "created_by": "9bbef2e2-f2d6-4404-ae55-464064bce344",
+    "archived_at": null,
     "created_at": "2026-09-15T10:00:00.000Z",
     "updated_at": "2026-09-24T10:00:00.000Z"
   },
@@ -174,6 +193,7 @@
     "name": "API pública 22",
     "description": "Proyecto de prueba 22 creado por Pablo Navarro.",
     "created_by": "9bbef2e2-f2d6-4404-ae55-464064bce344",
+    "archived_at": null,
     "created_at": "2026-09-16T10:00:00.000Z",
     "updated_at": "2026-09-25T10:00:00.000Z"
   },
@@ -182,6 +202,7 @@
     "name": "Onboarding de empleados 23",
     "description": "Proyecto de prueba 23 creado por Pablo Navarro.",
     "created_by": "9bbef2e2-f2d6-4404-ae55-464064bce344",
+    "archived_at": "2026-10-14T10:00:00.000Z",
     "created_at": "2026-09-17T10:00:00.000Z",
     "updated_at": "2026-09-21T10:00:00.000Z"
   },
@@ -190,6 +211,7 @@
     "name": "Sistema de reservas 24",
     "description": "Proyecto de prueba 24 creado por Pablo Navarro.",
     "created_by": "9bbef2e2-f2d6-4404-ae55-464064bce344",
+    "archived_at": null,
     "created_at": "2026-09-18T10:00:00.000Z",
     "updated_at": "2026-09-20T10:00:00.000Z"
   },
@@ -198,6 +220,7 @@
     "name": "Portal de clientes 25",
     "description": "Proyecto de prueba 25 creado por Elena Torres.",
     "created_by": "2ec0953b-5acd-4aef-9e20-5561c7ddce05",
+    "archived_at": null,
     "created_at": "2026-09-16T10:00:00.000Z",
     "updated_at": "2026-09-19T10:00:00.000Z"
   },
@@ -206,6 +229,7 @@
     "name": "Migración de base de datos 26",
     "description": "Proyecto de prueba 26 creado por Elena Torres.",
     "created_by": "2ec0953b-5acd-4aef-9e20-5561c7ddce05",
+    "archived_at": null,
     "created_at": "2026-09-17T10:00:00.000Z",
     "updated_at": "2026-09-18T10:00:00.000Z"
   },
@@ -214,6 +238,7 @@
     "name": "App de inventario 27",
     "description": "Proyecto de prueba 27 creado por Elena Torres.",
     "created_by": "2ec0953b-5acd-4aef-9e20-5561c7ddce05",
+    "archived_at": null,
     "created_at": "2026-09-18T10:00:00.000Z",
     "updated_at": "2026-09-27T10:00:00.000Z"
   },
@@ -231,6 +256,7 @@
     "name": "Integración de pagos 29",
     "description": "Proyecto de prueba 29 creado por Javier Ruiz.",
     "created_by": "53519bf6-0ec5-4fd9-9822-f464efb968d5",
+    "archived_at": null,
     "created_at": "2026-09-17T10:00:00.000Z",
     "updated_at": "2026-09-20T10:00:00.000Z"
   },
@@ -239,6 +265,7 @@
     "name": "Panel de métricas 30",
     "description": "Proyecto de prueba 30 creado por Javier Ruiz.",
     "created_by": "53519bf6-0ec5-4fd9-9822-f464efb968d5",
+    "archived_at": null,
     "created_at": "2026-09-18T10:00:00.000Z",
     "updated_at": "2026-09-27T10:00:00.000Z"
   },
@@ -247,6 +274,7 @@
     "name": "Automatización de informes 31",
     "description": "Proyecto de prueba 31 creado por Javier Ruiz.",
     "created_by": "53519bf6-0ec5-4fd9-9822-f464efb968d5",
+    "archived_at": null,
     "created_at": "2026-09-19T10:00:00.000Z",
     "updated_at": "2026-09-25T10:00:00.000Z"
   },
@@ -255,6 +283,7 @@
     "name": "Gestión de incidencias 32",
     "description": "Proyecto de prueba 32 creado por Javier Ruiz.",
     "created_by": "53519bf6-0ec5-4fd9-9822-f464efb968d5",
+    "archived_at": null,
     "created_at": "2026-09-20T10:00:00.000Z",
     "updated_at": "2026-09-25T10:00:00.000Z"
   },
@@ -263,6 +292,7 @@
     "name": "Campaña de marketing 33",
     "description": "Proyecto de prueba 33 creado por Carmen Díaz.",
     "created_by": "d4242ee2-8073-4adc-a021-ec6ed95e0dcc",
+    "archived_at": "2026-10-18T10:00:00.000Z",
     "created_at": "2026-09-18T10:00:00.000Z",
     "updated_at": "2026-09-24T10:00:00.000Z"
   },
@@ -271,6 +301,7 @@
     "name": "API pública 34",
     "description": "Proyecto de prueba 34 creado por Carmen Díaz.",
     "created_by": "d4242ee2-8073-4adc-a021-ec6ed95e0dcc",
+    "archived_at": null,
     "created_at": "2026-09-19T10:00:00.000Z",
     "updated_at": "2026-09-22T10:00:00.000Z"
   },
@@ -279,6 +310,7 @@
     "name": "Onboarding de empleados 35",
     "description": "Proyecto de prueba 35 creado por Carmen Díaz.",
     "created_by": "d4242ee2-8073-4adc-a021-ec6ed95e0dcc",
+    "archived_at": null,
     "created_at": "2026-09-20T10:00:00.000Z",
     "updated_at": "2026-09-25T10:00:00.000Z"
   },
@@ -287,6 +319,7 @@
     "name": "Sistema de reservas 36",
     "description": "Proyecto de prueba 36 creado por Carmen Díaz.",
     "created_by": "d4242ee2-8073-4adc-a021-ec6ed95e0dcc",
+    "archived_at": null,
     "created_at": "2026-09-21T10:00:00.000Z",
     "updated_at": "2026-09-27T10:00:00.000Z"
   },
@@ -295,6 +328,7 @@
     "name": "Portal de clientes 37",
     "description": "Proyecto de prueba 37 creado por Álvaro Moreno.",
     "created_by": "47c2632d-99e8-4e12-acc8-899c59b654b7",
+    "archived_at": "2026-10-22T10:00:00.000Z",
     "created_at": "2026-09-19T10:00:00.000Z",
     "updated_at": "2026-09-24T10:00:00.000Z"
   },
@@ -303,6 +337,7 @@
     "name": "Migración de base de datos 38",
     "description": "Proyecto de prueba 38 creado por Álvaro Moreno.",
     "created_by": "47c2632d-99e8-4e12-acc8-899c59b654b7",
+    "archived_at": null,
     "created_at": "2026-09-20T10:00:00.000Z",
     "updated_at": "2026-09-24T10:00:00.000Z"
   },
@@ -311,6 +346,7 @@
     "name": "App de inventario 39",
     "description": "Proyecto de prueba 39 creado por Álvaro Moreno.",
     "created_by": "47c2632d-99e8-4e12-acc8-899c59b654b7",
+    "archived_at": null,
     "created_at": "2026-09-21T10:00:00.000Z",
     "updated_at": "2026-09-24T10:00:00.000Z"
   },
