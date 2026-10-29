@@ -44,7 +44,7 @@ export function ProjectCard({
           </button>
         </div>
 
-        <p className="flex-1">{description}</p>
+        <p className="flex-1 line-clamp-3">{description}</p>
         <Separator />
         <div className="flex gap-3 text justify-between items-center">
           <div className="flex gap-2 justify-center items-center">
