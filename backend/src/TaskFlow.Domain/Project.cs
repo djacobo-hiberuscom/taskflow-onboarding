@@ -10,6 +10,12 @@ public class Project
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt  { get; private set; }
 
+    // La persistencia rellena las propiedades al reconstruir un proyecto existente.
+    private Project()
+    {
+        Name = null!;
+    }
+
     public Project(string name, string? description, Guid createdBy)
     {
         name = ValidateName(name);

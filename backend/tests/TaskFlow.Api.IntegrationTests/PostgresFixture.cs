@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using TaskFlow.Infrastructure.Persistence;
 using Testcontainers.PostgreSql;
 using Xunit;
 
@@ -10,9 +12,17 @@ public class PostgresFixture : IAsyncLifetime
         .WithDatabase("taskflow_test")
         .Build();
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
-        return Database.StartAsync();
+        await Database.StartAsync();
+
+        var options = new DbContextOptionsBuilder<TaskFlowDbContext>()
+            .UseNpgsql(Database.GetConnectionString())
+            .Options;
+
+        await using var context = new TaskFlowDbContext(options);
+
+        await context.Database.MigrateAsync();
     }
 
     public Task DisposeAsync()
