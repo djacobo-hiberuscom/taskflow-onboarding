@@ -10,11 +10,17 @@ public class Project
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt  { get; private set; }
 
+    // La persistencia rellena las propiedades al reconstruir un proyecto existente.
+    private Project()
+    {
+        Name = null!;
+    }
+
     public Project(string name, string? description, Guid createdBy)
     {
         name = ValidateName(name);
 
-        description = ValidateDescription(description);
+        description = DomainText.ValidateDescription(description);
 
         if (createdBy == Guid.Empty)
         {
@@ -51,30 +57,10 @@ public class Project
         return name;
     }
 
-    private static string? ValidateDescription(string? description)
-    {
-        if (string.IsNullOrWhiteSpace(description))
-        {
-            description = null;
-        }
-        else
-        {
-            description = description.Trim();
-            if(description.Length > 5000)
-            {
-                throw new ArgumentException(
-                    "La descripción es demasiado larga.", nameof(description)
-                );
-            }
-        }
-
-        return description;
-    }
-
     public void UpdateDetails(string name, string? description)
     {
         name = ValidateName(name);
-        description = ValidateDescription(description);
+        description = DomainText.ValidateDescription(description);
 
         Name = name;
         Description = description;
