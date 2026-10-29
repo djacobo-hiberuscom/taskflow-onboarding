@@ -30,12 +30,12 @@ export function ArchivedPopUp() {
             Proyectos archivados
           </DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col gap-3 p-5 border rounded-2xl bg-background max-w-xl max-h-xl" onScroll={() => {}}>
+        <div className="flex flex-col gap-3 p-5 border rounded-2xl bg-background" onScroll={() => {}}>
           {proyectoArchived.map((pa) => {
               return <ArchivedRecyclerView proyecto={pa} />;
             })}
         </div>
-        
+
         <DialogFooter>
           <DialogClose render={<Button variant="outline">Close</Button>} />
         </DialogFooter>
