@@ -1,5 +1,7 @@
 import { getUsernameById, getUsernameByProjectId } from "@/tools/getUsername";
 import { useNavigate, useParams } from "@tanstack/react-router";
+// popups
+import {ArchivedPopUp} from "./popups/index.popup"
 
 // HOOKS
 import { useState } from "react";
@@ -80,6 +82,7 @@ export function DetailProject() {
   }
   return (
     <div className="">
+        <ArchivedPopUp />
       <div
         className="absolute top-3 left-17 p-1 rounded-full  border shadow-black z-50"
         onClick={navBack}
@@ -170,6 +173,7 @@ export function DetailProject() {
             onClic={(t) => setSelectTask(t === selectTask ? null : t)}
           />
         </div>
+        
       </div>
     </div>
   );
