@@ -197,7 +197,6 @@ export function DetailProject() {
             data={filterTask}
             onClic={(t) => {
               setSelectTask(t === selectTask ? null : t);
-              openDrawer();
             }}
           />
         </div>

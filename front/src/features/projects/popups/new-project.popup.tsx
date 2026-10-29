@@ -5,7 +5,6 @@ import {
   Button, Input
 } from "@/components/index.comp";
 
-import { X } from "lucide-react";
 
 interface parameters {
   isOpen: boolean;
