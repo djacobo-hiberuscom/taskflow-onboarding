@@ -23,5 +23,20 @@ public class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
         
         builder.HasIndex(user => user.KeycloakSub)
             .IsUnique();
+
+        builder.Property(user => user.DisplayName)
+            .HasColumnName("display_name")
+            .HasMaxLength(200)
+            .IsRequired();
+
+        builder.Property(user => user.Email)
+            .HasColumnName("email")
+            .HasMaxLength(320)
+            .IsRequired(false);
+
+        builder.Property(user => user.CreatedAt)
+            .HasColumnName("created_at")
+            .HasColumnType("timestamp with time zone")
+            .IsRequired();
     }
 }
