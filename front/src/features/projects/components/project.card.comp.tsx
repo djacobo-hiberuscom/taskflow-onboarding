@@ -18,6 +18,7 @@ interface parameters {
   miembros: number;
   tareasAbiertas: number;
   favourite: boolean;
+  onClic: () => void
 }
 
 export function ProjectCard({
@@ -26,20 +27,26 @@ export function ProjectCard({
   miembros,
   tareasAbiertas,
   favourite,
+  onClic,
 }: parameters) {
   const [isFavourite, setIsFavourite] = useState(favourite);
 
   return (
     <ContextMenu>
-      <ContextMenuTrigger className="flex flex-col gap-4 p-4 border rounded-xl bg-background max-w-xs hover:brightness-97">
+      <ContextMenuTrigger className="flex flex-col gap-4 p-4 border rounded-xl bg-background max-w-xs hover:brightness-97" onClick={onClic}>
         <div className="flex justify-between">
           <h1 className="font-bold text-xl">{title}</h1>
           <button
             className="self-start shrink-0 bg-background rounded-full p-1 hover:brightness-95 hover:cursor-pointer"
-            onClick={() => setIsFavourite(!isFavourite)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsFavourite(!isFavourite);
+            }}
           >
             <Heart
-              className={isFavourite ? "fill-red-400 text-red-400" : "text-foreground"}
+              className={
+                isFavourite ? "fill-red-400 text-red-400" : "text-foreground"
+              }
             />
           </button>
         </div>
@@ -49,22 +56,22 @@ export function ProjectCard({
         <div className="flex gap-3 text justify-between items-center">
           <div className="flex gap-2 justify-center items-center">
             <Users />
-            <Badge>{miembros} miembros</Badge>
+            <Badge className=" text-[#1E40AF] py-2 bg-[#DBEAFE]">{miembros} miembro{miembros > 1 ? "s": ""}</Badge>
           </div>
-          <Badge className="bg-chart-5">{tareasAbiertas} tareas</Badge>
+          <Badge className="bg-[#DCFCE7] text-[#166534]">{tareasAbiertas} tareas</Badge>
         </div>
       </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuGroup className="font-bold">
-          <ContextMenuItem>
+          <ContextMenuItem disabled={false}>
             <Pen />
             Edit
           </ContextMenuItem>
-          <ContextMenuItem>
+          <ContextMenuItem disabled={false}>
             <Archive />
             Archivar
           </ContextMenuItem>
-          <ContextMenuItem disabled className="text-red-600">
+          <ContextMenuItem disabled={false} className="text-red-600">
             <Trash />
             Elimiar
           </ContextMenuItem>

@@ -5,7 +5,7 @@ import { createRoute } from "@tanstack/react-router";
 import {AppLayout} from "@/app/layouts/index.layouts"
 
 // FEATURES
-import {DashboardFeat, ProjectFeeat, TaskFeat, MyProfileFeat} from "@/features/index.featues"
+import {DashboardFeat, ProjectFeeat, TaskFeat, MyProfileFeat, DetailProject} from "@/features/index.featues"
 
 // LAYOUT
 export const AppLayoutRoute = createRoute({
@@ -27,6 +27,13 @@ export const ProjectsRoute = createRoute({
     getParentRoute: () => AppLayoutRoute,
     path: "/projects",
     component: ProjectFeeat
+})
+
+// DETAIL PROJECT
+export const DetailProjectRoute = createRoute({
+    getParentRoute: () => AppLayoutRoute,
+    path: "/projects/$id",
+    component: DetailProject
 })
 
 // TASK

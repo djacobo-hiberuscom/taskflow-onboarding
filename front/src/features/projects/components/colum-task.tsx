@@ -1,13 +1,15 @@
-import { createColumnHelper } from "@tanstack/react-table";
+import { createColumnHelper } from "@tanstack/react-table"
+import { Button } from "#components/ui/button"
+import { type DataTableFeatures } from "@/components/ui/data-table/data-table-features"
+import type { Task } from "@/lib/api/types"
+import { getUsernameById } from "@/tools/getUsername"
 
-import { type DataTableFeatures } from "@/components/ui/data-table/data-table-features";
-import type { Project } from "@/lib/api/types";
-import { Button } from "#components/ui/button";
+const columnHelper = createColumnHelper<DataTableFeatures, Task>()
 
-const columnHelper = createColumnHelper<DataTableFeatures, Project>();
 
-export const ProjectColum = columnHelper.columns([
-  columnHelper.accessor("name", {
+
+export const TaskColum = columnHelper.columns([
+  columnHelper.accessor("title", {
     header: ({
       column
     }) => (
@@ -18,32 +20,44 @@ export const ProjectColum = columnHelper.columns([
       </Button>
     ),
   }),
-  columnHelper.accessor("description", {
-    header: ({
+  columnHelper.accessor("assigned_id", {
+    header :({
       column
     }) => (
       <Button variant="ghost" onClick={column.getToggleSortingHandler()} className="-ml-2.5">
-        Descripcion
+        Usuario Asignado
         {column.getIsSorted() === "asc" &&  " ↑"}
         {column.getIsSorted() === "desc" && " ↓"}
       </Button>
     ),
     cell: (info) => (
-      <button className="block max-w-[300px] truncate" onClick={() => console.log("clic")}>{info.getValue()}</button>
-    ),
-  }),
-  columnHelper.accessor("created_at", {
+      <span>{getUsernameById(info.getValue())}</span>
+    )
+  })
+  ,
+  columnHelper.accessor("priority", {
     header: ({
       column
     }) => (
       <Button variant="ghost" onClick={column.getToggleSortingHandler()} className="-ml-2.5">
-        Fecha de creacion 
+        Prioridad
         {column.getIsSorted() === "asc" &&  " ↑"}
         {column.getIsSorted() === "desc" && " ↓"}
       </Button>
     ),
   }),
-  columnHelper.accessor("updated_at", {
+  columnHelper.accessor("status", {
+    header: ({
+      column
+    }) => (
+      <Button variant="ghost" onClick={column.getToggleSortingHandler()} className="-ml-2.5">
+        Estado
+        {column.getIsSorted() === "asc" &&  " ↑"}
+        {column.getIsSorted() === "desc" && " ↓"}
+      </Button>
+    )
+  }),
+  columnHelper.accessor("update_at", {
     header: ({
       column
     }) => (
@@ -52,6 +66,6 @@ export const ProjectColum = columnHelper.columns([
         {column.getIsSorted() === "asc" &&  " ↑"}
         {column.getIsSorted() === "desc" && " ↓"}
       </Button>
-    ),
-  }),
-]);
+    )
+  })
+])
