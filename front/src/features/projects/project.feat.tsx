@@ -6,6 +6,9 @@ import {
   ArchivedButton,
 } from "./components/index.comp";
 
+// Popups
+import { NewProjectPopUp, EditProjectPopUp } from "./popups/index.popup";
+
 // PROYECTOS
 import PROYECTOS from "@/assets/tempdata/projects.json";
 
@@ -13,6 +16,7 @@ export function ProjectFeeat() {
   const projects = PROYECTOS;
   return (
     <div className="p-4 ">
+      
       <div id="cards" className="flex flex-wrap gap-5">
         {projects.map((p) => (
           <ProjectCard
