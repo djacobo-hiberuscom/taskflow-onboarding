@@ -1,7 +1,11 @@
 import { getUsernameById, getUsernameByProjectId } from "@/tools/getUsername";
 import { useNavigate, useParams } from "@tanstack/react-router";
 // popups
-import { EditProjectPopUp } from "./popups/index.popup";
+import {
+  EditProjectPopUp,
+  ArchiveConfirmPopUp,
+  DeleteConfirmPopUp,
+} from "./popups/index.popup";
 // HOOKS
 import { useState } from "react";
 
@@ -35,19 +39,28 @@ import TAREAS from "@/assets/tempdata/tasks.json";
 import PROYECTOS from "@/assets/tempdata/projects.json";
 
 export function DetailProject() {
-  const { id } = useParams({ from: "/app/projects/$id" });
-  const nav = useNavigate();
-  const [selectTask, setSelectTask] = useState<Task | null>(null);
-  const [busqueda, setBusqueda] = useState("");
-  const [status, setStatus] = useState<string | null>(null);
-  const [priority, setPriority] = useState<string | null>(null);
-  const [member, setMember] = useState<string | null>(null);
-  const [editProjectOpen, setEditProjectOpen] = useState(false);
+  // CONST
 
+  const { id } = useParams({ from: "/app/projects/$id" }); // ID del proyecto actual
+  const nav = useNavigate();
+  const [selectTask, setSelectTask] = useState<Task | null>(null); // Tarea selecionada para el drawer
+  const [busqueda, setBusqueda] = useState(""); // Buscador del input
+  const [status, setStatus] = useState<string | null>(null); // selecion del filtro (status)
+  const [priority, setPriority] = useState<string | null>(null); // Selecion del filtro (priority)
+  const [member, setMember] = useState<string | null>(null); // selecion del filtro (miembros)
+
+  const [editProjectOpen, setEditProjectOpen] = useState(false); // popUp de aeditar proyecto
+  const [archiveConfirmIsOpen, setArchiveConfirmIsOpen] = useState(false); // popup para archivar proyecto
+  const [deleteConfirmIsOpen, setDeleteConfirmIsOpen] = useState(false) // Porpup para delete proyecto
+
+  // OBtener proyecto
   const proyecto = PROYECTOS.find((p) => p.id === id);
   if (proyecto === null) return <h1>Error proyecto no encontrado</h1>;
 
+  // TAREAS DEL PROYECTO
   const projectTask = TAREAS.filter((t) => t.project_id === id);
+
+  // Filtrar tareas
   const filterTask = projectTask.filter(
     (t) =>
       (!status || t.status === status) &&
@@ -55,16 +68,31 @@ export function DetailProject() {
       (!member || t.assigned_id === member) &&
       t.title.toLowerCase().startsWith(busqueda.toLowerCase()),
   );
+
+  // NAV atras
   const navBack = () => {
     nav({
       to: "/projects",
     });
   };
 
+  // Abrir popup editProject
   const openEditProjecft = () => {
     setEditProjectOpen(!editProjectOpen);
   };
 
+  // Abrir archive confirm
+  const openArchiveConfirm = () => {
+    setArchiveConfirmIsOpen(!archiveConfirmIsOpen)
+  };
+
+  // Abrir delete confirm
+  const openDeleteConfirm = () => {
+    setDeleteConfirmIsOpen(!deleteConfirmIsOpen)
+  }
+
+
+  // FILTROS
   const item_f1 = [
     { label: "Hecho", value: "Done" },
     { label: "Sin hacer", value: "To Do" },
@@ -80,12 +108,14 @@ export function DetailProject() {
     value: iid,
   }));
 
+  // DESACTIVAR FILTROS
   const quitarFilters = () => {
     setStatus(null);
     setPriority(null);
     setMember(null);
   };
 
+  // COMPONENTE
   return (
     <div>
       <EditProjectPopUp
@@ -100,6 +130,20 @@ export function DetailProject() {
         tarea={selectTask}
         onOpenChange={(open) => {
           if (!open) setSelectTask(null);
+        }}
+      />
+      <ArchiveConfirmPopUp
+        isOpen={archiveConfirmIsOpen}
+        proyecto={proyecto}
+        onOpenChange={(open) => {
+          if (!open) setArchiveConfirmIsOpen(false);
+        }}
+      />
+      <DeleteConfirmPopUp
+        isOpen={deleteConfirmIsOpen}
+        proyecto={proyecto}
+        onOpenChange={(open) => {
+          if (!open) setDeleteConfirmIsOpen(false);
         }}
       />
 
@@ -132,7 +176,7 @@ export function DetailProject() {
                 <Pen />
                 Editar
               </Button>
-              <Button variant="outline" onClick={() => {}}>
+              <Button variant="outline" onClick={openArchiveConfirm}>
                 <Archive />
                 Archivar
               </Button>
@@ -141,6 +185,7 @@ export function DetailProject() {
               <Button
                 variant="outline"
                 className="text-red-400 hover:text-red-400"
+                onClick={openDeleteConfirm}
               >
                 <Trash />
                 Eliminar
