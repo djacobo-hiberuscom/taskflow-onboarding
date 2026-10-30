@@ -24,10 +24,10 @@ import {
 export const AppLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: "app",
-  beforeLoad: ({location}) => {
-    if (keycloak.authenticated) return
-    sessionStorage.setItem("returnTo", location.href)
-    throw redirect({to: "/login"})
+  beforeLoad: ({ location }) => {
+    if (keycloak.authenticated) return;
+    sessionStorage.setItem("returnTo", location.href);
+    throw redirect({ to: "/login" });
   },
   component: AppLayout,
 });
@@ -36,7 +36,7 @@ export const AppLayoutRoute = createRoute({
 export const LoginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/login",
-  
+
   component: LoginPage,
 });
 // REGISTER
