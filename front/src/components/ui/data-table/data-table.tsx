@@ -31,7 +31,7 @@ export function DataTable<TData extends RowData>({
   return (
     <div className="overflow-hidden rounded-md border">
       <Table>
-        <TableHeader className="bg-background">
+        <TableHeader className="brightness-95" >
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id} className="p-4">
               {headerGroup.headers.map((header) => {
@@ -64,7 +64,7 @@ export function DataTable<TData extends RowData>({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                Sin resultados
               </TableCell>
             </TableRow>
           )}

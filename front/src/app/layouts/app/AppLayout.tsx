@@ -18,8 +18,8 @@ import {
 import { Outlet, useLocation } from "@tanstack/react-router";
 
 export function AppLayout() {
-  const {pathname} = useLocation()
-  const title = personalNav.find((item) => item.to === pathname)?.label ?? ""
+  const { pathname } = useLocation();
+  const title = personalNav.find((item) => item.to === pathname)?.label ?? "";
 
   return (
     <SidebarProvider>
@@ -46,7 +46,7 @@ export function AppLayout() {
       <SidebarInset className="min-w-0 bg-[#F3F5F9]">
         <StickyHeader title={title} />
         <div className="mx-auto w-full max-w-350 flex-1">
-          <Outlet/>
+          <Outlet />
         </div>
       </SidebarInset>
     </SidebarProvider>
