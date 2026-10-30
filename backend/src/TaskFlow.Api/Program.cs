@@ -1,6 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using TaskFlow.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using TaskFlow.Application.Abstractions;
+using TaskFlow.Application.Projects;
+using TaskFlow.Infrastructure.Persistence.Repositories;
+using TaskFlow.Api.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +15,11 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddProblemDetails();
+
+builder.Services.AddTaskFlowAuthentication(builder.Configuration, builder.Environment);
+builder.Services.AddCors(options => options.AddPolicy("Frontend", policy =>
+    policy.WithOrigins(builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [])
+        .AllowAnyHeader().AllowAnyMethod()));
 
 
 
@@ -25,6 +34,12 @@ if(connectionString == null)
 
 builder.Services.AddDbContext<TaskFlowDbContext>(options =>
     options.UseNpgsql(connectionString));
+
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
+
+builder.Services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<TaskFlowDbContext>());
+
+builder.Services.AddScoped<ProjectService>();
 
 builder.Services.AddHealthChecks().AddDbContextCheck<TaskFlowDbContext>();
 
@@ -44,7 +59,7 @@ app.UseStatusCodePages();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi().AllowAnonymous();
 }
 
 if (!app.Environment.IsDevelopment())
@@ -52,7 +67,11 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
+app.UseRouting();
+app.UseCors("Frontend");
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<LocalUserMiddleware>();
 
 app.MapControllers();
 
@@ -74,6 +93,6 @@ app.MapHealthChecks("/health", new HealthCheckOptions
             await context.Response.WriteAsync(report.Status.ToString());
         }
     }
-});
+}).AllowAnonymous();
 
 app.Run();

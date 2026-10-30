@@ -81,4 +81,19 @@ public class AppUser
 
     }
 
+    public bool UpdateProfile(string displayName, string? email)
+    {
+        displayName = ValidateDisplayName(displayName);
+        email = ValidateEmail(email);
+
+        if (DisplayName == displayName && Email == email)
+        {
+            return false;
+        }
+
+        DisplayName = displayName;
+        Email = email;
+        return true;
+    }
+
 }
