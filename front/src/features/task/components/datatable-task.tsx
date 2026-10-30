@@ -1,6 +1,6 @@
 import { Input, DataTable } from "@/components/index.comp";
 import { useState } from "react";
-import { TaskColum } from "@/components/common/tools/index.tool"
+import { TaskColum } from "@/features/projects/components/colum-task"
 import Tareas from "@/assets/tempdata/tasks.json";
 
 const TAREAS = Tareas
