@@ -11,18 +11,24 @@ import type { Project } from "#lib/api/types";
 import { Trash, TriangleAlertIcon } from "lucide-react";
 
 interface popParameters {
+  modal?: boolean;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   proyecto?: Project;
 }
 
 export function DeleteConfirmPopUp({
+  modal,
   isOpen,
   onOpenChange,
   proyecto,
 }: popParameters) {
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={onOpenChange}
+     modal={modal}
+    >
       <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col p-4 gap-3">
         <DeleteConfirmContainer proyecto={proyecto} />
       </DialogContent>

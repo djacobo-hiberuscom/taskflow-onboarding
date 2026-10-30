@@ -6,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
+import {cn} from "@/lib/utils"
 interface item {
   label: string,
   value: string
@@ -15,14 +15,15 @@ interface item {
 interface parameters {
   items: item[],
   placeholder: string,
-  value: string | null,
-  onChange: (value: string | null) => void
+  value?: string | null,
+  onChange?: (value: string | null) => void
+  className?: string
 }
 
-export function FilterSeletor({items, placeholder, value, onChange}: parameters) {
+export function FilterSeletor({items, placeholder, value, onChange, className}: parameters) {
   return (
     <Select items={items} value={value} onValueChange={onChange}>
-      <SelectTrigger className="w-45">
+      <SelectTrigger className={cn("w-45", className)}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>

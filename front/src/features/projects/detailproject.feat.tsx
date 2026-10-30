@@ -128,6 +128,7 @@ export function DetailProject() {
       <DeailTaskDrawer
         isOpen={selectTask !== null}
         tarea={selectTask}
+        proyecto={proyecto}
         onOpenChange={(open) => {
           if (!open) setSelectTask(null);
         }}
