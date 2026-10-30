@@ -15,7 +15,7 @@ public class ProjectService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Guid> CreateProjectAsync(string name, string? description,
+    public async Task<Project> CreateProjectAsync(string name, string? description,
         Guid createdBy, CancellationToken cancellationToken = default)
     {
         var project = new Project(name, description, createdBy);
@@ -26,7 +26,7 @@ public class ProjectService
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return project.Id;
+        return project;
     }
 
 }

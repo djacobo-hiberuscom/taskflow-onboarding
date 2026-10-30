@@ -11,6 +11,7 @@ public sealed class CurrentUser : ICurrentUser
         "El usuario local todavía no se ha resuelto para esta petición.");
 
     public Guid UserId => User.Id;
+    public string DisplayName => User.DisplayName;
     public bool IsAdmin { get; private set; }
 
     internal void Initialize(AppUser user, bool isAdmin)
