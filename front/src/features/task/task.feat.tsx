@@ -1,252 +1,306 @@
-import { getUsernameById, getUsernameByProjectId } from "@/tools/getUsername";
-import { useNavigate, useParams } from "@tanstack/react-router";
+// ICONOS
+import { X } from "lucide-react";
 // popups
-import {
-  EditProjectPopUp,
-  ArchiveConfirmPopUp,
-  DeleteConfirmPopUp,
-} from "./popups/index.popup";
-// HOOKS
-import { useState } from "react";
-
-// COMPONENTES
-import {
-  Input,
-  DataTable,
-  Button,
-  Separator,
-  Badge,
-} from "@/components/index.comp";
-import { FilterSeletor, DeailTaskDrawer } from "./components/index.comp";
-
-// ICONS
-import {
-  ArrowBigLeftDashIcon,
-  Pen,
-  Archive,
-  Trash,
-  Plus,
-  CircleUserRound,
-  X,
-} from "lucide-react";
-
+import {} from "./popups/index.popup";
+// COMPONENTS
+import {Badge} from "@/components/index.comp"
+import {DeailTaskDrawer} from "./components/index.comp"
 // TYPES
 import type { Task } from "#lib/api/types";
-import { TaskColum } from "./components/colum-task";
 
 // CONST
 import TAREAS from "@/assets/tempdata/tasks.json";
 import PROYECTOS from "@/assets/tempdata/projects.json";
+import USUARIOS from "@/assets/tempdata/users.json";
+import { FilterSeletor } from "./components/index.comp";
+import { Button, Input } from "@/components/index.comp";
+import { useState } from "react";
 
-export function DetailProject() {
-  // CONST
+// CONST
+const Ntareas = TAREAS.length;
+const Nproyectos = PROYECTOS.length;
 
-  const { id } = useParams({ from: "/app/projects/$id" }); // ID del proyecto actual
-  const nav = useNavigate();
-  const [selectTask, setSelectTask] = useState<Task | null>(null); // Tarea selecionada para el drawer
-  const [busqueda, setBusqueda] = useState(""); // Buscador del input
-  const [status, setStatus] = useState<string | null>(null); // selecion del filtro (status)
-  const [priority, setPriority] = useState<string | null>(null); // Selecion del filtro (priority)
-  const [member, setMember] = useState<string | null>(null); // selecion del filtro (miembros)
+// FEAT
+export function TaskFeat() {
+  // FILTERS
+  const [projectFilter, setProjectFilter] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [priorityFilter, setPrirorityFilter] = useState<string | null>(null);
+  const [memberFilter, setMemberFilter] = useState<string | null>(null);
+  // BUSCADOR
+  const [buscador, setbuscador] = useState("");
 
-  const [editProjectOpen, setEditProjectOpen] = useState(false); // popUp de aeditar proyecto
-  const [archiveConfirmIsOpen, setArchiveConfirmIsOpen] = useState(false); // popup para archivar proyecto
-  const [deleteConfirmIsOpen, setDeleteConfirmIsOpen] = useState(false) // Porpup para delete proyecto
+  // Select task
+  const [selectTask, setSelectTask] = useState<Task | null>(null)
+  // PAGE
+  const PAGE_SIZE = 10;
+  const [page, setPage] = useState(1);
 
-  // OBtener proyecto
-  const proyecto = PROYECTOS.find((p) => p.id === id);
-  if (proyecto === null) return <h1>Error proyecto no encontrado</h1>;
-
-  // TAREAS DEL PROYECTO
-  const projectTask = TAREAS.filter((t) => t.project_id === id);
-
-  // Filtrar tareas
-  const filterTask = projectTask.filter(
+  // TAREAS
+  const tareasFiltradas = TAREAS.filter(
     (t) =>
-      (!status || t.status === status) &&
-      (!priority || t.priority === priority) &&
-      (!member || t.assigned_id === member) &&
-      t.title.toLowerCase().startsWith(busqueda.toLowerCase()),
-  );
+      (!projectFilter || t.project_id === projectFilter) &&
+      (!statusFilter || t.status === statusFilter) &&
+      (!priorityFilter || t.priority === priorityFilter) &&
+      (!memberFilter || t.assigned_id === memberFilter) &&
+      t.title.toLocaleLowerCase().includes(buscador.toLocaleLowerCase()),
+  ).slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  // NAV atras
-  const navBack = () => {
-    nav({
-      to: "/projects",
-    });
+  const totalPages = Math.ceil(Ntareas / PAGE_SIZE);
+
+  // QUITAR FILTROS
+  const quitarFiltros = () => {
+    setProjectFilter(null);
+    setStatusFilter(null);
+    setPrirorityFilter(null);
+    setMemberFilter(null);
+    setbuscador("");
   };
 
-  // Abrir popup editProject
-  const openEditProjecft = () => {
-    setEditProjectOpen(!editProjectOpen);
-  };
-
-  // Abrir archive confirm
-  const openArchiveConfirm = () => {
-    setArchiveConfirmIsOpen(!archiveConfirmIsOpen)
-  };
-
-  // Abrir delete confirm
-  const openDeleteConfirm = () => {
-    setDeleteConfirmIsOpen(!deleteConfirmIsOpen)
-  }
-
-
-  // FILTROS
-  const item_f1 = [
-    { label: "Hecho", value: "Done" },
-    { label: "Sin hacer", value: "To Do" },
-    { label: "En proceso", value: "In Progress" },
-  ];
-  const item_f2 = [
-    { label: "Alta", value: "High" },
-    { label: "Madia", value: "Medium" },
-    { label: "Baja", value: "Low" },
-  ];
-  const item_f3 = getUsernameByProjectId(id).map((iid) => ({
-    label: getUsernameById(iid) ?? "SinNombre",
-    value: iid,
-  }));
-
-  // DESACTIVAR FILTROS
-  const quitarFilters = () => {
-    setStatus(null);
-    setPriority(null);
-    setMember(null);
-  };
-
-  // COMPONENTE
   return (
-    <div>
-      <EditProjectPopUp
-        isOpen={editProjectOpen}
-        onOpenChange={(open) => {
-          if (!open) setEditProjectOpen(false);
-        }}
-        proyecto={proyecto}
-      />
+    <div className="flex flex-col gap-8 justify-start p-3">
       <DeailTaskDrawer
         isOpen={selectTask !== null}
         tarea={selectTask}
-        proyecto={proyecto}
+        proyecto={PROYECTOS.find((p) => p.id === selectTask?.project_id)}
         onOpenChange={(open) => {
           if (!open) setSelectTask(null);
         }}
       />
-      <ArchiveConfirmPopUp
-        isOpen={archiveConfirmIsOpen}
-        proyecto={proyecto}
-        onOpenChange={(open) => {
-          if (!open) setArchiveConfirmIsOpen(false);
-        }}
+      <HeaderTaskFeat />
+      <FiltersTaskFeat
+        projectFilter={projectFilter}
+        setProjectFilter={setProjectFilter}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        priorityFilter={priorityFilter}
+        setPrirorityFilter={setPrirorityFilter}
+        memberFilter={memberFilter}
+        setMemberFilter={setMemberFilter}
+        buscador={buscador}
+        setbuscador={setbuscador}
+        quitarFiltros={quitarFiltros}
+        setPage={() => setPage(1)}
       />
-      <DeleteConfirmPopUp
-        isOpen={deleteConfirmIsOpen}
-        proyecto={proyecto}
-        onOpenChange={(open) => {
-          if (!open) setDeleteConfirmIsOpen(false);
-        }}
-      />
-
-      <div
-        className="absolute top-3 left-17 p-1 rounded-full  border shadow-black z-50"
-        onClick={navBack}
-      >
-        <ArrowBigLeftDashIcon />
-      </div>
-
-      <div className="flex flex-col bg-background items-center justify-center gap-8 p-5 m-5 border rounded-xl">
-        <div className="p-5 w-full flex justify-between">
-          <div id="texto">
-            <h1 className="text-3xl font-bold">{proyecto?.name}</h1>
-            <p> {proyecto?.description}</p>
-
-            <Badge className="mt-9 text-2xs font-bold text-[#166534] py-2 bg-[#DCFCE7]">
-              {projectTask.length} Tareas
-            </Badge>
-          </div>
-          <div id="botonera" className="flex flex-col justify-end items gap-3">
-            <div className="flex flex-row gap-5 justify-end">
-              <h3 className="flex gap-2 text-xl items-center">
-                {getUsernameById(proyecto?.created_by)}
-                <CircleUserRound />
-              </h3>
-            </div>
-            <div className="flex gap-2 h-fit">
-              <Button variant="outline" onClick={openEditProjecft}>
-                <Pen />
-                Editar
-              </Button>
-              <Button variant="outline" onClick={openArchiveConfirm}>
-                <Archive />
-                Archivar
-              </Button>
-              <Separator orientation="vertical" />
-
-              <Button
-                variant="outline"
-                className="text-red-400 hover:text-red-400"
-                onClick={openDeleteConfirm}
-              >
-                <Trash />
-                Eliminar
-              </Button>
-            </div>
-            <Button>
-              <Plus />
-              Crear tarea
-            </Button>
-          </div>
-        </div>
-
-        <div
-          id="tabla-task"
-          className="flex flex-col overflow-hidden rounded-md bg-background shadow-2xs p-3 gap-4 w-full"
-        >
-          <div>
-            <div className="flex gap-2 items-center">
-              <FilterSeletor
-                items={item_f1}
-                placeholder="Seleciona estados"
-                value={status}
-                onChange={setStatus}
-              />
-              <FilterSeletor
-                items={item_f2}
-                placeholder="Seleciona prioridad"
-                value={priority}
-                onChange={setPriority}
-              />
-              <FilterSeletor
-                items={item_f3}
-                placeholder="Seleciona miembros"
-                value={member}
-                onChange={setMember}
-              />
-              <Button
-                variant="ghost"
-                className="flex justify-center items-center"
-                onClick={quitarFilters}
-              >
-                <X />
-                Quitar filtro
-              </Button>
-              <Input
-                placeholder="Buscar por nombre"
-                onChange={(e) => setBusqueda(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <DataTable
-            columns={TaskColum}
-            data={filterTask}
-            onClic={(t) => {
-              setSelectTask(t === selectTask ? null : t);
-            }}
-          />
+      <div>
+        <HeaderTableTask />
+        <div id="Tabla" className=" flex-1">
+          {tareasFiltradas.map((t) => {
+            return <RowTableTask tarea={t} onClictask={() => setSelectTask(t === selectTask ? null : t)}/>;
+          })}
         </div>
       </div>
+
+      <BotoneraFooter
+        nextClic={() => {
+          if (page + 1 <= totalPages) setPage(page + 1);
+        }}
+        previousClic={() => {
+          if (page - 1 > 0) setPage(page - 1);
+        }}
+        actualPage={page}
+        totalPages={totalPages}
+      />
     </div>
   );
 }
+
+// header
+function HeaderTaskFeat() {
+  return (
+    <div id="Header" className="">
+      <h1 className="text-xs text-gray-500">
+        {Ntareas} Tareas en {Nproyectos} Proyectos
+      </h1>
+    </div>
+  );
+}
+// ------
+
+// Filters
+const project_filter = PROYECTOS.map((p) => ({
+  // PROYECTOS
+  label: p.name,
+  value: p.id,
+}));
+const status_filter = [
+  // ESTADO
+  { label: "Hecho", value: "Done" },
+  { label: "Sin hacer", value: "To Do" },
+  { label: "En proceso", value: "In Progress" },
+];
+const priority_filter = [
+  // PRIORIDAD
+  { label: "Alta", value: "High" },
+  { label: "Madia", value: "Medium" },
+  { label: "Baja", value: "Low" },
+];
+const usuarios_filter = USUARIOS.map((u) => ({
+  // USUARIOS
+  label: u.display_name,
+  value: u.id,
+}));
+interface filterParams {
+  projectFilter: string | null;
+  setProjectFilter: (value: string | null) => void;
+  statusFilter: string | null;
+  setStatusFilter: (value: string | null) => void;
+  priorityFilter: string | null;
+  setPrirorityFilter: (value: string | null) => void;
+  memberFilter: string | null;
+  setMemberFilter: (value: string | null) => void;
+  buscador: string;
+  setbuscador: (value: string) => void;
+  quitarFiltros: () => void;
+  setPage:(value: number) => void
+}
+function FiltersTaskFeat({
+  projectFilter,
+  setProjectFilter,
+  statusFilter,
+  setStatusFilter,
+  priorityFilter,
+  setPrirorityFilter,
+  memberFilter,
+  setMemberFilter,
+  buscador,
+  setbuscador,
+  quitarFiltros,
+  setPage
+}: filterParams) {
+  // Componente
+
+  return (
+    <div id="Filtros" className="flex gap-2">
+      <FilterSeletor
+        items={project_filter}
+        placeholder="Proyectos"
+        value={projectFilter}
+        onChange={setProjectFilter}
+      />
+      <FilterSeletor
+        items={status_filter}
+        placeholder="Estados"
+        value={statusFilter}
+        onChange={setStatusFilter}
+      />
+      <FilterSeletor
+        items={priority_filter}
+        placeholder="Priorida"
+        value={priorityFilter}
+        onChange={setPrirorityFilter}
+      />
+      <FilterSeletor
+        items={usuarios_filter}
+        placeholder="Miembros"
+        value={memberFilter}
+        onChange={setMemberFilter}
+      />
+      <Button onClick={quitarFiltros} variant="outline">
+        <X />
+        Quitar filtros
+      </Button>
+      <Input
+        value={buscador}
+        onChange={(e) => {
+          setbuscador(e.target.value);
+          setPage(1)
+        }}
+        placeholder="Buscar por nombre"
+      />
+    </div>
+  );
+}
+// ------
+
+// Header Table
+function HeaderTableTask() {
+  return (
+    <div
+      id="HeaderTable"
+      className="grid grid-cols-6 items-center w-full text-gray-400 border rounded-t-2xl p-5"
+    >
+      <span>Nombre</span>
+      <span>Proyecto</span>
+      <span>Estado</span>
+      <span>Prioridad</span>
+      <span>Asignado</span>
+      <span>vencimiento</span>
+    </div>
+  );
+}
+// ------
+// TableRow
+interface rowParams {
+  tarea: Task;
+  onClictask: () => void
+}
+function RowTableTask({ tarea, onClictask }: rowParams) {
+  return (
+    <div className="grid grid-cols-6 justify-between w-full bg-background p-4 border-b gap-3 hover:brightness-95" onClick={onClictask}>
+      <span className="truncate">{tarea.title}</span>
+      <span className="truncate">{tarea.project_id}</span>
+      <Badge className={statusClass(tarea.status)}>{tarea.status}</Badge>
+      <Badge className={priorityClass(tarea.priority)}>{tarea.priority}</Badge>
+      <span className="truncate">{tarea.assigned_id}</span>
+      <span>{tarea.due_date}</span>
+    </div>
+  );
+}
+
+
+function priorityClass(prioridad?: Task["priority"]) {
+  switch (prioridad) {
+    case "High":
+      return "bg-[#FEE2E2] text-[#991B1B]";
+    case "Medium":
+      return "bg-[#FEF3C7] text-[#92400E]";
+    case "Low":
+      return "bg-[#DCFCE7] text-[#166534]";
+    default:
+      return "";
+  }
+}
+function statusClass(ststus?: Task["status"]) {
+  switch (ststus) {
+    case "Done":
+      return "bg-[#DCFCE7] text-[#166534]";
+    case "To Do":
+      return "bg-[#FEF3C7] text-[#92400E]";
+    case "In Progress":
+      return "bg-[#DBEAFE] text-[#1E40AF]";
+    default:
+      return "";
+  }
+}
+
+
+// ----
+// BOTONOERA
+interface botonParameters {
+  nextClic: () => void;
+  previousClic: () => void;
+  actualPage: number;
+  totalPages: number;
+}
+function BotoneraFooter({
+  nextClic,
+  previousClic,
+  actualPage,
+  totalPages,
+}: botonParameters) {
+  return (
+    <div className="flex gap-3 items-center justify-end">
+      <Button onClick={previousClic} variant="outline">
+        Anterior
+      </Button>
+      <span>
+        {actualPage} / {totalPages}
+      </span>
+      <Button onClick={nextClic} variant="outline">
+        Siguiente
+      </Button>
+    </div>
+  );
+}
+
