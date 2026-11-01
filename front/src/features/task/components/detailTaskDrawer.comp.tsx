@@ -24,6 +24,7 @@ interface parameters {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   proyecto?: Project;
+  isAdmin: boolean;
 }
 
 export function DeailTaskDrawer({
@@ -31,13 +32,13 @@ export function DeailTaskDrawer({
   isOpen,
   onOpenChange,
   proyecto,
+  isAdmin,
 }: parameters) {
-
-  const [confirmDeleteIsOpen, setConfirmDeleteIsOpen] = useState(false)
+  const [confirmDeleteIsOpen, setConfirmDeleteIsOpen] = useState(false);
 
   const openDeleteConfirm = () => {
-    setConfirmDeleteIsOpen(!confirmDeleteIsOpen)
-  }
+    setConfirmDeleteIsOpen(!confirmDeleteIsOpen);
+  };
 
   return (
     <Drawer
@@ -47,15 +48,21 @@ export function DeailTaskDrawer({
       open={isOpen}
       onOpenChange={onOpenChange}
     >
-      <DeleteConfirmPopUp 
-      modal={false}
-      isOpen= {confirmDeleteIsOpen}
-      onOpenChange={(open)=> {if (!open) setConfirmDeleteIsOpen(false)}}
+      <DeleteConfirmPopUp
+        modal={false}
+        isOpen={confirmDeleteIsOpen}
+        onOpenChange={(open) => {
+          if (!open) setConfirmDeleteIsOpen(false);
+        }}
       />
       <DrawerContent>
-        <DetailTaskDrawerContainer tarea={tarea} proyecto={proyecto} />
+        <DetailTaskDrawerContainer
+          isAdmin={isAdmin}
+          tarea={tarea}
+          proyecto={proyecto}
+        />
         <DrawerFooter>
-          <DrawerBotonera onDeleteClic={openDeleteConfirm}/>
+          <DrawerBotonera isAdmin={isAdmin} onDeleteClic={openDeleteConfirm} />
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
@@ -67,8 +74,13 @@ export function DeailTaskDrawer({
 interface containerParameters {
   tarea?: Task | null;
   proyecto?: Project;
+  isAdmin: boolean;
 }
-function DetailTaskDrawerContainer({ tarea, proyecto }: containerParameters) {
+function DetailTaskDrawerContainer({
+  tarea,
+  proyecto,
+  isAdmin,
+}: containerParameters) {
   const [status, setStatus] = useState<string | null>(tarea?.status ?? null);
   const [member, setMember] = useState<string | null>(
     tarea?.assigned_id ?? null,
@@ -101,6 +113,7 @@ function DetailTaskDrawerContainer({ tarea, proyecto }: containerParameters) {
           <div className="min-w-0 flex flex-col gap-1">
             <span>Etado</span>
             <FilterSeletor
+              isAdmin={null}
               className="w-full"
               items={item_f1}
               placeholder="Estado actual"
@@ -111,6 +124,7 @@ function DetailTaskDrawerContainer({ tarea, proyecto }: containerParameters) {
           <div className="min-w-0 flex flex-col gap-1">
             <span>Asignado</span>
             <FilterSeletor
+              isAdmin={isAdmin}
               className="w-full"
               items={item_f2}
               placeholder="Miembro asignado"
@@ -127,7 +141,9 @@ function DetailTaskDrawerContainer({ tarea, proyecto }: containerParameters) {
         <div id="Data">
           <div id="Prioridad" className="border-y p-5 flex">
             <h1 className="flex-1">Prioridad</h1>
-            <Badge className={priorityClass(tarea?.priority)}>{tarea?.priority}</Badge>
+            <Badge className={priorityClass(tarea?.priority)}>
+              {tarea?.priority}
+            </Badge>
           </div>
           <div id="Vencimiento" className="border-y p-5 flex">
             <h1 className="flex-1">Vencimiento</h1>
@@ -152,17 +168,29 @@ function DetailTaskDrawerContainer({ tarea, proyecto }: containerParameters) {
   );
 }
 
-
-interface par{
-  onDeleteClic: () => void
+interface par {
+  onDeleteClic: () => void;
+  isAdmin: boolean;
 }
-function DrawerBotonera ({onDeleteClic}:par){
+function DrawerBotonera({ onDeleteClic, isAdmin }: par) {
   return (
     <div className="flex justify-between">
-      <Button variant="outline" className="text-white bg-[#4F46E5] hover:bg-[#4338CA] hover:text-white">Save</Button>
-      <Button variant="outline" className="text-[#B91C1C]" onClick={onDeleteClic}>Eliminar</Button>
+      <Button
+        variant="outline"
+        className="text-white bg-[#4F46E5] hover:bg-[#4338CA] hover:text-white"
+      >
+        Save
+      </Button>
+      <Button
+        disabled={!isAdmin}
+        variant="outline"
+        className="text-[#B91C1C]"
+        onClick={onDeleteClic}
+      >
+        Eliminar
+      </Button>
     </div>
-  )
+  );
 }
 
 function priorityClass(prioridad?: Task["priority"]) {

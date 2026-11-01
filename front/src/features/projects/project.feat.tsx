@@ -14,9 +14,11 @@ import { ArchivedPopUp, NewProjectPopup } from "./popups/index.popup";
 import PROYECTOS from "@/assets/tempdata/projects.json";
 import { useNavigate } from "@tanstack/react-router";
 
-
+// USER
+import { keycloak } from "@/lib/auth/keycloak";
 
 export function ProjectFeeat() {
+  const isAdmin: boolean = keycloak.hasRealmRole("Admin")
   const [archivedOpen, setArcivedOpen] = useState(false)
   const [newProjectOpen, setNewProjectOpen] = useState(false)
   const nav = useNavigate()
@@ -46,6 +48,7 @@ export function ProjectFeeat() {
           {projects.map((p) => (
             <ProjectCard
               key={p.id}
+              isAdmin={isAdmin}
               id = {p.id}
               onClic={() =>  nav({to : "/projects/$id", params: {id: p.id}})}
               title={p.name}
@@ -57,7 +60,7 @@ export function ProjectFeeat() {
           ))}
         </div>
         <div id="botonera" className="sticky bottom-4 flex justify-end gap-2">
-          <ArchivedButton onClic={() => openArchive()} />
+          <ArchivedButton isAdmin={isAdmin} onClic={() => openArchive()} />
           <AddButton onClic={() => openNewProject()} />
         </div>
       </div>

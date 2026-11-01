@@ -18,11 +18,12 @@ interface parameters {
   value?: string | null,
   onChange?: (value: string | null) => void
   className?: string
+  isAdmin?:boolean | null
 }
 
-export function FilterSeletor({items, placeholder, value, onChange, className}: parameters) {
+export function FilterSeletor({items, placeholder, value, onChange, className, isAdmin}: parameters) {
   return (
-    <Select items={items} value={value} onValueChange={onChange}>
+    <Select disabled={isAdmin === null ? false : !isAdmin} items={items} value={value} onValueChange={onChange}>
       <SelectTrigger className={cn("w-45", className)}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

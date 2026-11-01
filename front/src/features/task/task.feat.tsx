@@ -3,8 +3,8 @@ import { X } from "lucide-react";
 // popups
 import {} from "./popups/index.popup";
 // COMPONENTS
-import {Badge} from "@/components/index.comp"
-import {DeailTaskDrawer} from "./components/index.comp"
+import { Badge } from "@/components/index.comp";
+import { DeailTaskDrawer } from "./components/index.comp";
 // TYPES
 import type { Task } from "#lib/api/types";
 
@@ -15,6 +15,7 @@ import USUARIOS from "@/assets/tempdata/users.json";
 import { FilterSeletor } from "./components/index.comp";
 import { Button, Input } from "@/components/index.comp";
 import { useState } from "react";
+import { keycloak } from "#lib/auth/keycloak";
 
 // CONST
 const Ntareas = TAREAS.length;
@@ -22,6 +23,8 @@ const Nproyectos = PROYECTOS.length;
 
 // FEAT
 export function TaskFeat() {
+  // IS ADMIN
+  const isAdmin = keycloak.hasRealmRole("Admin");
   // FILTERS
   const [projectFilter, setProjectFilter] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
@@ -31,7 +34,7 @@ export function TaskFeat() {
   const [buscador, setbuscador] = useState("");
 
   // Select task
-  const [selectTask, setSelectTask] = useState<Task | null>(null)
+  const [selectTask, setSelectTask] = useState<Task | null>(null);
   // PAGE
   const PAGE_SIZE = 10;
   const [page, setPage] = useState(1);
@@ -60,6 +63,7 @@ export function TaskFeat() {
   return (
     <div className="flex flex-col gap-8 justify-start p-3">
       <DeailTaskDrawer
+        isAdmin={isAdmin}
         isOpen={selectTask !== null}
         tarea={selectTask}
         proyecto={PROYECTOS.find((p) => p.id === selectTask?.project_id)}
@@ -69,6 +73,7 @@ export function TaskFeat() {
       />
       <HeaderTaskFeat />
       <FiltersTaskFeat
+        isAdmin={null}
         projectFilter={projectFilter}
         setProjectFilter={setProjectFilter}
         statusFilter={statusFilter}
@@ -86,7 +91,12 @@ export function TaskFeat() {
         <HeaderTableTask />
         <div id="Tabla" className=" flex-1">
           {tareasFiltradas.map((t) => {
-            return <RowTableTask tarea={t} onClictask={() => setSelectTask(t === selectTask ? null : t)}/>;
+            return (
+              <RowTableTask
+                tarea={t}
+                onClictask={() => setSelectTask(t === selectTask ? null : t)}
+              />
+            );
           })}
         </div>
       </div>
@@ -141,6 +151,7 @@ const usuarios_filter = USUARIOS.map((u) => ({
   value: u.id,
 }));
 interface filterParams {
+  isAdmin: boolean | null;
   projectFilter: string | null;
   setProjectFilter: (value: string | null) => void;
   statusFilter: string | null;
@@ -152,9 +163,10 @@ interface filterParams {
   buscador: string;
   setbuscador: (value: string) => void;
   quitarFiltros: () => void;
-  setPage:(value: number) => void
+  setPage: (value: number) => void;
 }
 function FiltersTaskFeat({
+  isAdmin,
   projectFilter,
   setProjectFilter,
   statusFilter,
@@ -166,31 +178,35 @@ function FiltersTaskFeat({
   buscador,
   setbuscador,
   quitarFiltros,
-  setPage
+  setPage,
 }: filterParams) {
   // Componente
 
   return (
     <div id="Filtros" className="flex gap-2">
       <FilterSeletor
+        isAdmin={isAdmin}
         items={project_filter}
         placeholder="Proyectos"
         value={projectFilter}
         onChange={setProjectFilter}
       />
       <FilterSeletor
+        isAdmin={isAdmin}
         items={status_filter}
         placeholder="Estados"
         value={statusFilter}
         onChange={setStatusFilter}
       />
       <FilterSeletor
+        isAdmin={isAdmin}
         items={priority_filter}
         placeholder="Priorida"
         value={priorityFilter}
         onChange={setPrirorityFilter}
       />
       <FilterSeletor
+        isAdmin={isAdmin}
         items={usuarios_filter}
         placeholder="Miembros"
         value={memberFilter}
@@ -204,7 +220,7 @@ function FiltersTaskFeat({
         value={buscador}
         onChange={(e) => {
           setbuscador(e.target.value);
-          setPage(1)
+          setPage(1);
         }}
         placeholder="Buscar por nombre"
       />
@@ -233,11 +249,14 @@ function HeaderTableTask() {
 // TableRow
 interface rowParams {
   tarea: Task;
-  onClictask: () => void
+  onClictask: () => void;
 }
 function RowTableTask({ tarea, onClictask }: rowParams) {
   return (
-    <div className="grid grid-cols-6 justify-between w-full bg-background p-4 border-b gap-3 hover:brightness-95" onClick={onClictask}>
+    <div
+      className="grid grid-cols-6 justify-between w-full bg-background p-4 border-b gap-3 hover:brightness-95"
+      onClick={onClictask}
+    >
       <span className="truncate">{tarea.title}</span>
       <span className="truncate">{tarea.project_id}</span>
       <Badge className={statusClass(tarea.status)}>{tarea.status}</Badge>
@@ -247,7 +266,6 @@ function RowTableTask({ tarea, onClictask }: rowParams) {
     </div>
   );
 }
-
 
 function priorityClass(prioridad?: Task["priority"]) {
   switch (prioridad) {
@@ -273,7 +291,6 @@ function statusClass(ststus?: Task["status"]) {
       return "";
   }
 }
-
 
 // ----
 // BOTONOERA
@@ -303,4 +320,3 @@ function BotoneraFooter({
     </div>
   );
 }
-
