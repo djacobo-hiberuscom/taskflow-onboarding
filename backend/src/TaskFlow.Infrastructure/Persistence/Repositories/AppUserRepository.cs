@@ -37,4 +37,16 @@ public class AppUserRepository(TaskFlowDbContext context) : IAppUserRepository
         
         return user;
     }
+
+    public async Task<AppUser[]> GetByIdsAsync(Guid[] userIds, CancellationToken cancellationToken)
+    {
+        if (userIds.Length == 0)
+        {
+            return [];
+        }
+
+        return await context.Users
+            .Where(user => userIds.Contains(user.Id))
+            .ToArrayAsync(cancellationToken);
+    }
 }

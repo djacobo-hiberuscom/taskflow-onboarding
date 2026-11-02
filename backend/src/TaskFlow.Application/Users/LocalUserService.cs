@@ -44,4 +44,9 @@ public class LocalUserService(IAppUserRepository users, IUnitOfWork unitOfWork)
 
         return user;
     }
+
+    public async Task<AppUser[]> GetByIdsAsync(Guid[] userIds, CancellationToken cancellationToken)
+    {
+        return await users.GetByIdsAsync(userIds, cancellationToken);
+    }
 }

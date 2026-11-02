@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.IO.Compression;
+using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using TaskFlow.Application.Projects;
@@ -25,6 +26,53 @@ public class ProjectRepository : IProjectRepository
     public void AddMembership(AppUserProject membership)
     {
         _context.ProjectMemberships.Add(membership);
+    }
+
+    public async Task<ProjectPage> GetPageAsync(
+        Guid? memberUserId, bool archived, int page, 
+        int pageSize, CancellationToken cancellationToken)
+    {
+        var query = _context.Projects.AsQueryable();
+        if(archived == true)
+        {
+            query = query.Where(project => project.ArchivedAt != null);
+        }
+        else
+        {
+            query = query.Where(project => project.ArchivedAt == null);
+        }
+
+        if(memberUserId != null)
+        {
+            query = query.Where(project => 
+                _context.ProjectMemberships.Any(membership => 
+                membership.ProjectId == project.Id &&
+                membership.UserId == memberUserId.Value));
+        }
+
+        var TotalCount = await query.CountAsync(cancellationToken);
+
+        var orderedQuery = query
+            .OrderByDescending(project => project.CreatedAt)
+            .ThenBy(project => project.Id);
+
+        var skip = ((long)page - 1) * pageSize;
+        Project[] items = [];
+        if(skip < TotalCount)
+        {
+            items = await orderedQuery
+                .Skip((int)skip)
+                .Take(pageSize)
+                .ToArrayAsync(cancellationToken);
+        }
+
+        return new ProjectPage
+        {
+            Items = items,
+            Page = page,
+            PageSize = pageSize,
+            TotalCount = TotalCount
+        };
     }
 
     public async Task<Project?> GetVisibleByIdAsync(Guid projectId, Guid userId,

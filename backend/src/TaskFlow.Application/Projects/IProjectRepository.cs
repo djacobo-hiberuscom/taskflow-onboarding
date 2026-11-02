@@ -13,5 +13,9 @@ public interface IProjectRepository
 
     Task<AppUser[]> GetMembersAsync(
         Guid projectId, CancellationToken cancellationToken);
+
+    Task<ProjectPage> GetPageAsync(
+        Guid? memberUserId, bool archived, int page, int pageSize,
+        CancellationToken cancellationToken);
 }
 

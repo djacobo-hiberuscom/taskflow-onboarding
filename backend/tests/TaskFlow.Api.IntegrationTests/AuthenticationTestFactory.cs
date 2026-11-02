@@ -154,6 +154,11 @@ internal sealed class TestUserStore : IAppUserRepository
     {
         return Task.FromResult(Records.Values.SingleOrDefault(user => user.Id == userId));
     }
+
+    public Task<AppUser[]> GetByIdsAsync(Guid[] userIds, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(Records.Values.Where(user => userIds.Contains(user.Id)).ToArray());
+    }
 }
 
 internal sealed class TestUnitOfWork : IUnitOfWork

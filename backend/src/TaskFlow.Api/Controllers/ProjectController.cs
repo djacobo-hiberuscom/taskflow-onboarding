@@ -10,6 +10,8 @@ using TaskFlow.Application.Users;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using System.Linq.Expressions;
 using System.IO.Compression;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
 
 namespace TaskFlow.Api.Controllers;
@@ -54,6 +56,69 @@ public class ProjectController : ControllerBase
             UpdatedAt = project.UpdatedAt
         };
         return Created($"/api/v1/projects/{project.Id}", response);
+    }
+
+    [HttpGet]
+    [ProducesResponseType<ProjectPageResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status503ServiceUnavailable)]
+    public async Task<IActionResult> GetAll(
+        CancellationToken cancellationToken,
+        [FromQuery, Range(1, int.MaxValue, ErrorMessage =
+            "La página debe ser mayor o igual a 1.")] int page = 1,
+        [FromQuery, Range(1, 100, ErrorMessage =
+            "El tamaño de página debe estar entre 1 y 100.")] int pageSize = 20,
+        [FromQuery] bool archived = false)
+    {
+        if(archived && !_currentUser.IsAdmin)
+        {
+            return Forbid();
+        }
+
+        var projectPage = await _projectService.GetProjectsAsync(
+            _currentUser.UserId, _currentUser.IsAdmin, archived,
+            page, pageSize, cancellationToken);
+
+        // Obtener juntos los creadores de los proyectos de esta página.
+        var creatorIds = projectPage.Items.Select(project => project.CreatedBy)
+            .OfType<Guid>().Distinct().ToArray();
+        var creators = await _localUserService.GetByIdsAsync(creatorIds, cancellationToken);
+        var creatorsById = creators.ToDictionary(creator => creator.Id);
+
+        var projectResponses = projectPage.Items.Select(project =>
+        {
+            UserSummaryResponse? creatorResponse = null;
+            if (project.CreatedBy.HasValue &&
+                creatorsById.TryGetValue(project.CreatedBy.Value, out var creator))
+            {
+                creatorResponse = new UserSummaryResponse
+                {
+                    Id = creator.Id,
+                    DisplayName = creator.DisplayName
+                };
+            }
+
+            return new ProjectResponse
+            {
+                Id = project.Id,
+                Name = project.Name,
+                Description = project.Description,
+                CreatedBy = creatorResponse,
+                ArchivedAt = project.ArchivedAt,
+                CreatedAt = project.CreatedAt,
+                UpdatedAt = project.UpdatedAt
+            };
+        }).ToArray();
+
+        return Ok(new ProjectPageResponse
+        {
+            Items = projectResponses,
+            Page = projectPage.Page,
+            PageSize = projectPage.PageSize,
+            TotalCount = projectPage.TotalCount
+        });
     }
 
     [HttpGet("{projectId}")]

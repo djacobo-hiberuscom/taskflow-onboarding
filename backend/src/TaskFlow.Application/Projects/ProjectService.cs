@@ -30,6 +30,21 @@ public class ProjectService
         return project;
     }
 
+    public async Task<ProjectPage> GetProjectsAsync(
+        Guid userId, bool isAdmin, bool archived, int page, int pageSize, CancellationToken cancellationToken)
+    {
+        Guid? memberUserId = userId;
+        if (isAdmin)
+        {
+            memberUserId = null;
+        }
+
+        var projectPage = await _projectRepository.GetPageAsync(
+            memberUserId, archived, page, pageSize, cancellationToken);
+
+        return projectPage;
+    }
+
     public async Task<Project?> GetProjectByIdAsync(Guid projectId, Guid userId,
         bool isAdmin, CancellationToken cancellationToken)
     {
