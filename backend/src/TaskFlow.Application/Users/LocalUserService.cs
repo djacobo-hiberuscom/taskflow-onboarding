@@ -36,4 +36,12 @@ public class LocalUserService(IAppUserRepository users, IUnitOfWork unitOfWork)
         displayName = displayName.Trim();
         return displayName.Length > 200 ? displayName[..200] : displayName;
     }
+
+    public async Task<AppUser?> GetByIdAsync(
+        Guid userId, CancellationToken cancellationToken)
+    {
+        var user = await users.GetByIdAsync(userId, cancellationToken);
+
+        return user;
+    }
 }

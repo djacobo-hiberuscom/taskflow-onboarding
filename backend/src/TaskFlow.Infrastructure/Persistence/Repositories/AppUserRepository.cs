@@ -28,4 +28,13 @@ public class AppUserRepository(TaskFlowDbContext context) : IAppUserRepository
         return await context.Users.SingleAsync(
             user => user.KeycloakSub == candidate.KeycloakSub, cancellationToken);
     }
+
+    public async Task<AppUser?> GetByIdAsync(
+        Guid userId, CancellationToken cancellationToken)
+    {
+        var user = await context.Users.SingleOrDefaultAsync(
+            user => user.Id == userId, cancellationToken);
+        
+        return user;
+    }
 }

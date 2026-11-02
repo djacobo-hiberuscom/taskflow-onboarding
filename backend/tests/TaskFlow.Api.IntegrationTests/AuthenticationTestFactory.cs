@@ -149,6 +149,11 @@ internal sealed class TestUserStore : IAppUserRepository
     {
         return Task.FromResult(Records.GetOrAdd(candidate.KeycloakSub, candidate));
     }
+
+    public Task<AppUser?> GetByIdAsync(Guid userId, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(Records.Values.SingleOrDefault(user => user.Id == userId));
+    }
 }
 
 internal sealed class TestUnitOfWork : IUnitOfWork

@@ -1,3 +1,4 @@
+using System.Data;
 using TaskFlow.Application.Abstractions;
 using TaskFlow.Domain;
 
@@ -27,6 +28,23 @@ public class ProjectService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return project;
+    }
+
+    public async Task<Project?> GetProjectByIdAsync(Guid projectId, Guid userId,
+        bool isAdmin, CancellationToken cancellationToken)
+    {
+        var project = await _projectRepository.GetVisibleByIdAsync(projectId, userId, isAdmin, cancellationToken);
+
+        return project;
+    }
+
+    public async Task<AppUser[]> GetMembersAsync(
+        Guid projectId, CancellationToken cancellationToken)
+    {
+        var members = await _projectRepository.GetMembersAsync(
+            projectId, cancellationToken);
+        
+        return members;
     }
 
 }
