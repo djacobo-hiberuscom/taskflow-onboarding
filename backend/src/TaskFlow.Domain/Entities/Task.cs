@@ -76,4 +76,24 @@ public class Task
 
         return title;
     }
+
+    public void UpdateDetails(
+        string title, string? description, TaskPriority priority,
+        DateOnly? dueDate)
+    {
+        title = ValidateTitle(title);
+        description = DomainText.ValidateDescription(description);
+
+        if (!Enum.IsDefined(priority))
+        {
+            throw new ArgumentOutOfRangeException(nameof(priority),
+                "La prioridad no es válida.");
+        }
+
+        Title = title;
+        Description = description;
+        Priority = priority;
+        DueDate = dueDate;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
 }
