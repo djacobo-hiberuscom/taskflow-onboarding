@@ -66,5 +66,30 @@ public class Project
         Description = description;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
+
+    public void Archive()
+    {
+        if(ArchivedAt != null)
+        {
+            return;
+        }
+        
+        var now = DateTimeOffset.UtcNow;
+        ArchivedAt = now;
+        UpdatedAt = now;
+        
+    }
+
+    public void Restore()
+    {
+        if(ArchivedAt == null)
+        {
+            return;
+        }
+        
+        ArchivedAt = null;
+        UpdatedAt = DateTimeOffset.UtcNow;
+        
+    }
 }
 

@@ -2,7 +2,7 @@
 
 > **Responsables:** conjunto — backend y frontend
 >
-> **Estado:** guía de la implementación actual de la base del backend y del AppHost. La configuración completa de identidad y el modelo de negocio se implementan en sus respectivas issues.
+> **Estado:** guía del backend y AppHost actuales, incluido el modelo persistido y la autenticación de la API. La integración real de Keycloak con la SPA y los endpoints de proyectos/tareas siguen pendientes.
 >
 > **Decisión:** Aspire orquesta los servicios durante el desarrollo; las migraciones se aplican explícitamente en un paso separado.
 >
@@ -12,10 +12,11 @@
 
 - `infrastructure/TaskFlow.AppHost/`: proyecto C# que describe los recursos y su arranque con Aspire.
 - `backend/src/`: proyectos `TaskFlow.Domain`, `TaskFlow.Application`, `TaskFlow.Infrastructure` y `TaskFlow.Api`.
-- `backend/tests/TaskFlow.Api.IntegrationTests/`: fixture PostgreSQL, factoría de la API y pruebas de salud.
+- `backend/tests/TaskFlow.Api.IntegrationTests/`: fixture PostgreSQL, factorías de la API y pruebas de salud, esquema y autenticación.
+- `backend/tests/TaskFlow.Domain.Test/`: pruebas unitarias del dominio, sin Docker.
 - `front/`: aplicación React/Vite.
 - `docs/04-development/`: instrucciones de preparación, ejecución y comprobación.
-- `TaskFlow.sln`: solución que agrupa los cuatro proyectos del backend y el proyecto de pruebas. Actualmente no incluye AppHost.
+- `TaskFlow.sln`: solución que agrupa los cuatro proyectos del backend y sus dos proyectos de pruebas. Actualmente no incluye AppHost.
 - `dotnet-tools.json`: manifiesto de herramientas locales, con `dotnet-ef` fijado en `10.0.13`.
 
 La solución permite compilar y ejecutar las pruebas del backend en conjunto. AppHost orquesta procesos y contenedores; no es una capa de negocio.
@@ -69,7 +70,7 @@ El AppHost actual usa la integración de Keycloak y su extensión de PostgreSQL,
 
 ## 4. Bases de datos, configuración y secretos
 
-Por indicación del responsable para esta primera práctica, ambas bases usan el superusuario predeterminado `postgres`. No se crean roles PostgreSQL separados ni un script inicializador de permisos. Es una simplificación del entorno local respecto al diseño inicial; los roles `Admin` y `User` de la aplicación siguen siendo parte de la integración de identidad pendiente.
+Por indicación del responsable para esta primera práctica, ambas bases usan el superusuario predeterminado `postgres`. No se crean roles PostgreSQL separados ni un script inicializador de permisos. Es una simplificación del entorno local respecto al diseño inicial; los roles `Admin` y `User` de la aplicación se comprueban separadamente desde el token validado.
 
 AppHost inyecta en la API la conexión de negocio `ConnectionStrings__TaskFlowDb`. La API la lee como `GetConnectionString("TaskFlowDb")` y detiene el arranque si falta. Keycloak utiliza su propia base `KeyCloakDb`; la API se referencia al servicio Keycloak, pero no accede a sus tablas internas.
 
@@ -79,8 +80,14 @@ Los secretos se conservan fuera de Git. La contraseña de PostgreSQL puede consu
 |---|---|
 | `ConnectionStrings__TaskFlowDb` | Conexión de negocio suministrada por AppHost; configurada explícitamente en la terminal que ejecuta EF. |
 | `ASPNETCORE_ENVIRONMENT` | `Development`, definido en el perfil local `http`. |
+| `Keycloak__Authority` | `http://localhost:8080/realms/taskflow`, configurado en Development y suministrado por AppHost. Debe coincidir con `iss`. |
+| `Keycloak__Audience` | `taskflow-api`, en `appsettings.json`; el access token debe incluir esa audiencia. |
+| `Keycloak__Introspection__ClientId` | `taskflow-api`, cliente confidencial configurado en el realm. |
+| `Keycloak__Introspection__ClientSecret` | AppHost lo inyecta a partir del parámetro secreto existente `taskflow-api-client-secret`; no se versiona. |
+| `Keycloak__Introspection__TimeoutSeconds` | 5 segundos por defecto, configurables entre 1 y 30. |
+| `Cors__AllowedOrigins__0` | `http://localhost:5173` en Development. Fuera de Development se configura explícitamente junto al emisor HTTPS. |
 
-Las opciones de JWT, introspección, CORS y las variables públicas de Vite se incorporarán cuando se implemente esa integración. Las variables de Vite son visibles en el navegador y no deben contener contraseñas ni secretos de cliente.
+El secreto del cliente debe coincidir con el del realm importado; la API y Keycloak reciben el mismo parámetro de AppHost. Si se ejecuta la API fuera de Aspire, hay que proporcionar ese secreto mediante configuración local segura. Su ausencia no impide consultar salud, pero una petición con JWT válido recibe 503 porque no se puede comprobar la sesión. Las variables de Vite son visibles en el navegador y no deben contener contraseñas ni secretos de cliente.
 
 ## 5. Migraciones explícitas, separadas del arranque
 
@@ -107,7 +114,7 @@ dotnet ef migrations list --project backend/src/TaskFlow.Infrastructure --startu
 
 El primer comando debe identificar `TaskFlow.Infrastructure.Persistence.TaskFlowDbContext`, proveedor `Npgsql.EntityFrameworkCore.PostgreSQL`, base `TaskFlowDb` y servidor local en el puerto `5432`. Mostrar la información del contexto no sustituye la comprobación real de conectividad de `/health`.
 
-Actualmente el contexto no tiene entidades mapeadas ni migraciones: `No migrations were found` es coherente con ese estado. En una base sin historial, la consulta de `__EFMigrationsHistory` puede registrar el fallo por tabla inexistente antes de mostrar ese resultado. Otros errores de conexión, credenciales o SQL deben investigarse; no crear manualmente la tabla de historial.
+El contexto ya mapea usuarios, proyectos, pertenencias y tareas y dispone de `InitialCreate`. En una base sin historial, la consulta de `__EFMigrationsHistory` puede registrar el fallo por tabla inexistente antes de listar las migraciones pendientes. Otros errores de conexión, credenciales o SQL deben investigarse; no crear manualmente la tabla de historial.
 
 **Comando único para aplicar las migraciones disponibles:**
 
@@ -125,7 +132,7 @@ dotnet ef migrations add InitialCreate --project backend/src/TaskFlow.Infrastruc
 
 Este último comando genera archivos para revisar y versionar; `database update` los aplica. No generar una migración vacía para completar la issue de la base del backend. Crear o editar datos no requiere migraciones si no cambia el esquema.
 
-La API y AppHost no ejecutan `Database.Migrate`, `MigrateAsync` ni `EnsureCreated` al arrancar. La preparación futura del esquema de pruebas se hará en la infraestructura de pruebas, cuando existan las migraciones. El volumen local conserva los datos entre reinicios; no se debe eliminar para aplicar una actualización ordinaria.
+La API y AppHost no ejecutan `Database.Migrate`, `MigrateAsync` ni `EnsureCreated` al arrancar. La fixture de pruebas aplica las migraciones a su contenedor temporal antes de ejecutar las pruebas. El volumen local conserva los datos entre reinicios; no se debe eliminar para aplicar una actualización ordinaria.
 
 ## 6. Verificación de la base del backend
 
@@ -144,7 +151,7 @@ dotnet test TaskFlow.sln --filter "FullyQualifiedName~HealthTest"
 
 El nombre de la clase es `HealthTest`, en singular. Verificar que el resumen indica pruebas ejecutadas, no cero coincidencias.
 
-Las dos pruebas actuales usan `WebApplicationFactory` y una fixture con la imagen `postgres:18.6`. Una comprueba `200` y cuerpo `Healthy`; la otra detiene temporalmente su contenedor y comprueba `503`, `application/problem+json` y `status: 503`. La fixture crea una base temporal `taskflow_test`, aislada de los datos locales. No se necesita arrancar Aspire para ejecutar estas pruebas.
+Las pruebas de salud usan `WebApplicationFactory` y una fixture con la imagen `postgres:18.6`. Una comprueba `200` y cuerpo `Healthy`; la otra detiene temporalmente su contenedor y comprueba `503`, `application/problem+json` y `status: 503`. Las pruebas de esquema y de alta concurrente utilizan contenedores de esa misma versión. La fixture crea una base temporal `taskflow_test`, aislada de los datos locales. No se necesita arrancar Aspire para ejecutar estas pruebas.
 
 Con Aspire arrancado, también puede comprobarse desde Bruno:
 
@@ -152,14 +159,36 @@ Con Aspire arrancado, también puede comprobarse desde Bruno:
 |---|---|
 | `GET http://localhost:5080/health` | `200` y `Healthy` con PostgreSQL disponible; `503` y Problem Details si deja de estar disponible manteniendo la API en ejecución. |
 | `GET http://localhost:5080/openapi/v1.json` | `200` y documento OpenAPI en `Development`. No implica disponer de una interfaz Swagger. |
-| `GET http://localhost:5080/api/v1/ping` | `200`; controlador provisional para comprobar Controllers y el prefijo de ruta. |
-| `GET http://localhost:5080/ruta-inexistente`, con `Accept: application/json` | `404` con Problem Details. |
+| `GET http://localhost:5080/api/v1/me` sin token | `401` y cabecera `WWW-Authenticate: Bearer`. |
+| `GET http://localhost:5080/api/v1/me` con access token válido y activo | `200` con perfil local y roles. |
+| `GET http://localhost:5080/api/v1/ping` con access token válido y activo | `200`; controlador provisional protegido por la política predeterminada de respaldo. |
+| `GET http://localhost:5080/ruta-inexistente`, con token válido, activo y rol admitido | `404` con Problem Details. |
 
 `Domain` no tiene referencias a ASP.NET Core, EF Core ni a las otras capas. `Application` referencia `Domain`; `Infrastructure`, `Application` y `Domain`; `Api`, `Application` e `Infrastructure`.
 
-La base técnica de ISS-02 no incluye todavía los endpoints de negocio completos, JWT, servicios de usuario, relaciones del dominio ni la migración inicial. `ProjectController` y `TaskController` son archivos de preparación sin endpoints implementados; `Ping` y `WeatherForecast` siguen siendo ejemplos provisionales. Los nuevos controladores de negocio deben declarar rutas bajo `/api/v1`; el ejemplo `WeatherForecast` aún conserva su ruta de plantilla.
+El modelo de dominio, su migración y la autenticación de la API están implementados. `ProjectController` y `TaskController` siguen sin endpoints de negocio implementados; `Ping` y `WeatherForecast` son ejemplos provisionales protegidos por la política de respaldo. Los nuevos controladores de negocio deben declarar rutas bajo `/api/v1`; el ejemplo `WeatherForecast` aún conserva su ruta de plantilla.
 
-Los recorridos de login, revocación, `/me`, permisos, datos de demostración y reconstrucción del esquema se verificarán en sus issues. El despliegue AWS continúa pendiente.
+Los permisos por pertenencia, la semilla de usuarios de demostración y el despliegue AWS continúan pendientes.
+
+### 6.1. Autenticación y perfil local
+
+La configuración se concentra en `backend/src/TaskFlow.Api/Authentication/AuthenticationExtensions.cs`. El recorrido es: JWT validado → introspección → roles admitidos → resolución del `AppUser` local → controlador. El identificador que entrega `ICurrentUser.UserId` pertenece a la tabla `app_user`, no es el `sub` de Keycloak. Los usuarios locales se crean automáticamente en su primer acceso autorizado; no se necesita un POST público para crear perfiles ni la API guarda contraseñas.
+
+Para comprobar desde Bruno, arrancar Aspire, aplicar las migraciones pendientes y obtener un **access token** iniciando sesión mediante el frontend. Crear una petición GET a `http://localhost:5080/api/v1/me`, seleccionar autenticación Bearer e introducir el token solo en el entorno local de ejecución. No usar el ID token ni versionar tokens. La respuesta esperada es `{ "id", "displayName", "email", "roles" }`. Repetir sin token (401), con token válido sin `Admin`/`User` (403) y, con un token válido previamente obtenido, sin conexión al endpoint de introspección (503, sin crear ni actualizar el perfil).
+
+Las pruebas HTTP de JWT, roles y errores de introspección no necesitan Docker ni Keycloak:
+
+```powershell
+dotnet test backend/tests/TaskFlow.Api.IntegrationTests/TaskFlow.Api.IntegrationTests.csproj --filter "FullyQualifiedName~TaskFlow.Api.IntegrationTests.AuthenticationTests"
+```
+
+Estas pruebas mantienen el validador JWT real y solo sustituyen las claves de discovery, la respuesta de introspección y la persistencia. Para comprobar alta concurrente real y salud anónima con PostgreSQL 18.6, se necesita Docker:
+
+```powershell
+dotnet test backend/tests/TaskFlow.Api.IntegrationTests/TaskFlow.Api.IntegrationTests.csproj --filter "FullyQualifiedName~AuthenticationDatabaseTests"
+```
+
+La aceptación con tokens firmados de prueba no sustituye el recorrido real de login, renovación, logout y revocación administrativa. Ese recorrido se verificará cuando esté integrado el trabajo de frontend/Keycloak.
 
 ## 7. Referencias oficiales
 

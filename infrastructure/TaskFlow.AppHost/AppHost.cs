@@ -28,6 +28,8 @@ var keycloak = builder.AddKeycloak("keycloak", port: 8080)
 var back = builder.AddProject<Projects.TaskFlow_Api>("api", launchProfileName: "http")
     .WithReference(taskFlowDb).WaitFor(taskFlowDb)
     .WithReference(keycloak).WaitFor(keycloak)
+    .WithEnvironment("Keycloak__Authority", "http://localhost:8080/realms/taskflow")
+    .WithEnvironment("Keycloak__Introspection__ClientSecret", kcApiSecret)
     .WithExternalHttpEndpoints();
 
 // FRONT
