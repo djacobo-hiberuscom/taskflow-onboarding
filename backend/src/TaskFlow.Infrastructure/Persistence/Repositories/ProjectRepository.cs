@@ -101,4 +101,20 @@ public class ProjectRepository : IProjectRepository
 
         return await query.ToArrayAsync(cancellationToken);
     }
+
+    public async Task<Project?> GetByIdForUpdateAsync(
+        Guid projectId, CancellationToken cancellationToken)
+    {
+        if(_context.Database.CurrentTransaction == null)
+        {
+            throw new InvalidOperationException(
+                "El bloqueo del proyecto requiere una transaccion activa.");
+        }
+
+        var projects =  await _context.Projects
+            .FromSql($"SELECT * FROM project WHERE id = {projectId} FOR UPDATE")
+            .ToArrayAsync(cancellationToken);
+
+        return projects.SingleOrDefault();
+    }
 }

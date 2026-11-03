@@ -62,4 +62,38 @@ public class ProjectService
         return members;
     }
 
+    public async Task<Project?> UpdateProjectAsync(
+        Guid projectId, string name, string? description, 
+        Guid userId, bool isAdmin, CancellationToken cancellationToken = default)
+    {
+        return await _unitOfWork.ExecuteInTransactionAsync<Project?>(
+            async token =>
+            {
+                //Recupera y bloquea el proyecto
+                var project = await _projectRepository
+                    .GetByIdForUpdateAsync(projectId, token);
+
+                if (project is null)
+                {
+                    return null;
+                }
+
+                //se comprueba si visibilidad despues de aplicar el bloqueo
+                var visibleProject = await _projectRepository
+                    .GetVisibleByIdAsync(projectId, userId, isAdmin, token);
+
+                if (visibleProject is null)
+                {
+                    return null;
+                }
+
+                project.UpdateDetails(name, description);
+
+                await _unitOfWork.SaveChangesAsync(token);
+
+                return project;
+            },
+            cancellationToken);
+    }
+
 }

@@ -174,6 +174,51 @@ public class ProjectController : ControllerBase
 
         });
     }
+
+    [HttpPut("{projectId}")]
+    public async Task<IActionResult> Update(
+        Guid projectId, 
+        [FromBody] UpdateProjectRequest request, 
+        CancellationToken cancellationToken)
+    {
+        var project = await _projectService.UpdateProjectAsync(
+            projectId, request.Name, request.Description,
+            _currentUser.UserId, _currentUser.IsAdmin, cancellationToken);
+        
+        if(project == null)
+        {
+            return NotFound();
+        }
+        
+        UserSummaryResponse? creatorResponse = null;
+        if (project.CreatedBy.HasValue)
+        {
+            var creator = await _localUserService.GetByIdAsync(
+                project.CreatedBy.Value, cancellationToken);
+            
+            if(creator is not null)
+            {
+                creatorResponse = new UserSummaryResponse
+                {
+                    Id = creator.Id,
+                    DisplayName = creator.DisplayName
+                };
+            }
+        }
+
+        var response = new ProjectResponse
+        {
+            Id = project.Id,
+            Name = project.Name,
+            Description = project.Description,
+            CreatedBy = creatorResponse,
+            ArchivedAt = project.ArchivedAt,
+            CreatedAt = project.CreatedAt,
+            UpdatedAt = project.UpdatedAt
+        };
+
+        return Ok(response);
+    }
     
 
 }

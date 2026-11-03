@@ -8,7 +8,8 @@ public interface IProjectRepository
 
     void AddMembership(AppUserProject membership);
 
-    Task<Project?> GetVisibleByIdAsync(Guid projectId, Guid userId, bool isAdmin,
+    Task<Project?> GetVisibleByIdAsync(
+        Guid projectId, Guid userId, bool isAdmin,
         CancellationToken cancellationToken);
 
     Task<AppUser[]> GetMembersAsync(
@@ -17,5 +18,8 @@ public interface IProjectRepository
     Task<ProjectPage> GetPageAsync(
         Guid? memberUserId, bool archived, int page, int pageSize,
         CancellationToken cancellationToken);
+
+    Task<Project?> GetByIdForUpdateAsync(
+        Guid projectId, CancellationToken cancellationToken = default);
 }
 

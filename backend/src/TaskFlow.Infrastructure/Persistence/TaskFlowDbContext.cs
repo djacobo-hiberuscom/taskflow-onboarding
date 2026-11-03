@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TaskFlow.Domain;
 using TaskFlow.Infrastructure.Persistence.Configurations;
 using TaskFlow.Application.Abstractions;
+using System.Data;
 namespace TaskFlow.Infrastructure.Persistence;
 
 
@@ -16,6 +17,21 @@ public class TaskFlowDbContext : DbContext, IUnitOfWork
         : base(options)
     {
         
+    }
+    public async Task<TResult> ExecuteInTransactionAsync<TResult>(
+    Func<CancellationToken, Task<TResult>> operation,
+    CancellationToken cancellationToken = default)
+    {
+        await using var transaction =
+            await Database.BeginTransactionAsync(
+                IsolationLevel.ReadCommitted,
+                cancellationToken);
+
+        var result = await operation(cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
+
+        return result;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -165,6 +165,15 @@ internal sealed class TestUnitOfWork : IUnitOfWork
 {
     internal int SaveCount { get; private set; }
 
+    public Task<TResult> ExecuteInTransactionAsync<TResult>(
+        Func<CancellationToken, Task<TResult>> operation,
+        CancellationToken cancellationToken = default)
+    {
+        // Este doble solo se usa con el almacén en memoria de las pruebas de autenticación.
+        cancellationToken.ThrowIfCancellationRequested();
+        return operation(cancellationToken);
+    }
+
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         SaveCount++;
