@@ -21,5 +21,7 @@ public interface IProjectRepository
 
     Task<Project?> GetByIdForUpdateAsync(
         Guid projectId, CancellationToken cancellationToken = default);
+    
+    void Remove(Project project);
 }
 

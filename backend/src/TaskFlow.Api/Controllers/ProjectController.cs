@@ -244,6 +244,56 @@ public class ProjectController : ControllerBase
                     "Resultado de archivado no reconocido.");
         }
     }
+
+    [HttpPost("{projectId}/restore")]
+    public async Task<IActionResult> Restore(
+        Guid projectId, CancellationToken cancellationToken)
+    {
+        var result = await _projectService.RestoreProjectAsync(
+            projectId, _currentUser.UserId, _currentUser.IsAdmin,
+            cancellationToken);
+
+        switch (result)
+        {
+            case ProjectOperationResult.Success:
+                return NoContent();
+            
+            case ProjectOperationResult.NotFound:
+                return NotFound();
+            
+            case ProjectOperationResult.Forbidden:
+                return Forbid();
+            
+            default:
+                throw new InvalidOperationException(
+                    "Resultado de desarchivado no reconocido.");
+        }
+    }
+
+    [HttpDelete("{projectId}")]
+    public async Task<IActionResult> Delete(
+        Guid projectId, CancellationToken cancellationToken)
+    {
+        var result = await _projectService.DeleteProjectAsync(
+            projectId, _currentUser.UserId, _currentUser.IsAdmin,
+            cancellationToken);
+
+        switch (result)
+        {
+            case ProjectOperationResult.Success:
+                return NoContent();
+            
+            case ProjectOperationResult.NotFound:
+                return NotFound();
+            
+            case ProjectOperationResult.Forbidden:
+                return Forbid();
+            
+            default:
+                throw new InvalidOperationException(
+                    "Resultado de borrado no reconocido.");
+        }
+    }
     
 
 }

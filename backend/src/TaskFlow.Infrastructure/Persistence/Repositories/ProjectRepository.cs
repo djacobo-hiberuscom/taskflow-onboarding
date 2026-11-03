@@ -117,4 +117,9 @@ public class ProjectRepository : IProjectRepository
 
         return projects.SingleOrDefault();
     }
+
+    public void Remove(Project project)
+    {
+        _context.Projects.Remove(project);
+    }
 }

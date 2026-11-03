@@ -135,4 +135,82 @@ public class ProjectService
             cancellationToken);
     }
 
+     public async Task<ProjectOperationResult> RestoreProjectAsync(
+        Guid projectId, Guid userId, bool isAdmin, 
+        CancellationToken cancellationToken)
+    {
+        return await _unitOfWork.ExecuteInTransactionAsync<ProjectOperationResult>(
+            async token =>
+            {
+                //Recupera y bloquea el proyecto
+                var project = await _projectRepository
+                    .GetByIdForUpdateAsync(projectId, token);
+
+                if (project is null)
+                {
+                    return ProjectOperationResult.NotFound;
+                }
+
+                //se comprueba si visibilidad despues de aplicar el bloqueo
+                var visibleProject = await _projectRepository
+                    .GetVisibleByIdAsync(projectId, userId, isAdmin, token);
+
+                if (visibleProject is null)
+                {
+                    return ProjectOperationResult.NotFound;
+                }
+
+                if (!isAdmin)
+                {
+                    return ProjectOperationResult.Forbidden;
+                }
+
+                project.Restore();
+
+                await _unitOfWork.SaveChangesAsync(token);
+
+                return ProjectOperationResult.Success;
+            },
+            cancellationToken);
+    }
+
+     public async Task<ProjectOperationResult> DeleteProjectAsync(
+        Guid projectId, Guid userId, bool isAdmin, 
+        CancellationToken cancellationToken)
+    {
+        return await _unitOfWork.ExecuteInTransactionAsync<ProjectOperationResult>(
+            async token =>
+            {
+                //Recupera y bloquea el proyecto
+                var project = await _projectRepository
+                    .GetByIdForUpdateAsync(projectId, token);
+
+                if (project is null)
+                {
+                    return ProjectOperationResult.NotFound;
+                }
+
+                //se comprueba si visibilidad despues de aplicar el bloqueo
+                var visibleProject = await _projectRepository
+                    .GetVisibleByIdAsync(projectId, userId, isAdmin, token);
+
+                if (visibleProject is null)
+                {
+                    return ProjectOperationResult.NotFound;
+                }
+
+                if (!isAdmin)
+                {
+                    return ProjectOperationResult.Forbidden;
+                }
+
+                _projectRepository.Remove(project);
+
+                await _unitOfWork.SaveChangesAsync(token);
+
+                return ProjectOperationResult.Success;
+            },
+            cancellationToken);
+    }
+
 }

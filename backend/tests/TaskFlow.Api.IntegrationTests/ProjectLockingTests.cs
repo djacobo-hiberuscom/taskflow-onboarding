@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using TaskFlow.Api.Contracts.Projects;
 using TaskFlow.Infrastructure.Persistence;
 using TaskFlow.Infrastructure.Persistence.Repositories;
 using AppUser = TaskFlow.Domain.AppUser;
@@ -155,11 +156,16 @@ public class ProjectLockingTests(PostgresFixture postgres) : IClassFixture<Postg
     }
 
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task ArchiveAndUpdate_ConcurrentHttpRequests_RespectWhichOperationLocksFirst(bool archiveFirst)
+    [InlineData("archive", true)]
+    [InlineData("archive", false)]
+    [InlineData("restore", true)]
+    [InlineData("restore", false)]
+    [InlineData("delete", true)]
+    [InlineData("delete", false)]
+    public async Task StateChangeAndUpdate_ConcurrentHttpRequests_RecheckVisibilityAfterLock(
+        string action, bool stateChangeFirst)
     {
-        var sample = await SeedAsync();
+        var sample = await SeedAsync(archived: action == "restore");
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
         var pause = new PauseFirstLockInterceptor();
         using var factory = new AuthenticationTestFactory(postgres.Database.GetConnectionString());
@@ -173,18 +179,23 @@ public class ProjectLockingTests(PostgresFixture postgres) : IClassFixture<Postg
         admin.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
             factory.CreateToken(sample.User.KeycloakSub, ["Admin"]));
 
-        var first = archiveFirst
-            ? admin.PostAsync($"/api/v1/projects/{sample.Project.Id}/archive", null, timeout.Token)
+        var projectUri = $"/api/v1/projects/{sample.Project.Id}";
+        Task<HttpResponseMessage> ChangeStateAsync() => action == "delete"
+            ? admin.DeleteAsync(projectUri, timeout.Token)
+            : admin.PostAsync(projectUri + $"/{action}", null, timeout.Token);
+
+        var first = stateChangeFirst
+            ? ChangeStateAsync()
             : member.PutAsJsonAsync($"/api/v1/projects/{sample.Project.Id}",
                 new { name = "Edición concurrente" }, timeout.Token);
         Task<HttpResponseMessage>? second = null;
         try
         {
             await pause.FirstLocked.Task.WaitAsync(timeout.Token);
-            second = archiveFirst
+            second = stateChangeFirst
                 ? member.PutAsJsonAsync($"/api/v1/projects/{sample.Project.Id}",
                     new { name = "Edición concurrente" }, timeout.Token)
-                : admin.PostAsync($"/api/v1/projects/{sample.Project.Id}/archive", null, timeout.Token);
+                : ChangeStateAsync();
 
             var secondPid = await pause.SecondStarted.Task.WaitAsync(timeout.Token);
             await WaitUntilDatabaseLockAsync(secondPid, second, timeout.Token);
@@ -192,15 +203,41 @@ public class ProjectLockingTests(PostgresFixture postgres) : IClassFixture<Postg
 
             using var firstResponse = await first;
             using var secondResponse = await second;
-            Assert.Equal(archiveFirst ? HttpStatusCode.NoContent : HttpStatusCode.OK, firstResponse.StatusCode);
-            Assert.Equal(archiveFirst ? HttpStatusCode.NotFound : HttpStatusCode.NoContent, secondResponse.StatusCode);
+            var updateAllowed = action == "restore" ? stateChangeFirst : !stateChangeFirst;
+            var updateStatus = updateAllowed ? HttpStatusCode.OK : HttpStatusCode.NotFound;
+            Assert.Equal(stateChangeFirst ? HttpStatusCode.NoContent : updateStatus, firstResponse.StatusCode);
+            Assert.Equal(stateChangeFirst ? updateStatus : HttpStatusCode.NoContent, secondResponse.StatusCode);
+            if (updateAllowed)
+            {
+                var updatedResponse = stateChangeFirst ? secondResponse : firstResponse;
+                var updatedProject = Assert.IsType<ProjectResponse>(
+                    await updatedResponse.Content.ReadFromJsonAsync<ProjectResponse>(timeout.Token));
+                Assert.Equal("Edición concurrente", updatedProject.Name);
+            }
 
             await using var context = CreateContext();
-            var stored = await context.Projects.SingleAsync(project => project.Id == sample.Project.Id);
-            Assert.NotNull(stored.ArchivedAt);
-            Assert.Equal(archiveFirst ? sample.Project.Name : "Edición concurrente", stored.Name);
-            Assert.Equal(stored.ArchivedAt.Value, stored.UpdatedAt);
-            Assert.Equal(1, await context.ProjectMemberships.CountAsync(item => item.ProjectId == stored.Id));
+            var stored = await context.Projects.SingleOrDefaultAsync(project => project.Id == sample.Project.Id);
+            if (action == "delete")
+            {
+                Assert.Null(stored);
+                Assert.False(await context.ProjectMemberships.AnyAsync(item => item.ProjectId == sample.Project.Id));
+                Assert.True(await context.Users.AnyAsync(user => user.Id == sample.User.Id));
+            }
+            else
+            {
+                Assert.NotNull(stored);
+                Assert.Equal(updateAllowed ? "Edición concurrente" : sample.Project.Name, stored.Name);
+                if (action == "archive")
+                {
+                    Assert.NotNull(stored.ArchivedAt);
+                    Assert.Equal(stored.ArchivedAt.Value, stored.UpdatedAt);
+                }
+                else
+                {
+                    Assert.Null(stored.ArchivedAt);
+                }
+                Assert.Equal(1, await context.ProjectMemberships.CountAsync(item => item.ProjectId == stored.Id));
+            }
         }
         finally
         {
@@ -242,10 +279,11 @@ public class ProjectLockingTests(PostgresFixture postgres) : IClassFixture<Postg
         }
     }
 
-    private async Task<(AppUser User, Project Project)> SeedAsync()
+    private async Task<(AppUser User, Project Project)> SeedAsync(bool archived = false)
     {
         var user = new AppUser(Guid.NewGuid().ToString(), "Miembro", null);
         var project = new Project($"Proyecto bloqueado {Guid.NewGuid():N}", null, user.Id);
+        if (archived) { project.Archive(); }
         await using var context = CreateContext();
         context.Users.Add(user);
         context.Projects.Add(project);
