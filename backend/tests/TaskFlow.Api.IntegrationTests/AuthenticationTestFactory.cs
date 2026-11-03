@@ -155,6 +155,13 @@ internal sealed class TestUserStore : IAppUserRepository
         return Task.FromResult(Records.Values.SingleOrDefault(user => user.Id == userId));
     }
 
+    public Task<AppUser?> GetByIdForKeyShareAsync(
+        Guid userId, CancellationToken cancellationToken = default)
+    {
+        // Este almacén es en memoria; el bloqueo real se comprueba contra PostgreSQL.
+        return GetByIdAsync(userId, cancellationToken);
+    }
+
     public Task<AppUser[]> GetByIdsAsync(Guid[] userIds, CancellationToken cancellationToken)
     {
         return Task.FromResult(Records.Values.Where(user => userIds.Contains(user.Id)).ToArray());

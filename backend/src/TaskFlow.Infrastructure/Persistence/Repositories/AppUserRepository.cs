@@ -49,4 +49,21 @@ public class AppUserRepository(TaskFlowDbContext context) : IAppUserRepository
             .Where(user => userIds.Contains(user.Id))
             .ToArrayAsync(cancellationToken);
     }
+
+    public async Task<AppUser?> GetByIdForKeyShareAsync(
+        Guid userId, CancellationToken cancellationToken = default)
+    {
+        if (context.Database.CurrentTransaction is null)
+        {
+            throw new InvalidOperationException(
+                "La protección del usuario requiere una transacción activa.");
+        }
+
+        var users = await context.Users
+            .FromSql(
+                $"SELECT * FROM app_user WHERE id = {userId} FOR KEY SHARE")
+            .ToArrayAsync(cancellationToken);
+
+        return users.SingleOrDefault();
+    }
 }

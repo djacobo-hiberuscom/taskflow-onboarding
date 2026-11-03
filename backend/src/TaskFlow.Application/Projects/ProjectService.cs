@@ -1,5 +1,6 @@
 using System.Data;
 using TaskFlow.Application.Abstractions;
+using TaskFlow.Application.Users;
 using TaskFlow.Domain;
 
 namespace TaskFlow.Application.Projects;
@@ -8,26 +9,44 @@ public class ProjectService
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IAppUserRepository _appUserRepository;
 
 
-    public ProjectService(IProjectRepository projectRepository, IUnitOfWork unitOfWork)
+    public ProjectService(
+        IProjectRepository projectRepository, IUnitOfWork unitOfWork,
+        IAppUserRepository appUserRepository)
     {
         _projectRepository = projectRepository;
         _unitOfWork = unitOfWork;
+        _appUserRepository = appUserRepository;
     }
 
     public async Task<Project> CreateProjectAsync(string name, string? description,
         Guid createdBy, CancellationToken cancellationToken = default)
     {
-        var project = new Project(name, description, createdBy);
-        _projectRepository.Add(project);
+        return await _unitOfWork.ExecuteInTransactionAsync(async token =>
+        {
+            var creator = await _appUserRepository
+                .GetByIdForKeyShareAsync(createdBy, token);
+            
+            if(creator is null)
+            {
+                throw new InvalidOperationException(
+                    "El usuario creador ya no existe.");
+            }
+            
+            var project = new Project(name, description, createdBy);
+            _projectRepository.Add(project);
 
-        var appUserProject = new AppUserProject(project.Id, createdBy);
-        _projectRepository.AddMembership(appUserProject);
+            var appUserProject = new AppUserProject(project.Id, createdBy);
+            _projectRepository.AddMembership(appUserProject);
 
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.SaveChangesAsync(token);
 
-        return project;
+            return project;
+        },
+        cancellationToken);
+
     }
 
     public async Task<ProjectPage> GetProjectsAsync(
