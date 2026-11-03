@@ -1,7 +1,11 @@
-
+import { Button } from "#components/ui/button";
+import { logout } from "@/lib/auth/keycloak";
 
 export function MyProfileFeat () {
     return (
-        <h1>Mi perfil</h1>
+        <div>
+            <Button onClick={logout}>LogOut</Button>
+        </div>
+        
     )
 }
