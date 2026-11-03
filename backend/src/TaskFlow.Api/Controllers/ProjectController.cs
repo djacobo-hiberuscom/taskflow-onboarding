@@ -219,6 +219,31 @@ public class ProjectController : ControllerBase
 
         return Ok(response);
     }
+
+    [HttpPost("{projectId}/archive")]
+    public async Task<IActionResult> Archive(
+        Guid projectId, CancellationToken cancellationToken)
+    {
+        var result = await _projectService.ArchiveProjectAsync(
+            projectId, _currentUser.UserId, _currentUser.IsAdmin,
+            cancellationToken);
+
+        switch (result)
+        {
+            case ProjectOperationResult.Success:
+                return NoContent();
+            
+            case ProjectOperationResult.NotFound:
+                return NotFound();
+            
+            case ProjectOperationResult.Forbidden:
+                return Forbid();
+            
+            default:
+                throw new InvalidOperationException(
+                    "Resultado de archivado no reconocido.");
+        }
+    }
     
 
 }

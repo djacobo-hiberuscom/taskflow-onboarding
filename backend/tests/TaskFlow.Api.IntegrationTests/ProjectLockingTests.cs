@@ -108,7 +108,7 @@ public class ProjectLockingTests(PostgresFixture postgres) : IClassFixture<Postg
             var updaterPid = await interceptor.Started.Task.WaitAsync(timeout.Token);
             await WaitUntilDatabaseLockAsync(updaterPid, update, timeout.Token);
 
-            // Simula la escritura administrativa con otra conexión real; su endpoint aún no existe.
+            // Simula una escritura administrativa con otra conexión real.
             if (operation == "archive")
             {
                 lockedProject.Archive();
@@ -154,6 +154,71 @@ public class ProjectLockingTests(PostgresFixture postgres) : IClassFixture<Postg
         }
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task ArchiveAndUpdate_ConcurrentHttpRequests_RespectWhichOperationLocksFirst(bool archiveFirst)
+    {
+        var sample = await SeedAsync();
+        using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        var pause = new PauseFirstLockInterceptor();
+        using var factory = new AuthenticationTestFactory(postgres.Database.GetConnectionString());
+        using var observedFactory = factory.WithWebHostBuilder(builder =>
+            builder.ConfigureTestServices(services => services.AddDbContext<TaskFlowDbContext>(options =>
+                options.AddInterceptors(pause))));
+        using var member = observedFactory.CreateClient();
+        using var admin = observedFactory.CreateClient();
+        member.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
+            factory.CreateToken(sample.User.KeycloakSub, ["User"]));
+        admin.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
+            factory.CreateToken(sample.User.KeycloakSub, ["Admin"]));
+
+        var first = archiveFirst
+            ? admin.PostAsync($"/api/v1/projects/{sample.Project.Id}/archive", null, timeout.Token)
+            : member.PutAsJsonAsync($"/api/v1/projects/{sample.Project.Id}",
+                new { name = "Edición concurrente" }, timeout.Token);
+        Task<HttpResponseMessage>? second = null;
+        try
+        {
+            await pause.FirstLocked.Task.WaitAsync(timeout.Token);
+            second = archiveFirst
+                ? member.PutAsJsonAsync($"/api/v1/projects/{sample.Project.Id}",
+                    new { name = "Edición concurrente" }, timeout.Token)
+                : admin.PostAsync($"/api/v1/projects/{sample.Project.Id}/archive", null, timeout.Token);
+
+            var secondPid = await pause.SecondStarted.Task.WaitAsync(timeout.Token);
+            await WaitUntilDatabaseLockAsync(secondPid, second, timeout.Token);
+            pause.ReleaseFirst.TrySetResult(true);
+
+            using var firstResponse = await first;
+            using var secondResponse = await second;
+            Assert.Equal(archiveFirst ? HttpStatusCode.NoContent : HttpStatusCode.OK, firstResponse.StatusCode);
+            Assert.Equal(archiveFirst ? HttpStatusCode.NotFound : HttpStatusCode.NoContent, secondResponse.StatusCode);
+
+            await using var context = CreateContext();
+            var stored = await context.Projects.SingleAsync(project => project.Id == sample.Project.Id);
+            Assert.NotNull(stored.ArchivedAt);
+            Assert.Equal(archiveFirst ? sample.Project.Name : "Edición concurrente", stored.Name);
+            Assert.Equal(stored.ArchivedAt.Value, stored.UpdatedAt);
+            Assert.Equal(1, await context.ProjectMemberships.CountAsync(item => item.ProjectId == stored.Id));
+        }
+        finally
+        {
+            pause.ReleaseFirst.TrySetResult(true);
+            timeout.Cancel();
+            await DrainRequestAsync(first);
+            await DrainRequestAsync(second);
+        }
+    }
+
+    private static async Task DrainRequestAsync(Task<HttpResponseMessage>? request)
+    {
+        if (request is not null)
+        {
+            try { using var response = await request; } catch (Exception) { }
+        }
+    }
+
     private async Task WaitUntilDatabaseLockAsync(int pid, Task operation, CancellationToken cancellationToken)
     {
         await using var inspection = CreateContext();
@@ -191,6 +256,38 @@ public class ProjectLockingTests(PostgresFixture postgres) : IClassFixture<Postg
 
     private TaskFlowDbContext CreateContext() => new(new DbContextOptionsBuilder<TaskFlowDbContext>()
         .UseNpgsql(postgres.Database.GetConnectionString()).Options);
+
+    private sealed class PauseFirstLockInterceptor : DbCommandInterceptor
+    {
+        private int _firstSeen;
+        public TaskCompletionSource<bool> FirstLocked { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource<bool> ReleaseFirst { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        public TaskCompletionSource<int> SecondStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(
+            DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result,
+            CancellationToken cancellationToken = default)
+        {
+            if (command.CommandText.Contains("FOR UPDATE", StringComparison.Ordinal) && Volatile.Read(ref _firstSeen) == 1)
+            {
+                SecondStarted.TrySetResult(((NpgsqlConnection)command.Connection!).ProcessID);
+            }
+            return base.ReaderExecutingAsync(command, eventData, result, cancellationToken);
+        }
+
+        public override async ValueTask<DbDataReader> ReaderExecutedAsync(
+            DbCommand command, CommandExecutedEventData eventData, DbDataReader result,
+            CancellationToken cancellationToken = default)
+        {
+            if (command.CommandText.Contains("FOR UPDATE", StringComparison.Ordinal) &&
+                Interlocked.CompareExchange(ref _firstSeen, 1, 0) == 0)
+            {
+                FirstLocked.TrySetResult(true);
+                await ReleaseFirst.Task.WaitAsync(cancellationToken);
+            }
+            return result;
+        }
+    }
 
     private sealed class LockAttemptInterceptor : DbCommandInterceptor
     {
