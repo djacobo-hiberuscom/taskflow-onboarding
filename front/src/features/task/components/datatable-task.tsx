@@ -1,6 +1,6 @@
 import { Input, DataTable } from "@/components/index.comp";
 import { useState } from "react";
-import { TaskColum } from "@/components/common/tools/index.tool"
+import { TaskColum } from "@/features/projects/components/colum-task"
 import Tareas from "@/assets/tempdata/tasks.json";
 
 const TAREAS = Tareas
@@ -11,7 +11,6 @@ export function DataTableTask() {
 
   return (
     <div className="flex flex-col gap-3">
-      <h2>Tareas</h2>
       <div className="flex gap-3">
         <Input
           placeholder="Buscar proyectos por nombre......"
