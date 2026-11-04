@@ -49,7 +49,7 @@ function EditProjectContainer({ proyecto, onClose }: parameters) {
         </div>
         <div className="space-y-2">
           <h3>Descripcion</h3>
-          <Input placeholder="Descripcion" value={proyecto.description} />
+          <Input placeholder="Descripcion" value={proyecto.description ?? "Sin Descripcion"} />
         </div>
       </div>
       <div id="botonera" className="flex justify-end gap-3">
