@@ -26,6 +26,7 @@ import { getUsernameByProjectId } from "@/tools/getUsername";
 import { useState } from "react";
 import { useProjects, useRestoreProject } from "#hooks/use-project";
 import { DeleteConfirmPopUp } from "./delete-confirm.popup";
+import { useNavigate } from "@tanstack/react-router";
 
 interface parameters {
   isOpen: boolean;
@@ -36,8 +37,9 @@ export function ArchivedPopUp({ isOpen, onOpenChange }: parameters) {
   const { data, isLoading, error } = useProjects({ archived: true });
   const useRestore = useRestoreProject();
   const [page, setPage] = useState(1);
+  const nav = useNavigate()
   const [toDelete, setToDelete] = useState<Project | null>(null);
-  const [toRestore, setToRestore] = useState<Project | null>(null);
+
   const PAGE_SIZE = 5;
 
   const visibles = data?.items.filter((p) => p.archivedAt !== null) ?? [];
@@ -49,13 +51,17 @@ export function ArchivedPopUp({ isOpen, onOpenChange }: parameters) {
   const totalPage = Math.ceil(visibles.length / PAGE_SIZE);
 
   
-  
-  const handleClicRestore = () => {
-    if (!toRestore) return;
-    useRestore.mutate(toRestore.id, {
+
+  const handleClicRestore = (proeycto: Project) => {
+    useRestore.mutate(proeycto.id, {
       onSuccess: () => {},
     });
   };
+
+  const handleClicOpen = (proyeto: Project) => {
+    onOpenChange(false)
+    nav({to: "/projects/$id", params: { id: proyeto.id} })
+  }  
 
   return (
     <div>
@@ -80,10 +86,11 @@ export function ArchivedPopUp({ isOpen, onOpenChange }: parameters) {
                   <ArchivedRow
                     proyecto={pa}
                     onDeleteProject={() => setToDelete(pa)}
-                    onOpenProject={() => {}}
+                    onOpenProject={() => {
+                      handleClicOpen(pa)
+                    }}
                     onRestoreProject={() => {
-                      setToRestore(pa);
-                      handleClicRestore();
+                      handleClicRestore(pa);
                     }}
                   />
                 );
