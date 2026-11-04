@@ -3,8 +3,13 @@ import {getAccessToken} from "@/lib/auth/keycloak"
 
 // API ERROR
 export class ApiError extends Error{
-    constructor(public status: number, public problem?: unknown){
+    status: number
+    problem?: unknown
+    constructor(status: number, problem?: unknown){
         super(`HTTP ${status}`)
+        this.name = "ApiError"
+        this.status = status
+        this.problem = problem
     }
 }
 

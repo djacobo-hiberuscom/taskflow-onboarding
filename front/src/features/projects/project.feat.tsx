@@ -33,7 +33,6 @@ export function ProjectFeeat() {
 
   const [toDelete, setToDelete] = useState<Project | null>(null);
   const [toArchive, setToArchive] = useState<Project | null>(null);
-  const [toEdit, setToEdit] = useState<Project | null>(null);
 
   const nav = useNavigate();
 

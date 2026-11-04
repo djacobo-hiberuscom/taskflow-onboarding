@@ -147,6 +147,7 @@ export function DetailProject() {
         onOpenChange={(open) => {
           if (!open) setArchiveConfirmIsOpen(false);
         }}
+        onArchived={() => nav({to: "/projects", replace: true})}
       />
       <DeleteConfirmPopUp
         isOpen={deleteConfirmIsOpen}
@@ -176,7 +177,7 @@ export function DetailProject() {
           <div id="botonera" className="flex flex-col justify-end items gap-3">
             <div className="flex flex-row gap-5 justify-end">
               <h3 className="flex gap-2 text-xl items-center">
-                {getUsernameById(proyecto?.created_by)}
+                {getUsernameById(proyecto?.createdBy?.displayName)}
                 <CircleUserRound />
               </h3>
             </div>
