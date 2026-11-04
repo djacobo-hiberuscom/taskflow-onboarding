@@ -8,6 +8,7 @@ import {
 } from "./popups/index.popup";
 // HOOKS
 import { useState } from "react";
+import { useProject } from "#hooks/use-project";
 
 // COMPONENTES
 import {
@@ -36,13 +37,17 @@ import { TaskColum } from "./components/colum-task";
 
 // CONST
 import TAREAS from "@/assets/tempdata/tasks.json";
-import PROYECTOS from "@/assets/tempdata/projects.json";
+import { ApiError } from "#lib/api/client";
+import { NotFound } from "../index.featues";
 
 export function DetailProject() {
   // CONST
-
-  const { id } = useParams({ from: "/app/projects/$id" }); // ID del proyecto actual
   const nav = useNavigate();
+  const { id } = useParams({ from: "/app/projects/$id" }); // ID del proyecto actual
+  const { data, isLoading, error } = useProject(id);
+
+  
+
   const [selectTask, setSelectTask] = useState<Task | null>(null); // Tarea selecionada para el drawer
   const [busqueda, setBusqueda] = useState(""); // Buscador del input
   const [status, setStatus] = useState<string | null>(null); // selecion del filtro (status)
@@ -51,11 +56,15 @@ export function DetailProject() {
 
   const [editProjectOpen, setEditProjectOpen] = useState(false); // popUp de aeditar proyecto
   const [archiveConfirmIsOpen, setArchiveConfirmIsOpen] = useState(false); // popup para archivar proyecto
-  const [deleteConfirmIsOpen, setDeleteConfirmIsOpen] = useState(false) // Porpup para delete proyecto
+  const [deleteConfirmIsOpen, setDeleteConfirmIsOpen] = useState(false); // Porpup para delete proyecto
+
+  // Error stados
+  if (isLoading) return <h1>Cargando</h1>;
+  if (error instanceof ApiError && error.status === 404) return <NotFound />;
+  if (error) return <h1>{error.message}</h1>;
 
   // OBtener proyecto
-  const proyecto = PROYECTOS.find((p) => p.id === id);
-  if (proyecto === null) return <h1>Error proyecto no encontrado</h1>;
+  const proyecto = data
 
   // TAREAS DEL PROYECTO
   const projectTask = TAREAS.filter((t) => t.project_id === id);
@@ -83,14 +92,13 @@ export function DetailProject() {
 
   // Abrir archive confirm
   const openArchiveConfirm = () => {
-    setArchiveConfirmIsOpen(!archiveConfirmIsOpen)
+    setArchiveConfirmIsOpen(!archiveConfirmIsOpen);
   };
 
   // Abrir delete confirm
   const openDeleteConfirm = () => {
-    setDeleteConfirmIsOpen(!deleteConfirmIsOpen)
-  }
-
+    setDeleteConfirmIsOpen(!deleteConfirmIsOpen);
+  };
 
   // FILTROS
   const item_f1 = [

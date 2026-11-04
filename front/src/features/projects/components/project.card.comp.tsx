@@ -17,11 +17,14 @@ import {
 interface parameters {
   id:string
   title: string;
-  description: string;
+  description?: string | null;
   miembros: number;
   tareasAbiertas: number;
   favourite: boolean;
   onClic: () => void,
+  onEdit: () => void,
+  onArchive: () => void,
+  onDelete: () => void,
   isAdmin: boolean
 }
 
@@ -32,8 +35,15 @@ export function ProjectCard({
   //miembros,
   favourite,
   onClic,
+  onEdit,
+  onDelete,
+  onArchive,
   isAdmin
 }: parameters) {
+
+  
+
+
   const [isFavourite, setIsFavourite] = useState(favourite);
   const miembros = getUsernameByProjectId(id).length
   const nTareas = TAREAS.filter((t) => t.project_id === id).length; // N TAREAS
@@ -41,7 +51,7 @@ export function ProjectCard({
     <ContextMenu>
       <ContextMenuTrigger className="flex flex-col gap-4 p-4 border rounded-xl bg-background max-w-xs hover:brightness-97" onClick={onClic}>
         <div className="flex justify-between">
-          <h1 className="font-bold text-xl">{title}</h1>
+          <h1 className="font-bold text-xl truncate">{title}</h1>
           <button
             className="self-start shrink-0 bg-background rounded-full p-1 hover:brightness-95 hover:cursor-pointer"
             onClick={(e) => {
@@ -69,15 +79,15 @@ export function ProjectCard({
       </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuGroup className="font-bold">
-          <ContextMenuItem disabled={false}>
+          <ContextMenuItem disabled={!isAdmin} onClick={onEdit}>
             <Pen />
             Edit
           </ContextMenuItem>
-          <ContextMenuItem disabled={!isAdmin}>
+          <ContextMenuItem disabled={!isAdmin} onClick={onArchive}>
             <Archive />
             Archivar
           </ContextMenuItem>
-          <ContextMenuItem disabled={!isAdmin} className="text-red-600">
+          <ContextMenuItem disabled={!isAdmin} className="text-red-600" onClick={onDelete}>
             <Trash />
             Elimiar
           </ContextMenuItem>

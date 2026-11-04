@@ -8,3 +8,8 @@ export * from "./profile/myprofile.feat"
 export * from "./auth/Callback.page"
 export * from "./auth/login.page"
 export * from "./auth/register.page"
+
+// SYSTEM
+export * from "./system/forbidden"
+export * from "./system/notfound"
+export * from "./system/timeout"

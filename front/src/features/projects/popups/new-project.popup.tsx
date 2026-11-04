@@ -4,6 +4,9 @@ import {
   DialogContent,
   Button, Input
 } from "@/components/index.comp";
+import { useState } from "react";
+// TYPES
+import { useCreateProject } from "#hooks/use-project";
 
 
 interface parameters {
@@ -14,14 +17,32 @@ export function NewProjectPopup ({isOpen, onOpenChange}: parameters) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col p-4 gap-3">
-        <NewProjectContainer />
+        <NewProjectContainer onClose={() => onOpenChange(false)}/>
       </DialogContent>
     </Dialog>
   )
 }
 
 
-function NewProjectContainer() {
+function NewProjectContainer({onClose} : {onClose: () => void}) {
+  const [nombre, setNombre] = useState<string>("")
+  const [description, setDescription] = useState<string>("")
+  
+  const createProject = useCreateProject() 
+  const handleCreateClic = () => {
+    if (nombre.trim().length === 0) return
+    createProject.mutate(
+      {name: nombre.trim(), description: description.trim() || null},
+      {
+        onSuccess: () => {
+          setNombre("")
+          setDescription("")
+          onClose()
+        }
+      }
+    )
+  }
+
   return (
     <div className="flex flex-col gap-4 rounded-2xl p-4 max-w-2xl">
       <div id="Header" className="flex justify-between gap-2">
@@ -38,11 +59,11 @@ function NewProjectContainer() {
       <div id="body" className="flex flex-col gap-4">
         <div className="space-y-2">
           <h3>Nombre*</h3>
-          <Input placeholder="Nombre" />
+          <Input placeholder="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)}/>
         </div>
         <div className="space-y-2">
           <h3>Descripcion</h3>
-          <Input placeholder="Descripcion" />
+          <Input placeholder="Descripcion" value={description} onChange={(e) => setDescription(e.target.value)} />
         </div>
       </div>
       <div id="botonera" className="flex justify-end gap-3">
@@ -53,6 +74,7 @@ function NewProjectContainer() {
           Cancelar
         </Button>
         <Button
+        onClick={handleCreateClic}
           variant="outline"
           className="bg-primary text-background hover:cursor-pointer hover:bg-primary hover:brightness-120 hover:text-background"
         >

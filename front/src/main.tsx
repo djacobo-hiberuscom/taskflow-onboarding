@@ -2,20 +2,39 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { RouterProvider } from "@tanstack/react-router";
-import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import {
+  QueryClientProvider,
+  QueryClient,
+  QueryCache,
+} from "@tanstack/react-query";
 import { router } from "./app/router.tsx";
-const queryClient = new QueryClient();
+import { initKeycloak } from "@/lib/auth/keycloak.ts";
+import { ApiError } from "#lib/api/client";
 
-import {initKeycloak} from "@/lib/auth/keycloak.ts"
+const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error) => {
+      if (!(error instanceof ApiError)) return;
+      if (error.status === 401) router.navigate({ to: "/timeout" });
+      if (error.status === 403) router.navigate({ to: "/403" });
+    },
+  }),
+  defaultOptions: {
+    queries: {
+      retry: (count, error) =>
+        error instanceof ApiError && error.status < 500 ? false : count < 2,
+    },
+  },
+});
 
-function render () {
+function render() {
   createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
-  </StrictMode>,
-);
+    <StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </StrictMode>,
+  );
 }
 
-initKeycloak().catch(console.error).finally(render)
+initKeycloak().catch(console.error).finally(render);

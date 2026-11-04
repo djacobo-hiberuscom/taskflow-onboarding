@@ -10,6 +10,10 @@ import type { Project } from "#lib/api/types";
 // ICON
 import { Trash, TriangleAlertIcon } from "lucide-react";
 
+// HOOKS
+import { useDeleteProject } from "#hooks/use-project";
+import { useNavigate } from "@tanstack/react-router";
+
 interface popParameters {
   modal?: boolean;
   isOpen: boolean;
@@ -24,13 +28,12 @@ export function DeleteConfirmPopUp({
   proyecto,
 }: popParameters) {
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={onOpenChange}
-     modal={modal}
-    >
+    <Dialog open={isOpen} onOpenChange={onOpenChange} modal={modal}>
       <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col p-4 gap-3">
-        <DeleteConfirmContainer proyecto={proyecto} />
+        <DeleteConfirmContainer
+          proyecto={proyecto}
+          onClose={() => onOpenChange(false)}
+        />
       </DialogContent>
     </Dialog>
   );
@@ -38,8 +41,22 @@ export function DeleteConfirmPopUp({
 
 interface parameters {
   proyecto?: Project;
+  onClose: () => void;
 }
-export function DeleteConfirmContainer({ proyecto }: parameters) {
+export function DeleteConfirmContainer({ proyecto, onClose }: parameters) {
+  const nav = useNavigate();
+  const deleteProject = useDeleteProject();
+
+  const handleClicDelete = () => {
+    if (!proyecto) return;
+    deleteProject.mutate(proyecto.id, {
+      onSuccess: () => {
+        onClose();
+        nav({ to: "/projects", replace: true });
+      },
+    });
+  };
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-col gap-2 ">
@@ -61,8 +78,14 @@ export function DeleteConfirmContainer({ proyecto }: parameters) {
         </div>
       </div>
       <div className="flex gap-1 justify-end">
-        <Button variant="outline">Cancelar</Button>
-        <Button variant="outline" className="bg-red-500 text-white">
+        <Button variant="outline" onClick={onClose}>
+          Cancelar
+        </Button>
+        <Button
+          variant="outline"
+          className="bg-red-500 text-white"
+          onClick={handleClicDelete}
+        >
           Eliminar
         </Button>
       </div>
