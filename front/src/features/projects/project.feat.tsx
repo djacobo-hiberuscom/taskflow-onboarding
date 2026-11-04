@@ -49,7 +49,7 @@ export function ProjectFeeat() {
     setNewProjectOpen(!newProjectOpen);
   };
   return (
-    <div className="p-4 flex flex-col gap-2">
+    <div className="p-4 flex flex-col flex-1 gap-2">
 
       <ArchivedPopUp
         isOpen={archivedOpen}
@@ -79,7 +79,7 @@ export function ProjectFeeat() {
         onArchived={() => nav({to: "/projects", replace: true})}
       />
 
-      <div className="flex flex-wrap gap-5">
+      <div className="flex flex-wrap gap-5 content-start">
         {projects
           ?.filter((p) => p.archivedAt === null)
           .map((p) => (
@@ -99,7 +99,7 @@ export function ProjectFeeat() {
             />
           ))}
       </div>
-      <div id="botonera" className="sticky bottom-4 flex justify-end gap-2">
+      <div id="botonera" className="sticky bottom-4 mt-auto flex justify-end gap-2">
         <ArchivedButton isAdmin={isAdmin} onClic={() => openArchive()} />
         <AddButton onClic={() => openNewProject()} />
       </div>
