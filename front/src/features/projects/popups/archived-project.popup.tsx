@@ -24,7 +24,7 @@ import TAREAS from "@/assets/tempdata/tasks.json";
 
 import { getUsernameByProjectId } from "@/tools/getUsername";
 import { useState } from "react";
-import { useProjects } from "#hooks/use-project";
+import { useProjects, useRestoreProject } from "#hooks/use-project";
 import { DeleteConfirmPopUp } from "./delete-confirm.popup";
 
 interface parameters {
@@ -32,15 +32,12 @@ interface parameters {
   onOpenChange: (open: boolean) => void;
 }
 
-export function ArchivedPopUp({
-  isOpen,
-  onOpenChange,
-  
-}: parameters) {
+export function ArchivedPopUp({ isOpen, onOpenChange }: parameters) {
   const { data, isLoading, error } = useProjects({ archived: true });
-
+  const useRestore = useRestoreProject();
   const [page, setPage] = useState(1);
-  const [toDelete, setToDelete] = useState<Project | null>(null)
+  const [toDelete, setToDelete] = useState<Project | null>(null);
+  const [toRestore, setToRestore] = useState<Project | null>(null);
   const PAGE_SIZE = 5;
 
   const visibles = data?.items.filter((p) => p.archivedAt !== null) ?? [];
@@ -51,10 +48,21 @@ export function ArchivedPopUp({
 
   const totalPage = Math.ceil(visibles.length / PAGE_SIZE);
 
+  
+  
+  const handleClicRestore = () => {
+    if (!toRestore) return;
+    useRestore.mutate(toRestore.id, {
+      onSuccess: () => {},
+    });
+  };
+
   return (
     <div>
       <DeleteConfirmPopUp
-        onOpenChange={(open) => {if (!open) setToDelete(null)}}
+        onOpenChange={(open) => {
+          if (!open) setToDelete(null);
+        }}
         isOpen={toDelete !== null}
         proyecto={toDelete ?? undefined}
       />
@@ -73,7 +81,10 @@ export function ArchivedPopUp({
                     proyecto={pa}
                     onDeleteProject={() => setToDelete(pa)}
                     onOpenProject={() => {}}
-                    onRestoreProject={() => {}}
+                    onRestoreProject={() => {
+                      setToRestore(pa);
+                      handleClicRestore();
+                    }}
                   />
                 );
               })}
