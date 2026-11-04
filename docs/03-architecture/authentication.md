@@ -2,7 +2,7 @@
 
 > **Responsable:** conjunto — backend (validación de tokens y políticas) y frontend (flujo OIDC y sesión en la SPA)
 >
-> **Estado:** acuerdos del análisis y de integración confirmados con frontend; revocación en Keycloak con introspección por petición acordada el 2026-10-23. No hay una configuración de identidad validada ni código de autenticación implementado.
+> **Estado:** implementados JWT Bearer, roles de realm, usuario local, `/api/v1/me` e introspección por petición. Las pruebas HTTP utilizan tokens RSA firmados y un proveedor simulado; la comprobación conjunta con el Keycloak y la SPA reales sigue pendiente.
 >
 > **Coherencia:** se actualiza este documento del equipo; los originales del manager quedan pendientes de aprobación según [documentation-alignment.md](documentation-alignment.md).
 >
@@ -10,7 +10,7 @@
 
 ## 1. Alcance
 
-Este documento concreta cómo se autentican los usuarios de TaskFlow, cómo se configura Keycloak, cómo llegan los roles `Admin` y `User` a la API y cómo se aplican los permisos por rol y por pertenencia a proyecto. Los nombres de realm, cliente SPA y audiencia están confirmados con frontend. La revocación queda definida en §5 por indicación del usuario. La revisión conjunta de fase 0 sigue pendiente y el diseño no se presenta como implementado.
+Este documento concreta cómo se autentican los usuarios de TaskFlow, cómo se configura Keycloak, cómo llegan los roles `Admin` y `User` a la API y cómo se aplican los permisos por rol y por pertenencia a proyecto. Los nombres de realm, cliente SPA y audiencia están confirmados con frontend. La revocación queda definida en §5 por indicación del usuario. El estado de implementación y las comprobaciones pendientes se detallan en §10.
 
 ## 2. Flujo de autenticación
 
@@ -225,6 +225,12 @@ Reglas de implementación:
 
 Realm, cliente SPA, audiencia, biblioteca `keycloak-js`, PKCE, tokens en memoria, tiempos de sesión (5 minutos / 30 minutos / 10 horas), rotación, llamadas a `/me`, perfil local y precedencia 404/403 están acordados. El entorno de desarrollo se orquesta con Aspire.
 
-La revocación de §5 queda acordada. Falta implementar y comprobar importación de realm, mappers, clientes y secreto confidencial, introspección, manejo de 401/503, rotación, endpoints públicos, perfil y pruebas. No hay una configuración ejecutable validada por este documento.
+La API registra JWT Bearer con discovery/JWKS, emisor y audiencia configurados, firma RS256 (algoritmo del realm versionado), caducidad y tolerancia de 30 segundos. `KeycloakRolesTransformation` admite únicamente `Admin` y `User` de `realm_access.roles`; las políticas predeterminada y de respaldo exigen uno de ellos.
+
+Tras validar el JWT se consulta introspección sin caché entre peticiones. Inactivo produce 401; fallo HTTP, respuesta inválida, ausencia de secreto o tiempo de espera agotado produce 503. No se resuelve ni escribe el usuario local en esos casos. `/health` y OpenAPI en Development son anónimos; las rutas de ejemplo Ping y WeatherForecast quedan protegidas por la política de respaldo.
+
+`LocalUserMiddleware` resuelve `AppUser` por `sub` después de autorizar la petición y completa el `ICurrentUser` del ámbito. `AppUserRepository` utiliza `INSERT ... ON CONFLICT (keycloak_sub) DO NOTHING` para coordinar primeros accesos simultáneos. `/api/v1/me` sincroniza el perfil solo si cambia y devuelve los roles actuales sin persistirlos. AppHost comparte con la API el parámetro secreto ya utilizado por el cliente confidencial de Keycloak. El detalle de archivos y la prueba manual están en [la guía de entorno](../04-development/environment-setup.md#61-autenticación-y-perfil-local).
+
+Se incluyen pruebas HTTP con tokens firmados y respuestas simuladas de introspección, y pruebas con PostgreSQL 18.6 para alta concurrente y salud anónima. La comprobación real de login, renovación, logout y revocación administrativa queda pendiente de ejecutar junto con la rama de frontend y el entorno Keycloak. La semilla de usuarios de demostración y los permisos por pertenencia de los endpoints de negocio no se implementan con este cambio. Estos avances no cierran por sí solos ISS-06, ISS-12 ni ISS-13.
 
 Los documentos originales del manager siguen sin editar hasta su aprobación. Las discrepancias pendientes de trasladar se registran en [documentation-alignment.md](documentation-alignment.md).
