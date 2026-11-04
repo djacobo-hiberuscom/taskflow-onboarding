@@ -33,7 +33,7 @@ export function DataTable<TData extends RowData>({
       <Table>
         <TableHeader className="brightness-95" >
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
+            <TableRow key={headerGroup.id} className="p-4">
               {headerGroup.headers.map((header) => {
                 return (
                   <TableHead key={header.id}>

@@ -21,7 +21,8 @@ interface parameters {
   miembros: number;
   tareasAbiertas: number;
   favourite: boolean;
-  onClic: () => void
+  onClic: () => void,
+  isAdmin: boolean
 }
 
 export function ProjectCard({
@@ -31,6 +32,7 @@ export function ProjectCard({
   //miembros,
   favourite,
   onClic,
+  isAdmin
 }: parameters) {
   const [isFavourite, setIsFavourite] = useState(favourite);
   const miembros = getUsernameByProjectId(id).length
@@ -71,11 +73,11 @@ export function ProjectCard({
             <Pen />
             Edit
           </ContextMenuItem>
-          <ContextMenuItem disabled={false}>
+          <ContextMenuItem disabled={!isAdmin}>
             <Archive />
             Archivar
           </ContextMenuItem>
-          <ContextMenuItem disabled={false} className="text-red-600">
+          <ContextMenuItem disabled={!isAdmin} className="text-red-600">
             <Trash />
             Elimiar
           </ContextMenuItem>
