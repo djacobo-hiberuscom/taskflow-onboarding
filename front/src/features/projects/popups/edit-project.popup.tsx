@@ -1,33 +1,36 @@
 import type { Project } from "#lib/api/types";
 // COMPONENTES
-import {
-  Dialog,
-  DialogContent,
-  Button, Input
-} from "@/components/index.comp";
+import { Dialog, DialogContent, Button, Input } from "@/components/index.comp";
 
 interface popParameters {
-  isOpen: boolean,
-  onOpenChange: (opne: boolean) => void
-  proyecto?: Project
+  isOpen: boolean;
+  onOpenChange: (opne: boolean) => void;
+  proyecto?: Project | null;
 }
-export function EditProjectPopUp({isOpen, onOpenChange, proyecto}:popParameters) {
+export function EditProjectPopUp({
+  isOpen,
+  onOpenChange,
+  proyecto,
+}: popParameters) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col p-4 gap-3">
-        <EditProjectContainer proyecto={proyecto} />
+        <EditProjectContainer
+          proyecto={proyecto}
+          onClose={() => onOpenChange(false)}
+        />
       </DialogContent>
     </Dialog>
   );
 }
 
 interface parameters {
-    proyecto?: Project
+  proyecto?: Project | null;
+  onClose: () => void;
 }
-function EditProjectContainer ({proyecto} : parameters) {
-  if (!proyecto) return <h1>Error al obtener proyecto</h1>
+function EditProjectContainer({ proyecto, onClose }: parameters) {
+  if (!proyecto) return <h1>Error al obtener proyecto</h1>;
   return (
-    
     <div className="flex flex-col gap-4 rounded-2xl p-4 max-w-2xl">
       <div id="Header" className="flex justify-between gap-2">
         <div className="flex flex-col gap-3">
@@ -37,21 +40,21 @@ function EditProjectContainer ({proyecto} : parameters) {
         <div
           onClick={() => {}}
           className="p-1 bg-background rounded-full hover:brightness-80 hover:cursor-pointer size-fit"
-        >
-        </div>
+        ></div>
       </div>
       <div id="body" className="flex flex-col gap-4">
         <div className="space-y-2">
           <h3>Nombre*</h3>
-          <Input placeholder="Nombre" value={proyecto.name}/>
+          <Input placeholder="Nombre" value={proyecto.name} />
         </div>
         <div className="space-y-2">
           <h3>Descripcion</h3>
-          <Input placeholder="Descripcion" value={proyecto.description}/>
+          <Input placeholder="Descripcion" value={proyecto.description} />
         </div>
       </div>
       <div id="botonera" className="flex justify-end gap-3">
         <Button
+          onClick={onClose}
           variant="outline"
           className="bg-background hover:cursor-pointer"
         >
@@ -65,5 +68,5 @@ function EditProjectContainer ({proyecto} : parameters) {
         </Button>
       </div>
     </div>
-  )
+  );
 }

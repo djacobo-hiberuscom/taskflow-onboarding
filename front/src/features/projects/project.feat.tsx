@@ -11,6 +11,7 @@ import {
   ArchiveConfirmPopUp,
   ArchivedPopUp,
   DeleteConfirmPopUp,
+  EditProjectPopUp,
   NewProjectPopup,
 } from "./popups/index.popup";
 
@@ -31,6 +32,7 @@ export function ProjectFeeat() {
   const [archivedOpen, setArcivedOpen] = useState(false);
   const [newProjectOpen, setNewProjectOpen] = useState(false);
 
+  const [toEdit, setToEdit] = useState<Project | null>(null); // popUp de aeditar proyecto
   const [toDelete, setToDelete] = useState<Project | null>(null);
   const [toArchive, setToArchive] = useState<Project | null>(null);
 
@@ -50,7 +52,6 @@ export function ProjectFeeat() {
   };
   return (
     <div className="p-4 flex flex-col flex-1 gap-2">
-
       <ArchivedPopUp
         isOpen={archivedOpen}
         onOpenChange={(open) => {
@@ -76,7 +77,14 @@ export function ProjectFeeat() {
         onOpenChange={(open) => {
           if (!open) setToArchive(null);
         }}
-        onArchived={() => nav({to: "/projects", replace: true})}
+        onArchived={() => nav({ to: "/projects", replace: true })}
+      />
+      <EditProjectPopUp
+        isOpen={toEdit !== null}
+        onOpenChange={(open) => {
+          if (!open) setToEdit(null);
+        }}
+        proyecto={toEdit}
       />
 
       <div className="flex flex-wrap gap-5 content-start">
@@ -95,11 +103,14 @@ export function ProjectFeeat() {
               favourite={false}
               onDelete={() => setToDelete(p)}
               onArchive={() => setToArchive(p)}
-              onEdit={() => {}}
+              onEdit={() => setToEdit(p)}
             />
           ))}
       </div>
-      <div id="botonera" className="sticky bottom-4 mt-auto flex justify-end gap-2">
+      <div
+        id="botonera"
+        className="sticky bottom-4 mt-auto flex justify-end gap-2"
+      >
         <ArchivedButton isAdmin={isAdmin} onClic={() => openArchive()} />
         <AddButton onClic={() => openNewProject()} />
       </div>
