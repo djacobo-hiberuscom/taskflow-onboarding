@@ -28,6 +28,24 @@ public class ProjectRepository : IProjectRepository
         _context.ProjectMemberships.Add(membership);
     }
 
+    public async System.Threading.Tasks.Task EnsureMembershipAsync(
+        Guid projectId, Guid userId, CancellationToken cancellationToken)
+    {
+        if(_context.Database.CurrentTransaction is null)
+        {
+            throw new InvalidOperationException(
+                "El alta de pertenencia requiere una transacción activa.");
+        }
+
+        var membership = new AppUserProject(projectId, userId);
+
+        await _context.Database.ExecuteSqlInterpolatedAsync($"""
+            INSERT INTO app_user_project (project_id, user_id, created_at)
+            VALUES ({membership.ProjectId}, {membership.UserId}, {membership.CreatedAt})
+            ON CONFLICT (project_id, user_id) DO NOTHING
+            """, cancellationToken);
+    }
+
     public async Task<ProjectPage> GetPageAsync(
         Guid? memberUserId, bool archived, int page, 
         int pageSize, CancellationToken cancellationToken)

@@ -96,4 +96,28 @@ public class Task
         DueDate = dueDate;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
+
+    public void ChangeStatus(TaskState status)
+    {
+        if (!Enum.IsDefined(status))
+        {
+            throw new ArgumentOutOfRangeException(nameof(status),
+                "El estado no es válido.");
+        }
+
+        Status = status;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void ChangeAssignee(Guid? assignedId)
+    {
+        if (assignedId == Guid.Empty)
+        {
+            throw new ArgumentException(
+                "El usuario no puede estar vacío.", nameof(assignedId));
+        }
+        
+        AssignedId = assignedId;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
 }

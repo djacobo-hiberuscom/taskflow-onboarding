@@ -23,5 +23,8 @@ public interface IProjectRepository
         Guid projectId, CancellationToken cancellationToken = default);
     
     void Remove(Project project);
+
+    System.Threading.Tasks.Task EnsureMembershipAsync(
+        Guid projectId, Guid userId, CancellationToken cancellationToken);
 }
 
