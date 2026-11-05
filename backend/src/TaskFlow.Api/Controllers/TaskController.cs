@@ -1,12 +1,15 @@
 //debera usar prefijo /v1
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using TaskFlow.Api.Contracts.Tasks;
 using TaskFlow.Api.Contracts.Users;
 using TaskFlow.Application.Abstractions;
 using TaskFlow.Application.Projects;
 using TaskFlow.Application.Tasks;
 using TaskFlow.Application.Users;
+using TaskFlow.Domain;
 
 namespace TaskFlow.Api.Controllers;
 
@@ -77,11 +80,78 @@ public class TaskController : ControllerBase
         });
     }
 
-/*     [HttpPost("/api/v1/projects/{projectId}/tasks")]
+    [HttpPost("/api/v1/projects/{projectId}/tasks")]
     public async Task<IActionResult> Create(
-        [FromBody] CreateTaskRequest request, CancellationToken cancellationToken)
+        Guid projectId,
+        [FromBody] CreateTaskRequest request,
+        CancellationToken cancellationToken)
     {
-        
-    } */
+        var priority = Enum.Parse<TaskPriority>(request.Priority);
+        var status = Enum.Parse<TaskState>(request.Status);
+
+        var result = await _taskService.CreateTaskAsync(
+            projectId, request.Title, request.Description, 
+            priority, status, request.DueDate, 
+            request.AssigneeId, _currentUser.UserId, _currentUser.IsAdmin, 
+            cancellationToken);
+
+        if(result.Result == TaskOperationResult.NotFound)
+        {
+            return NotFound();
+        }
+
+        if(result.Result == TaskOperationResult.InvalidAssignee)
+        {
+            ModelState.AddModelError(
+                "assigneeId", "El usuario asignado no existe.");
+
+            return ValidationProblem();
+        }
+
+        if(result.Result != TaskOperationResult.Success ||
+            result.Task is null ||
+            result.ProjectName is null)
+        {
+            throw new InvalidOperationException(
+                "El resultado de la creación de la tarea no es válido.");
+        }
+
+        var task = result.Task;
+        var projectName = result.ProjectName;
+
+        UserSummaryResponse? userSummary = null;
+
+        if(task.AssignedId is not null)
+        {
+            var assignee = await _localUserService.GetByIdAsync(
+                task.AssignedId.Value, cancellationToken);
+            
+            if(assignee is not null)
+            {
+                userSummary = new UserSummaryResponse
+                {
+                    Id = assignee.Id,
+                    DisplayName = assignee.DisplayName
+                };
+            }
+        }
+
+        var taskResponse = new TaskResponse
+        {
+            Id = task.Id,
+            ProjectId = task.ProjectId,
+            ProjectName = projectName,
+            Title = task.Title,
+            Description = task.Description,
+            Status = task.Status.ToString(),
+            Priority = task.Priority.ToString(),
+            DueDate = task.DueDate,
+            Assignee = userSummary,
+            CreatedAt = task.CreatedAt,
+            UpdatedAt = task.UpdatedAt
+        };
+
+        return Created($"/api/v1/tasks/{task.Id}", taskResponse);
+    }
     
 }

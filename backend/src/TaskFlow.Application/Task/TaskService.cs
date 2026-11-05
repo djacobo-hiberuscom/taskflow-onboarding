@@ -65,7 +65,7 @@ public class TaskService
                     assigneeId.Value, token);
             }
 
-            //Bloquear el proyecto, haya asignado o no.
+            //Bloquear el proyecto, haya usuario asignado o no.
             var project = await _projectRepository.GetByIdForUpdateAsync(
                 projectId, token);
         
@@ -85,6 +85,9 @@ public class TaskService
 
             //Ahora podemos comunicar que el asignado no existe
             //comprobar que el usuario asignado es válido
+            //esta comprobacion se hace despues de la del proycto porque en la
+            //especificacion tiene prioridad el error de visibilidad sobre el de 
+            //asignado inválido.
             if(assigneeId.HasValue && assignee is null)
             {
                 return (TaskOperationResult.InvalidAssignee, null, null);
