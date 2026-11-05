@@ -2,46 +2,64 @@
 import {
   Dialog,
   DialogContent,
-  Button, Input
+  Button,
+  Input,
+  toast,
 } from "@/components/index.comp";
 import { useState } from "react";
 // TYPES
 import { useCreateProject } from "#hooks/use-project";
 
+const openSuccessToast = () => {
+  toast.add({
+    type: "success",
+    description: "Proyecto creado correctamente",
+  });
+};
+const openErrorToast = () => {
+  toast.add({
+    type: "error",
+    description: "Error al crear el proyecto",
+  });
+};
 
 interface parameters {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
 }
-export function NewProjectPopup ({isOpen, onOpenChange}: parameters) {
+export function NewProjectPopup({ isOpen, onOpenChange }: parameters) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col p-4 gap-3">
-        <NewProjectContainer onClose={() => onOpenChange(false)}/>
+        <NewProjectContainer onClose={() => onOpenChange(false)} />
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
+function NewProjectContainer({ onClose }: { onClose: () => void }) {
+  const [nombre, setNombre] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
 
-function NewProjectContainer({onClose} : {onClose: () => void}) {
-  const [nombre, setNombre] = useState<string>("")
-  const [description, setDescription] = useState<string>("")
-  
-  const createProject = useCreateProject() 
+  const createProject = useCreateProject();
   const handleCreateClic = () => {
-    if (nombre.trim().length === 0) return
+    if (nombre.trim().length === 0) return;
     createProject.mutate(
-      {name: nombre.trim(), description: description.trim() || null},
+      { name: nombre.trim(), description: description.trim() || null },
       {
         onSuccess: () => {
-          setNombre("")
-          setDescription("")
-          onClose()
-        }
-      }
-    )
-  }
+          setNombre("");
+          setDescription("");
+          onClose();
+          openSuccessToast();
+        },
+        onError: () => {
+          onClose();
+          openErrorToast();
+        },
+      },
+    );
+  };
 
   return (
     <div className="flex flex-col gap-4 rounded-2xl p-4 max-w-2xl">
@@ -53,17 +71,24 @@ function NewProjectContainer({onClose} : {onClose: () => void}) {
         <div
           onClick={() => {}}
           className="p-1 bg-background rounded-full hover:brightness-80 hover:cursor-pointer size-fit"
-        >
-        </div>
+        ></div>
       </div>
       <div id="body" className="flex flex-col gap-4">
         <div className="space-y-2">
           <h3>Nombre*</h3>
-          <Input placeholder="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)}/>
+          <Input
+            placeholder="Nombre"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+          />
         </div>
         <div className="space-y-2">
           <h3>Descripcion</h3>
-          <Input placeholder="Descripcion" value={description} onChange={(e) => setDescription(e.target.value)} />
+          <Input
+            placeholder="Descripcion"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
         </div>
       </div>
       <div id="botonera" className="flex justify-end gap-3">
@@ -74,7 +99,7 @@ function NewProjectContainer({onClose} : {onClose: () => void}) {
           Cancelar
         </Button>
         <Button
-        onClick={handleCreateClic}
+          onClick={handleCreateClic}
           variant="outline"
           className="bg-primary text-background hover:cursor-pointer hover:bg-primary hover:brightness-120 hover:text-background"
         >

@@ -3,6 +3,7 @@ import type { Project } from "#lib/api/types";
 // COMPONENTES
 import { Dialog, DialogContent, Button, Input } from "@/components/index.comp";
 import { useState } from "react";
+import { toast } from "@/components/index.comp";
 
 interface popParameters {
   isOpen: boolean;
@@ -37,6 +38,19 @@ function EditProjectContainer({ proyecto, onClose }: parameters) {
 
   if (!proyecto) return <h1>Error al obtener proyecto</h1>;
 
+  const openSuccessToast = () => {
+    toast.add({
+      type: "success",
+      description: "Proyecto editado correctamente",
+    });
+  };
+  const openErrorToast = () => {
+    toast.add({
+      type: "error",
+      description: "Error al editar el proyecto",
+    });
+  }
+
   const onUpdateHandleClic = () => {
     useUpdate.mutate(
       {
@@ -45,7 +59,14 @@ function EditProjectContainer({ proyecto, onClose }: parameters) {
         description: description?.trim() || null,
       },
       {
-        onSuccess: () => onClose(),
+        onSuccess: () => {
+          onClose();
+          openSuccessToast()
+        },
+        onError: () => {
+          onClose()
+          openErrorToast()
+        }
       },
     );
   };

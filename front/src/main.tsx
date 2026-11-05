@@ -10,6 +10,7 @@ import {
 import { router } from "./app/router.tsx";
 import { initKeycloak } from "@/lib/auth/keycloak.ts";
 import { ApiError } from "#lib/api/client";
+import { Toaster } from "#components/ui/toast";
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -31,7 +32,9 @@ function render() {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <Toaster>
+          <RouterProvider router={router} />
+        </Toaster>
       </QueryClientProvider>
     </StrictMode>,
   );

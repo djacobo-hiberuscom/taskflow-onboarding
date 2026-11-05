@@ -3,7 +3,7 @@
 import { Dialog, DialogContent, Button } from "@/components/index.comp";
 
 // COMPONENTS
-
+import { toast } from "@/components/index.comp";
 // TYPES
 import type { Project } from "#lib/api/types";
 
@@ -13,6 +13,19 @@ import { Trash, TriangleAlertIcon } from "lucide-react";
 // HOOKS
 import { useDeleteProject } from "#hooks/use-project";
 import { useNavigate } from "@tanstack/react-router";
+
+const openSuccessToast = () => {
+  toast.add({
+    type: "success",
+    description: "Proyecto eliminado correctamente",
+  });
+};
+const openErrorToast = () => {
+  toast.add({
+    type: "error",
+    description: "Error al eliminar el proyecto",
+  });
+};
 
 interface popParameters {
   modal?: boolean;
@@ -53,7 +66,12 @@ export function DeleteConfirmContainer({ proyecto, onClose }: parameters) {
       onSuccess: () => {
         onClose();
         nav({ to: "/projects", replace: true });
+        openSuccessToast()
       },
+      onError: () => {
+        onClose()
+        openErrorToast()
+      }
     });
   };
 

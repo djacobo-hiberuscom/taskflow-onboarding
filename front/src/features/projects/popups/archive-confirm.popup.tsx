@@ -3,7 +3,7 @@
 import { Dialog, DialogContent, Button } from "@/components/index.comp";
 
 // COMPONENTS
-
+import { toast } from "@/components/index.comp";
 // TYPES
 import type { Project } from "#lib/api/types";
 
@@ -12,9 +12,19 @@ import { Archive } from "lucide-react";
 
 // HOOKS
 import { useArchiveProject } from "#hooks/use-project";
-import { useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { DeleteConfirmPopUp } from "./delete-confirm.popup";
+
+const openSuccessToast = () => {
+  toast.add({
+    type: "success",
+    description: "Proyecto archivado correctamente",
+  });
+};
+const openErrorToast = () => {
+  toast.add({
+    type: "error",
+    description: "Error al archivar el proyecto",
+  });
+};
 
 interface popParameters {
   isOpen: boolean;
@@ -29,8 +39,6 @@ export function ArchiveConfirmPopUp({
   proyecto,
   onArchived,
 }: popParameters) {
-  
-
   return (
     <div>
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -64,6 +72,11 @@ export function ArchiveConfirmContainer({
       onSuccess: () => {
         onClose();
         onArchived?.();
+        openSuccessToast();
+      },
+      onError: () => {
+        onClose()
+        openErrorToast();
       },
     });
   };

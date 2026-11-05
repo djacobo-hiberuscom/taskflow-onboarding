@@ -8,6 +8,7 @@ import {
   DialogTitle,
   Button,
   Badge,
+  toast,
 } from "@/components/index.comp";
 // ICONOS
 import { Archive, Trash, RefreshCw, ArrowRight } from "lucide-react";
@@ -28,6 +29,19 @@ import { useProjects, useRestoreProject } from "#hooks/use-project";
 import { DeleteConfirmPopUp } from "./delete-confirm.popup";
 import { useNavigate } from "@tanstack/react-router";
 
+const openSuccessToast = () => {
+  toast.add({
+    type: "success",
+    description: "Proyecto restaurado correctamente",
+  });
+};
+const openErrorToast = () => {
+  toast.add({
+    type: "error",
+    description: "Error al restaurar el proyecto",
+  });
+};
+
 interface parameters {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -37,7 +51,7 @@ export function ArchivedPopUp({ isOpen, onOpenChange }: parameters) {
   const { data, isLoading, error } = useProjects({ archived: true });
   const useRestore = useRestoreProject();
   const [page, setPage] = useState(1);
-  const nav = useNavigate()
+  const nav = useNavigate();
   const [toDelete, setToDelete] = useState<Project | null>(null);
 
   const PAGE_SIZE = 5;
@@ -50,18 +64,23 @@ export function ArchivedPopUp({ isOpen, onOpenChange }: parameters) {
 
   const totalPage = Math.ceil(visibles.length / PAGE_SIZE);
 
-  
-
   const handleClicRestore = (proeycto: Project) => {
     useRestore.mutate(proeycto.id, {
-      onSuccess: () => {},
+      onSuccess: () => {
+        onOpenChange(false);
+        openSuccessToast();
+      },
+      onError: () => {
+        onOpenChange(false);
+        openErrorToast();
+      },
     });
   };
 
   const handleClicOpen = (proyeto: Project) => {
-    onOpenChange(false)
-    nav({to: "/projects/$id", params: { id: proyeto.id} })
-  }  
+    onOpenChange(false);
+    nav({ to: "/projects/$id", params: { id: proyeto.id } });
+  };
 
   return (
     <div>
@@ -85,9 +104,12 @@ export function ArchivedPopUp({ isOpen, onOpenChange }: parameters) {
                 return (
                   <ArchivedRow
                     proyecto={pa}
-                    onDeleteProject={() => setToDelete(pa)}
+                    onDeleteProject={() => {
+                      setToDelete(pa);
+                      onOpenChange(false)
+                    }}
                     onOpenProject={() => {
-                      handleClicOpen(pa)
+                      handleClicOpen(pa);
                     }}
                     onRestoreProject={() => {
                       handleClicRestore(pa);
