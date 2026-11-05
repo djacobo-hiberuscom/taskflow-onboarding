@@ -294,4 +294,52 @@ public class TaskService
             }, cancellationToken);
     }
 
+    public async Task<TaskOperationResult> DeleteTaskAsync(
+        Guid taskId, Guid userId, bool isAdmin,
+        CancellationToken cancellationToken)
+    {
+        return await _unitOfWork.ExecuteInTransactionAsync<TaskOperationResult>(
+            async token =>
+            {
+                var projectId = await _taskRepository.GetProjectIdAsync(
+                    taskId, token);
+                
+                if(projectId is null)
+                {
+                    return TaskOperationResult.NotFound;
+                }
+
+                var project = await _projectRepository.GetByIdForUpdateAsync(
+                    projectId.Value, token);
+
+                if(project is null)
+                {
+                    return TaskOperationResult.NotFound;
+                }
+
+                var visibleProject = await _projectRepository.GetVisibleByIdAsync(
+                    projectId.Value, userId, isAdmin, token);
+                
+                if(visibleProject is null)
+                {
+                    return TaskOperationResult.NotFound;
+                }
+
+                var task = await _taskRepository.GetByIdAsync(
+                    taskId, token);
+                
+                if(task is null)
+                {
+                    return TaskOperationResult.NotFound;
+                }
+
+                _taskRepository.Remove(task);
+
+                await _unitOfWork.SaveChangesAsync(token);
+
+                return TaskOperationResult.Success;
+
+            }, cancellationToken);
+    }
+
 }

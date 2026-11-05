@@ -296,6 +296,10 @@ public class TaskUpdateApiTests(PostgresFixture postgres) : IClassFixture<Postgr
     [InlineData("delete-project", "assignee")]
     [InlineData("delete-task", "assignee")]
     [InlineData("edit-task", "assignee")]
+    [InlineData("archive", "delete")]
+    [InlineData("delete-project", "delete")]
+    [InlineData("delete-task", "delete")]
+    [InlineData("edit-task", "delete")]
     public async Task Write_WaitsForProjectLockAndReadsCurrentTaskAndPermissions(string operation, string writeKind)
     {
         var sample = await SeedAsync();
@@ -312,14 +316,16 @@ public class TaskUpdateApiTests(PostgresFixture postgres) : IClassFixture<Postgr
         var project = await new ProjectRepository(holder).GetByIdForUpdateAsync(sample.Project.Id, timeout.Token);
         Assert.NotNull(project);
 
-        var route = Route(sample.Task.Id) + (writeKind == "details" ? "" : $"/{writeKind}");
+        var route = Route(sample.Task.Id) + (writeKind is "details" or "delete" ? "" : $"/{writeKind}");
         object body = writeKind switch
         {
             "status" => new { status = "ToDo" },
             "assignee" => new { assigneeId = sample.Assignee.Id },
             _ => ValidBody()
         };
-        var update = client.PutAsJsonAsync(route, body, timeout.Token);
+        var update = writeKind == "delete"
+            ? client.DeleteAsync(route, timeout.Token)
+            : client.PutAsJsonAsync(route, body, timeout.Token);
         try
         {
             var pid = await attempt.Started.Task.WaitAsync(timeout.Token);
@@ -349,7 +355,15 @@ public class TaskUpdateApiTests(PostgresFixture postgres) : IClassFixture<Postgr
             await transaction.CommitAsync(timeout.Token);
 
             using var response = await update;
-            if (operation == "edit-task")
+            if (operation == "edit-task" && writeKind == "delete")
+            {
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+                Assert.Equal("", await response.Content.ReadAsStringAsync());
+                await using var verification = CreateContext();
+                Assert.False(await verification.Tasks.AnyAsync(item => item.Id == sample.Task.Id));
+                Assert.Equal(2, await verification.ProjectMemberships.CountAsync(item => item.ProjectId == sample.Project.Id));
+            }
+            else if (operation == "edit-task")
             {
                 var detail = await ReadUpdatedAsync(response);
                 Assert.Equal(writeKind == "status" ? "ToDo" : "Done", detail.Status);

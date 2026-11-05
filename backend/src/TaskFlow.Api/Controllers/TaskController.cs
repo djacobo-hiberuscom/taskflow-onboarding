@@ -300,7 +300,7 @@ public class TaskController : ControllerBase
         if(result.Result == TaskOperationResult.InvalidAssignee)
         {
             ModelState.AddModelError(
-                "assgneeId", "El usuario asignado no existe.");
+                "assigneeId", "El usuario asignado no existe.");
 
             return ValidationProblem();
         }
@@ -349,5 +349,27 @@ public class TaskController : ControllerBase
         };
 
         return Ok(taskResponse);
+    }
+
+    [HttpDelete("{taskId}")]
+    public async Task<IActionResult> Delete(
+        Guid taskId, CancellationToken cancellationToken)
+    {
+        var result = await _taskService.DeleteTaskAsync(
+            taskId, _currentUser.UserId, _currentUser.IsAdmin,
+            cancellationToken);
+
+        switch (result)
+        {
+            case TaskOperationResult.Success:
+                return NoContent();
+            
+            case TaskOperationResult.NotFound:
+                return NotFound();
+            
+            default:
+                throw new InvalidOperationException(
+                    "Resultado de borrado de tarea no reconocido.");
+        }
     }
 }
