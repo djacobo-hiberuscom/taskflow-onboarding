@@ -1,6 +1,8 @@
+import { useUpdateProject } from "#hooks/use-project";
 import type { Project } from "#lib/api/types";
 // COMPONENTES
 import { Dialog, DialogContent, Button, Input } from "@/components/index.comp";
+import { useState } from "react";
 
 interface popParameters {
   isOpen: boolean;
@@ -29,7 +31,25 @@ interface parameters {
   onClose: () => void;
 }
 function EditProjectContainer({ proyecto, onClose }: parameters) {
+  const [nombre, setNombre] = useState(proyecto?.name);
+  const [description, setDescription] = useState(proyecto?.description);
+  const useUpdate = useUpdateProject();
+
   if (!proyecto) return <h1>Error al obtener proyecto</h1>;
+
+  const onUpdateHandleClic = () => {
+    useUpdate.mutate(
+      {
+        id: proyecto.id,
+        name: nombre ?? "Sin nombre",
+        description: description?.trim() || null,
+      },
+      {
+        onSuccess: () => onClose(),
+      },
+    );
+  };
+
   return (
     <div className="flex flex-col gap-4 rounded-2xl p-4 max-w-2xl">
       <div id="Header" className="flex justify-between gap-2">
@@ -45,11 +65,19 @@ function EditProjectContainer({ proyecto, onClose }: parameters) {
       <div id="body" className="flex flex-col gap-4">
         <div className="space-y-2">
           <h3>Nombre*</h3>
-          <Input placeholder="Nombre" value={proyecto.name} />
+          <Input
+            placeholder="Nombre"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+          />
         </div>
         <div className="space-y-2">
           <h3>Descripcion</h3>
-          <Input placeholder="Descripcion" value={proyecto.description ?? "Sin Descripcion"} />
+          <Input
+            placeholder="Descripcion"
+            value={description ?? ""}
+            onChange={(e) => setDescription(e.target.value)}
+          />
         </div>
       </div>
       <div id="botonera" className="flex justify-end gap-3">
@@ -61,6 +89,7 @@ function EditProjectContainer({ proyecto, onClose }: parameters) {
           Cancelar
         </Button>
         <Button
+          onClick={onUpdateHandleClic}
           variant="outline"
           className="bg-primary text-background hover:cursor-pointer hover:bg-primary hover:brightness-120 hover:text-background"
         >
