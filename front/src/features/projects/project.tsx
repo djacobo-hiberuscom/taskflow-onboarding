@@ -1,10 +1,6 @@
-// Componentess
 import { useState } from "react";
-import {
-  ProjectCard,
-  AddButton,
-  ArchivedButton,
-} from "./components";
+// Componentess
+import { Projects, Botonera } from "./components";
 
 // Popups
 import {
@@ -13,28 +9,26 @@ import {
   DeleteConfirmPopUp,
   EditProjectPopUp,
   NewProjectPopup,
-} from "../../components/common/popup";
+} from "@/components/common/popup";
 
 // PROYECTOS
 import { useNavigate } from "@tanstack/react-router";
 
 // USER
-import { keycloak } from "@/lib/auth/keycloak";
 import { useProjects } from "#hooks/use-project";
 import { ApiError } from "#lib/api/client";
-import { NotFound } from "..";
+import { NotFound } from "@/app/layouts/index";
 import type { Project } from "#lib/api/types";
 
+//FEAT
 export function ProjectFeeat() {
-  const { data, isLoading, error } = useProjects();
-  const isAdmin: boolean = keycloak.hasRealmRole("Admin");
+  const { data, isLoading, error } = useProjects(); // Proyectos
 
-  const [archivedOpen, setArcivedOpen] = useState(false);
-  const [newProjectOpen, setNewProjectOpen] = useState(false);
-
+  const [archivedOpen, setArcivedOpen] = useState(false); // Abrir popup de archivados
+  const [newProjectOpen, setNewProjectOpen] = useState(false); // Abrir pop up de newproject
   const [toEdit, setToEdit] = useState<Project | null>(null); // popUp de aeditar proyecto
-  const [toDelete, setToDelete] = useState<Project | null>(null);
-  const [toArchive, setToArchive] = useState<Project | null>(null);
+  const [toDelete, setToDelete] = useState<Project | null>(null); // popup de deleteconfirm
+  const [toArchive, setToArchive] = useState<Project | null>(null); // popup de archive confirm
 
   const nav = useNavigate();
 
@@ -42,14 +36,6 @@ export function ProjectFeeat() {
   if (error instanceof ApiError && error.status === 404) return <NotFound />;
   if (error) return <h1>{error.message}</h1>;
 
-  const projects = data?.items ?? [];
-
-  const openArchive = () => {
-    setArcivedOpen(!archivedOpen);
-  };
-  const openNewProject = () => {
-    setNewProjectOpen(!newProjectOpen);
-  };
   return (
     <div className="p-4 flex flex-col flex-1 gap-2">
       <ArchivedPopUp
@@ -64,6 +50,7 @@ export function ProjectFeeat() {
           if (!open) setNewProjectOpen(false);
         }}
       />
+
       <DeleteConfirmPopUp
         isOpen={toDelete !== null}
         proyecto={toDelete ?? undefined}
@@ -87,33 +74,18 @@ export function ProjectFeeat() {
         proyecto={toEdit}
       />
 
-      <div className="flex flex-wrap gap-5 content-start">
-        {projects
-          ?.filter((p) => p.archivedAt === null)
-          .map((p) => (
-            <ProjectCard
-              key={p.id}
-              isAdmin={isAdmin}
-              id={p.id}
-              onClic={() => nav({ to: "/projects/$id", params: { id: p.id } })}
-              title={p.name}
-              description={p.description}
-              miembros={1}
-              tareasAbiertas={5}
-              favourite={false}
-              onDelete={() => setToDelete(p)}
-              onArchive={() => setToArchive(p)}
-              onEdit={() => setToEdit(p)}
-            />
-          ))}
-      </div>
-      <div
-        id="botonera"
-        className="sticky bottom-4 mt-auto flex justify-end gap-2"
-      >
-        <ArchivedButton isAdmin={isAdmin} onClic={() => openArchive()} />
-        <AddButton onClic={() => openNewProject()} />
-      </div>
+  
+      <Projects
+        projects={data?.items ?? []}
+        onArchive={setToArchive}
+        onDelete={setToDelete}
+        onEdit={setToEdit}
+      />
+
+      <Botonera
+        openNewProject={() => setNewProjectOpen(!newProjectOpen)}
+        openArchive={() => setArcivedOpen(!archivedOpen)}
+      />
     </div>
   );
 }

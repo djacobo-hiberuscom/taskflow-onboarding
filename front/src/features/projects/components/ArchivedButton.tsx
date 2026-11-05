@@ -1,11 +1,16 @@
-import { Button } from "#components/ui/button";
+// Compoenentees
+import { Button } from "@/components/index.comp";
+
+// Iconos
 import { Archive } from "lucide-react";
 
+// parametros
 interface parameters {
   onClic: () => void;
   isAdmin: boolean
 }
 
+// Compoenente
 export function ArchivedButton({ onClic, isAdmin}: parameters) {
   return (
     <Button

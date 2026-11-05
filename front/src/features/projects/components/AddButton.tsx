@@ -1,10 +1,14 @@
-import { Button } from "#components/ui/button";
+// Componentes
+import { Button } from "@/components/index.comp";
+// Iconos
 import { Plus } from "lucide-react";
 
+// parametros
 interface parameters {
   onClic: () => void;
 }
 
+// compoenente
 export function AddButton({ onClic }: parameters) {
   return (
     <Button
