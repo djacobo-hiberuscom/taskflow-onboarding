@@ -1,7 +1,14 @@
+// Router
 import { Link } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
+
+// Componentes
+import { Button } from "@/components/index.comp";
+
+// Keycloak
 import { login } from "@/lib/auth/keycloak";
 
+
+// FEAT
 export function LoginPage() {
   return (
     <div className="flex flex-col justify-center items-center h-screen">
