@@ -5,7 +5,7 @@ import {
   EditProjectPopUp,
   ArchiveConfirmPopUp,
   DeleteConfirmPopUp,
-} from "./popups/index.popup";
+} from "../../components/common/popup";
 // HOOKS
 import { useState } from "react";
 import { useProject } from "#hooks/use-project";
@@ -18,7 +18,7 @@ import {
   Separator,
   Badge,
 } from "@/components/index.comp";
-import { FilterSeletor, DeailTaskDrawer } from "./components/index.comp";
+import { FilterSeletor, DeailTaskDrawer } from "./components";
 
 // ICONS
 import {
@@ -38,7 +38,7 @@ import { TaskColum } from "./components/colum-task";
 // CONST
 import TAREAS from "@/assets/tempdata/tasks.json";
 import { ApiError } from "#lib/api/client";
-import { NotFound } from "../index.featues";
+import { NotFound } from "@/app/layouts/index";
 
 export function DetailProject() {
   // CONST

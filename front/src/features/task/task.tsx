@@ -1,7 +1,7 @@
 // ICONOS
 import { X } from "lucide-react";
 // popups
-import {} from "./popups/index.popup";
+
 // COMPONENTS
 import { Badge } from "@/components/index.comp";
 import { DeailTaskDrawer } from "./components/index.comp";

@@ -6,7 +6,7 @@ import { login } from "@/lib/auth/keycloak";
 
 
 // FEAT
-export function CallbackPage() {
+export function CallbackLayout() {
   return (
     <main>
       <p>No se pudo iniciar sesión.</p>

@@ -1,6 +1,8 @@
+// ICONOS
 import { TrendingUp } from "lucide-react";
-import { Label, Pie, PieChart } from "recharts";
 
+// COMPONENTES
+import { Label, Pie, PieChart } from "recharts";
 import {
   Card,
   CardContent,

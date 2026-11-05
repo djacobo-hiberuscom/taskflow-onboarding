@@ -4,7 +4,7 @@ import {
   ProjectCard,
   AddButton,
   ArchivedButton,
-} from "./components/index.comp";
+} from "./components";
 
 // Popups
 import {
@@ -13,7 +13,7 @@ import {
   DeleteConfirmPopUp,
   EditProjectPopUp,
   NewProjectPopup,
-} from "./popups/index.popup";
+} from "../../components/common/popup";
 
 // PROYECTOS
 import { useNavigate } from "@tanstack/react-router";
@@ -22,7 +22,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { keycloak } from "@/lib/auth/keycloak";
 import { useProjects } from "#hooks/use-project";
 import { ApiError } from "#lib/api/client";
-import { NotFound } from "../index.featues";
+import { NotFound } from "..";
 import type { Project } from "#lib/api/types";
 
 export function ProjectFeeat() {

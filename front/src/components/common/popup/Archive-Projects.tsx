@@ -16,7 +16,7 @@ import { Archive, Trash, RefreshCw, ArrowRight } from "lucide-react";
 // PROYECTOS
 import type { Project } from "#lib/api/types";
 import { ApiError } from "#lib/api/client";
-import { NotFound } from "../../index.featues";
+import { NotFound } from "../../../features";
 
 // TAREAS
 import TAREAS from "@/assets/tempdata/tasks.json";
@@ -26,7 +26,7 @@ import TAREAS from "@/assets/tempdata/tasks.json";
 import { getUsernameByProjectId } from "@/tools/getUsername";
 import { useState } from "react";
 import { useProjects, useRestoreProject } from "#hooks/use-project";
-import { DeleteConfirmPopUp } from "./delete-confirm.popup";
+import { DeleteConfirmPopUp } from "./Delete-Confirm";
 import { useNavigate } from "@tanstack/react-router";
 
 const openSuccessToast = () => {

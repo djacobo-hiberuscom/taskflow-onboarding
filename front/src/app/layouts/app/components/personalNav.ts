@@ -1,3 +1,4 @@
+// Iconos
 import {
   FolderKanban,
   LayoutDashboard,
@@ -6,8 +7,10 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+// type
 export type NavItem = { id: string; label: string; icon: LucideIcon, to: string };
 
+// Lista de tabs del sidebar
 export const personalNav: NavItem[] = [
   { id: "dashboard", label: "Panel", icon: LayoutDashboard, to: "/"},
   { id: "my-projects", label: "Proyectos", icon: FolderKanban, to: "/projects" },

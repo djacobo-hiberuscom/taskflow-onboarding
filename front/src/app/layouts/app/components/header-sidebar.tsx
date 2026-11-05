@@ -1,3 +1,4 @@
+// Componente
 export function HeaderSiderBar() {
   return (
     <div className="flex items-center gap-3 px-1">

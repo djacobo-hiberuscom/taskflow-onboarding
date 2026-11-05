@@ -1,5 +1,0 @@
-export * from "./new-project.popup"
-export * from "./edit-project.popup"
-export * from "./archived-project.popup"
-export * from "./archive-confirm.popup"
-export * from "./delete-confirm.popup"

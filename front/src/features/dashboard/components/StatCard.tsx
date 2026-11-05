@@ -1,11 +1,14 @@
+// Icono
 import { Folder } from "lucide-react";
 
+// Parametros Compoenente
 interface parameters {
   name: string;
   number: number;
   descripcion?: string;
 }
 
+// Compoenente
 export function StatCard({ name, number, descripcion }: parameters) {
   return (
     <div id="n-proyectos-activos" className="flex flex-col border rounded-2xl p-4 gap-10 min-w-2xs bg-background">

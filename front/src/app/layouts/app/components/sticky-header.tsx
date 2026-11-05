@@ -1,10 +1,7 @@
-import {Separator, SidebarTrigger} from "@/components/index.comp"
+// componentes
+import { Separator, SidebarTrigger } from "@/components/index.comp";
 
-
-interface params {
-  title: string;
-}
-
+// formato de fecha
 const today = new Intl.DateTimeFormat("es-ES", {
   weekday: "long",
   day: "numeric",
@@ -12,7 +9,13 @@ const today = new Intl.DateTimeFormat("es-ES", {
   timeZone: "Europe/Madrid",
 }).format(new Date());
 
-export function StickyHeader({title} :params) {
+// Parametros del compoenente
+interface params {
+  title: string;
+}
+
+// Componente
+export function StickyHeader({ title }: params) {
   return (
     <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-3 border-b border-[#E3E7EF] bg-[#F3F5F9]/85 px-4 backdrop-blur-md">
       <SidebarTrigger className="-ml-1 text-[#4A5568] hover:bg-[#E6EAF2]" />
