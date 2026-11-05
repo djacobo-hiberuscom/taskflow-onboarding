@@ -31,4 +31,13 @@ public class TaskRepository : ITaskRepository
             task => task.Id == taskId,
             cancellationToken);
     }
+
+    public async Task<Guid?> GetProjectIdAsync(
+        Guid taskId, CancellationToken cancellationToken)
+    {
+        return await _context.Tasks
+            .Where(task => task.Id == taskId)
+            .Select(task => (Guid?)task.ProjectId)
+            .SingleOrDefaultAsync(cancellationToken);
+    }
 }

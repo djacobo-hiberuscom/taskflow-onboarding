@@ -11,4 +11,7 @@ public interface ITaskRepository
         CancellationToken cancellationToken = default);
 
     void Remove(DomainTask task);
+
+    Task<Guid?> GetProjectIdAsync(
+        Guid taskId, CancellationToken cancellationToken);
 }

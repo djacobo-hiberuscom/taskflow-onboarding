@@ -116,5 +116,58 @@ public class TaskService
         }, cancellationToken);
     }
 
+    public async Task<(
+        TaskOperationResult Result,
+        DomainTask? Task,
+        string? ProjectName)> UpdateTaskAsync(
+            Guid taskId, string title, string? description,
+            TaskPriority priority, DateOnly? dueDate, Guid userId,
+            bool isAdmin, CancellationToken cancellationToken)
+    {
+        return await _unitOfWork.ExecuteInTransactionAsync<(
+            TaskOperationResult Result, 
+            DomainTask? Task, 
+            string? ProjectName)>(async token =>
+            {
+                var projectId = await _taskRepository.GetProjectIdAsync(
+                    taskId, token);
+                
+                if(projectId is null)
+                {
+                    return (TaskOperationResult.NotFound, null, null);
+                }
+
+                var project = await _projectRepository.GetByIdForUpdateAsync(
+                    projectId.Value, token);
+
+                if(project is null)
+                {
+                    return (TaskOperationResult.NotFound, null, null);
+                }
+
+                var visibleProject = await _projectRepository.GetVisibleByIdAsync(
+                    projectId.Value, userId, isAdmin, token);
+                
+                if(visibleProject is null)
+                {
+                    return (TaskOperationResult.NotFound, null, null);
+                }
+
+                var task = await _taskRepository.GetByIdAsync(
+                    taskId, token);
+                
+                if(task is null)
+                {
+                    return (TaskOperationResult.NotFound, null, null);
+                }
+
+                task.UpdateDetails(title, description, priority, dueDate);
+
+                await _unitOfWork.SaveChangesAsync(token);
+
+                return (TaskOperationResult.Success, task, visibleProject.Name);
+
+            }, cancellationToken);
+    }
 
 }

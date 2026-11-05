@@ -153,5 +153,69 @@ public class TaskController : ControllerBase
 
         return Created($"/api/v1/tasks/{task.Id}", taskResponse);
     }
+
+    [HttpPut("{taskId}")]
+    public async Task<IActionResult> Update(
+        Guid taskId,
+        [FromBody] UpdateTaskRequest request,
+        CancellationToken cancellationToken)
+    {
+        var priority = Enum.Parse<TaskPriority>(request.Priority);
+
+        var result = await _taskService.UpdateTaskAsync(
+            taskId, request.Title, request.Description,
+            priority, request.DueDate, _currentUser.UserId,
+            _currentUser.IsAdmin, cancellationToken);
+        
+        if(result.Result == TaskOperationResult.NotFound)
+        {
+            return NotFound();
+        }
+
+        if(result.Result != TaskOperationResult.Success ||
+            result.Task is null ||
+            result.ProjectName is null)
+        {
+            throw new InvalidOperationException(
+                "El resultado de la actualización de la tarea no es válido");
+        }
+        
+                var task = result.Task;
+        var projectName = result.ProjectName;
+
+        UserSummaryResponse? userSummary = null;
+
+        if(task.AssignedId is not null)
+        {
+            var assignee = await _localUserService.GetByIdAsync(
+                task.AssignedId.Value, cancellationToken);
+            
+            if(assignee is not null)
+            {
+                userSummary = new UserSummaryResponse
+                {
+                    Id = assignee.Id,
+                    DisplayName = assignee.DisplayName
+                };
+            }
+        }
+
+        var taskResponse = new TaskResponse
+        {
+            Id = task.Id,
+            ProjectId = task.ProjectId,
+            ProjectName = projectName,
+            Title = task.Title,
+            Description = task.Description,
+            Status = task.Status.ToString(),
+            Priority = task.Priority.ToString(),
+            DueDate = task.DueDate,
+            Assignee = userSummary,
+            CreatedAt = task.CreatedAt,
+            UpdatedAt = task.UpdatedAt
+        };
+
+        return Ok(taskResponse);
+    }
     
 }
