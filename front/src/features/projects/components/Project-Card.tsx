@@ -4,7 +4,6 @@ import { Separator } from "#components/ui/separator";
 import { useState } from "react";
 import TAREAS from "@/assets/tempdata/tasks.json"
 
-import {getUsernameByProjectId } from "@/tools/getUsername";
 // Contex menu
 import {
   ContextMenu,
@@ -46,7 +45,7 @@ export function ProjectCard({
 
 
   const [isFavourite, setIsFavourite] = useState(favourite);
-  const miembros = getUsernameByProjectId(proyecto.id).length
+  const miembros = proyecto.members?.length ?? 0
   const nTareas = TAREAS.filter((t) => t.project_id === proyecto.id).length; // N TAREAS
   return (
     <ContextMenu>
