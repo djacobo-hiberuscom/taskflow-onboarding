@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using TaskFlow.Api.Contracts.Projects;
 using TaskFlow.Api.Contracts.Tasks;
+using TaskFlow.Api.Contracts.Users;
 using TaskFlow.Infrastructure.Persistence;
 using AppUser = TaskFlow.Domain.AppUser;
 using AppUserProject = TaskFlow.Domain.AppUserProject;
@@ -209,7 +210,12 @@ public class TaskDeleteApiTests(PostgresFixture postgres) : IClassFixture<Postgr
         Assert.Equal(HttpStatusCode.Created, taskResponse.StatusCode);
         var task = Assert.IsType<TaskResponse>(await taskResponse.Content.ReadFromJsonAsync<TaskResponse>());
 
-        using var assigned = await creator.PutAsJsonAsync(Route(task.Id) + "/assignee", new { assigneeId = sample.Assignee.Id });
+        using var assignableResponse = await creator.GetAsync("/api/v1/users/assignable");
+        Assert.Equal(HttpStatusCode.OK, assignableResponse.StatusCode);
+        var assignableUsers = Assert.IsType<UserSummaryResponse[]>(
+            await assignableResponse.Content.ReadFromJsonAsync<UserSummaryResponse[]>());
+        var selected = Assert.Single(assignableUsers, user => user.Id == sample.Assignee.Id);
+        using var assigned = await creator.PutAsJsonAsync(Route(task.Id) + "/assignee", new { assigneeId = selected.Id });
         Assert.Equal(HttpStatusCode.OK, assigned.StatusCode);
         using var visibleProject = await collaborator.GetAsync($"/api/v1/projects/{project.Id}");
         Assert.Equal(HttpStatusCode.OK, visibleProject.StatusCode);

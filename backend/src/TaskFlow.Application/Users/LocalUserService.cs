@@ -49,4 +49,10 @@ public class LocalUserService(IAppUserRepository users, IUnitOfWork unitOfWork)
     {
         return await users.GetByIdsAsync(userIds, cancellationToken);
     }
+
+    public async Task<AppUser[]> GetAssignableAsync(
+        CancellationToken cancellationToken)
+    {
+        return await users.GetAssignableAsync(cancellationToken);
+    }
 }

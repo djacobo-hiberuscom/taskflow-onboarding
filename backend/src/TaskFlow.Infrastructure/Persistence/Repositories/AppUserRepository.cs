@@ -68,4 +68,14 @@ public class AppUserRepository(TaskFlowDbContext context) : IAppUserRepository
 
         return users.SingleOrDefault();
     }
+
+    public async Task<AppUser[]> GetAssignableAsync(
+        CancellationToken cancellationToken)
+    {
+        return await context.Users
+        .AsNoTracking()
+        .OrderBy(user => user.DisplayName)
+        .ThenBy(user => user.Id)
+        .ToArrayAsync(cancellationToken);
+    }
 }

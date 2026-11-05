@@ -166,6 +166,13 @@ internal sealed class TestUserStore : IAppUserRepository
     {
         return Task.FromResult(Records.Values.Where(user => userIds.Contains(user.Id)).ToArray());
     }
+
+    public Task<AppUser[]> GetAssignableAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.FromResult(Records.Values.OrderBy(user => user.DisplayName)
+            .ThenBy(user => user.Id).ToArray());
+    }
 }
 
 internal sealed class TestUnitOfWork : IUnitOfWork
