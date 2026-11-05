@@ -180,7 +180,71 @@ public class TaskController : ControllerBase
                 "El resultado de la actualización de la tarea no es válido");
         }
         
-                var task = result.Task;
+        var task = result.Task;
+        var projectName = result.ProjectName;
+
+        UserSummaryResponse? userSummary = null;
+
+        if(task.AssignedId is not null)
+        {
+            var assignee = await _localUserService.GetByIdAsync(
+                task.AssignedId.Value, cancellationToken);
+            
+            if(assignee is not null)
+            {
+                userSummary = new UserSummaryResponse
+                {
+                    Id = assignee.Id,
+                    DisplayName = assignee.DisplayName
+                };
+            }
+        }
+
+        var taskResponse = new TaskResponse
+        {
+            Id = task.Id,
+            ProjectId = task.ProjectId,
+            ProjectName = projectName,
+            Title = task.Title,
+            Description = task.Description,
+            Status = task.Status.ToString(),
+            Priority = task.Priority.ToString(),
+            DueDate = task.DueDate,
+            Assignee = userSummary,
+            CreatedAt = task.CreatedAt,
+            UpdatedAt = task.UpdatedAt
+        };
+
+        return Ok(taskResponse);
+    }
+
+
+     [HttpPut("{taskId}/status")]
+    public async Task<IActionResult> ChangeStatus(
+        Guid taskId,
+        [FromBody] ChangeTaskStatusRequest request,
+        CancellationToken cancellationToken)
+    {
+        var status = Enum.Parse<TaskState>(request.Status);
+
+        var result = await _taskService.ChangeTaskStatusAsync(
+            taskId, status, _currentUser.UserId,
+            _currentUser.IsAdmin, cancellationToken);
+        
+        if(result.Result == TaskOperationResult.NotFound)
+        {
+            return NotFound();
+        }
+
+        if(result.Result != TaskOperationResult.Success ||
+            result.Task is null ||
+            result.ProjectName is null)
+        {
+            throw new InvalidOperationException(
+                "El resultado de la actualización de la tarea no es válido");
+        }
+        
+        var task = result.Task;
         var projectName = result.ProjectName;
 
         UserSummaryResponse? userSummary = null;
@@ -218,4 +282,72 @@ public class TaskController : ControllerBase
         return Ok(taskResponse);
     }
     
+    [HttpPut("{taskId}/assignee")]
+    public async Task<IActionResult> ChangeAssignee(
+        Guid taskId,
+        [FromBody] ChangeTaskAssigneeRequest request,
+        CancellationToken cancellationToken)
+    {
+        var result = await _taskService.ChangeTaskAssigneeAsync(
+            taskId, request.AssigneeId, _currentUser.UserId,
+            _currentUser.IsAdmin, cancellationToken);
+        
+        if(result.Result == TaskOperationResult.NotFound)
+        {
+            return NotFound();
+        }
+
+        if(result.Result == TaskOperationResult.InvalidAssignee)
+        {
+            ModelState.AddModelError(
+                "assgneeId", "El usuario asignado no existe.");
+
+            return ValidationProblem();
+        }
+
+        if(result.Result != TaskOperationResult.Success ||
+            result.Task is null ||
+            result.ProjectName is null)
+        {
+            throw new InvalidOperationException(
+                "El resultado de la actualización de la tarea no es válido");
+        }
+        
+        var task = result.Task;
+        var projectName = result.ProjectName;
+
+        UserSummaryResponse? userSummary = null;
+
+        if(task.AssignedId is not null)
+        {
+            var assignee = await _localUserService.GetByIdAsync(
+                task.AssignedId.Value, cancellationToken);
+            
+            if(assignee is not null)
+            {
+                userSummary = new UserSummaryResponse
+                {
+                    Id = assignee.Id,
+                    DisplayName = assignee.DisplayName
+                };
+            }
+        }
+
+        var taskResponse = new TaskResponse
+        {
+            Id = task.Id,
+            ProjectId = task.ProjectId,
+            ProjectName = projectName,
+            Title = task.Title,
+            Description = task.Description,
+            Status = task.Status.ToString(),
+            Priority = task.Priority.ToString(),
+            DueDate = task.DueDate,
+            Assignee = userSummary,
+            CreatedAt = task.CreatedAt,
+            UpdatedAt = task.UpdatedAt
+        };
+
+        return Ok(taskResponse);
+    }
 }

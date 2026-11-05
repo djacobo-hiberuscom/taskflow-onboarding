@@ -170,4 +170,128 @@ public class TaskService
             }, cancellationToken);
     }
 
+        public async Task<(
+        TaskOperationResult Result,
+        DomainTask? Task,
+        string? ProjectName)> ChangeTaskStatusAsync(
+            Guid taskId, TaskState status, Guid userId,
+            bool isAdmin, CancellationToken cancellationToken)
+    {
+        return await _unitOfWork.ExecuteInTransactionAsync<(
+            TaskOperationResult Result, 
+            DomainTask? Task, 
+            string? ProjectName)>(async token =>
+            {
+                var projectId = await _taskRepository.GetProjectIdAsync(
+                    taskId, token);
+                
+                if(projectId is null)
+                {
+                    return (TaskOperationResult.NotFound, null, null);
+                }
+
+                var project = await _projectRepository.GetByIdForUpdateAsync(
+                    projectId.Value, token);
+
+                if(project is null)
+                {
+                    return (TaskOperationResult.NotFound, null, null);
+                }
+
+                var visibleProject = await _projectRepository.GetVisibleByIdAsync(
+                    projectId.Value, userId, isAdmin, token);
+                
+                if(visibleProject is null)
+                {
+                    return (TaskOperationResult.NotFound, null, null);
+                }
+
+                var task = await _taskRepository.GetByIdAsync(
+                    taskId, token);
+                
+                if(task is null)
+                {
+                    return (TaskOperationResult.NotFound, null, null);
+                }
+
+                task.ChangeStatus(status);
+
+                await _unitOfWork.SaveChangesAsync(token);
+
+                return (TaskOperationResult.Success, task, visibleProject.Name);
+
+            }, cancellationToken);
+    }
+
+     public async Task<(
+        TaskOperationResult Result,
+        DomainTask? Task,
+        string? ProjectName)> ChangeTaskAssigneeAsync(
+            Guid taskId, Guid? assigneeId, Guid userId,
+            bool isAdmin, CancellationToken cancellationToken)
+    {
+        return await _unitOfWork.ExecuteInTransactionAsync<(
+            TaskOperationResult Result, 
+            DomainTask? Task, 
+            string? ProjectName)>(async token =>
+            {
+                AppUser? assignee = null;
+
+                if(assigneeId is not null)
+                {
+                    assignee = await _appUserRepository.GetByIdForKeyShareAsync(
+                        assigneeId.Value, token);
+                }
+                var projectId = await _taskRepository.GetProjectIdAsync(
+                    taskId, token);
+                
+                if(projectId is null)
+                {
+                    return (TaskOperationResult.NotFound, null, null);
+                }
+
+                var project = await _projectRepository.GetByIdForUpdateAsync(
+                    projectId.Value, token);
+
+                if(project is null)
+                {
+                    return (TaskOperationResult.NotFound, null, null);
+                }
+
+                var visibleProject = await _projectRepository.GetVisibleByIdAsync(
+                    projectId.Value, userId, isAdmin, token);
+                
+                if(visibleProject is null)
+                {
+                    return (TaskOperationResult.NotFound, null, null);
+                }
+
+                var task = await _taskRepository.GetByIdAsync(
+                    taskId, token);
+                
+                if(task is null)
+                {
+                    return (TaskOperationResult.NotFound, null, null);
+                }
+
+                if(assigneeId.HasValue)
+                {
+                    if(assignee is null)
+                    {
+                        return (TaskOperationResult.InvalidAssignee, null, null);
+                    }
+
+                    await _projectRepository.EnsureMembershipAsync(
+                        projectId.Value, assigneeId.Value, token);
+                }
+
+                task.ChangeAssignee(assigneeId);
+
+                await _unitOfWork.SaveChangesAsync(token);
+
+                return (TaskOperationResult.Success, task, visibleProject.Name);
+
+            }, cancellationToken);
+    }
+
 }

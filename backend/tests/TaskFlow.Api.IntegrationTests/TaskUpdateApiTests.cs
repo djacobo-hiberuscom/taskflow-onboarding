@@ -284,11 +284,15 @@ public class TaskUpdateApiTests(PostgresFixture postgres) : IClassFixture<Postgr
     }
 
     [Theory]
-    [InlineData("archive")]
-    [InlineData("delete-project")]
-    [InlineData("delete-task")]
-    [InlineData("edit-task")]
-    public async Task Update_WaitsForProjectLockAndReadsCurrentTaskAndPermissions(string operation)
+    [InlineData("archive", false)]
+    [InlineData("delete-project", false)]
+    [InlineData("delete-task", false)]
+    [InlineData("edit-task", false)]
+    [InlineData("archive", true)]
+    [InlineData("delete-project", true)]
+    [InlineData("delete-task", true)]
+    [InlineData("edit-task", true)]
+    public async Task Write_WaitsForProjectLockAndReadsCurrentTaskAndPermissions(string operation, bool changeStatus)
     {
         var sample = await SeedAsync();
         using var factory = CreateFactory();
@@ -304,7 +308,9 @@ public class TaskUpdateApiTests(PostgresFixture postgres) : IClassFixture<Postgr
         var project = await new ProjectRepository(holder).GetByIdForUpdateAsync(sample.Project.Id, timeout.Token);
         Assert.NotNull(project);
 
-        var update = client.PutAsJsonAsync(Route(sample.Task.Id), ValidBody(), timeout.Token);
+        var route = Route(sample.Task.Id) + (changeStatus ? "/status" : "");
+        object body = changeStatus ? new { status = "ToDo" } : ValidBody();
+        var update = client.PutAsJsonAsync(route, body, timeout.Token);
         try
         {
             var pid = await attempt.Started.Task.WaitAsync(timeout.Token);
@@ -337,12 +343,12 @@ public class TaskUpdateApiTests(PostgresFixture postgres) : IClassFixture<Postgr
             if (operation == "edit-task")
             {
                 var detail = await ReadUpdatedAsync(response);
-                Assert.Equal("Done", detail.Status);
+                Assert.Equal(changeStatus ? "ToDo" : "Done", detail.Status);
                 Assert.Null(detail.Assignee);
-                Assert.Equal("Título actualizado", detail.Title);
+                Assert.Equal(changeStatus ? sample.Task.Title : "Título actualizado", detail.Title);
                 await using var verification = CreateContext();
                 var stored = await verification.Tasks.SingleAsync(item => item.Id == sample.Task.Id);
-                Assert.Equal(TaskState.Done, stored.Status);
+                Assert.Equal(changeStatus ? TaskState.ToDo : TaskState.Done, stored.Status);
                 Assert.Null(stored.AssignedId);
                 Assert.Equal(detail.Title, stored.Title);
             }
