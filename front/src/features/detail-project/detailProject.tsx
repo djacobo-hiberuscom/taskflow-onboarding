@@ -1,11 +1,6 @@
 import { getUsernameById, getUsernameByProjectId } from "@/tools/getUsername";
 import { useNavigate, useParams } from "@tanstack/react-router";
-// popups
-import {
-  EditProjectPopUp,
-  ArchiveConfirmPopUp,
-  DeleteConfirmPopUp,
-} from "../../components/common/popup";
+
 // HOOKS
 import { useState } from "react";
 import { useProject } from "#hooks/use-project";
@@ -18,17 +13,16 @@ import {
   Separator,
   Badge,
 } from "@/components/index.comp";
-import { FilterSeletor, DeailTaskDrawer, TaskColum, BackButton } from "./components/index";
+import {
+  FilterSeletor,
+  TaskColum,
+  BackButton,
+  DeailTaskDrawer,
+  PopupContainer,
+} from "./components/index";
 
 // ICONS
-import {
-  Pen,
-  Archive,
-  Trash,
-  Plus,
-  CircleUserRound,
-  X,
-} from "lucide-react";
+import { Pen, Archive, Trash, Plus, CircleUserRound, X } from "lucide-react";
 
 // TYPES
 import type { Task } from "#lib/api/types";
@@ -44,17 +38,13 @@ export function DetailProject() {
   const { id } = useParams({ from: "/app/projects/$id" }); // ID del proyecto actual
   const { data, isLoading, error } = useProject(id);
 
-  
-
   const [selectTask, setSelectTask] = useState<Task | null>(null); // Tarea selecionada para el drawer
   const [busqueda, setBusqueda] = useState(""); // Buscador del input
   const [status, setStatus] = useState<string | null>(null); // selecion del filtro (status)
   const [priority, setPriority] = useState<string | null>(null); // Selecion del filtro (priority)
   const [member, setMember] = useState<string | null>(null); // selecion del filtro (miembros)
 
-  const [editProjectOpen, setEditProjectOpen] = useState(false); // popUp de aeditar proyecto
-  const [archiveConfirmIsOpen, setArchiveConfirmIsOpen] = useState(false); // popup para archivar proyecto
-  const [deleteConfirmIsOpen, setDeleteConfirmIsOpen] = useState(false); // Porpup para delete proyecto
+  const [popup, setPopup] = useState<string | null>(null);
 
   // Error stados
   if (isLoading) return <h1>Cargando</h1>;
@@ -62,7 +52,7 @@ export function DetailProject() {
   if (error) return <h1>{error.message}</h1>;
 
   // OBtener proyecto
-  const proyecto = data
+  const proyecto = data;
 
   // TAREAS DEL PROYECTO
   const projectTask = TAREAS.filter((t) => t.project_id === id);
@@ -81,21 +71,6 @@ export function DetailProject() {
     nav({
       to: "/projects",
     });
-  };
-
-  // Abrir popup editProject
-  const openEditProjecft = () => {
-    setEditProjectOpen(!editProjectOpen);
-  };
-
-  // Abrir archive confirm
-  const openArchiveConfirm = () => {
-    setArchiveConfirmIsOpen(!archiveConfirmIsOpen);
-  };
-
-  // Abrir delete confirm
-  const openDeleteConfirm = () => {
-    setDeleteConfirmIsOpen(!deleteConfirmIsOpen);
   };
 
   // FILTROS
@@ -124,13 +99,6 @@ export function DetailProject() {
   // COMPONENTE
   return (
     <div>
-      <EditProjectPopUp
-        isOpen={editProjectOpen}
-        onOpenChange={(open) => {
-          if (!open) setEditProjectOpen(false);
-        }}
-        proyecto={proyecto}
-      />
       <DeailTaskDrawer
         isOpen={selectTask !== null}
         tarea={selectTask}
@@ -139,23 +107,9 @@ export function DetailProject() {
           if (!open) setSelectTask(null);
         }}
       />
-      <ArchiveConfirmPopUp
-        isOpen={archiveConfirmIsOpen}
-        proyecto={proyecto}
-        onOpenChange={(open) => {
-          if (!open) setArchiveConfirmIsOpen(false);
-        }}
-        onArchived={() => nav({to: "/projects", replace: true})}
-      />
-      <DeleteConfirmPopUp
-        isOpen={deleteConfirmIsOpen}
-        proyecto={proyecto}
-        onOpenChange={(open) => {
-          if (!open) setDeleteConfirmIsOpen(false);
-        }}
-      />
+      <PopupContainer proyecto={proyecto} popup={popup} close={() => setPopup(null)}/>
 
-      <BackButton navBack={navBack}/>
+      <BackButton navBack={navBack} />
 
       <div className="flex flex-col bg-background items-center justify-center gap-8 p-5 m-5 border rounded-xl">
         <div className="p-5 w-full flex justify-between">
@@ -175,11 +129,11 @@ export function DetailProject() {
               </h3>
             </div>
             <div className="flex gap-2 h-fit">
-              <Button variant="outline" onClick={openEditProjecft}>
+              <Button variant="outline" onClick={() => setPopup("Edit")}>
                 <Pen />
                 Editar
               </Button>
-              <Button variant="outline" onClick={openArchiveConfirm}>
+              <Button variant="outline" onClick={() => setPopup("Archive")}>
                 <Archive />
                 Archivar
               </Button>
@@ -188,7 +142,7 @@ export function DetailProject() {
               <Button
                 variant="outline"
                 className="text-red-400 hover:text-red-400"
-                onClick={openDeleteConfirm}
+                onClick={() => setPopup("Delete")}
               >
                 <Trash />
                 Eliminar
