@@ -5,13 +5,13 @@ import { Dialog, DialogContent, Button } from "@/components/index.comp";
 // COMPONENTS
 import { toast } from "@/components/index.comp";
 // TYPES
-import type { Project } from "#lib/api/types";
+import type { Project } from "@/lib/api/types";
 
 // ICON
 import { Trash, TriangleAlertIcon } from "lucide-react";
 
 // HOOKS
-import { useDeleteProject } from "#hooks/use-project";
+import { useDeleteProject } from "@/hooks/use-project";
 import { useNavigate } from "@tanstack/react-router";
 
 const openSuccessToast = () => {

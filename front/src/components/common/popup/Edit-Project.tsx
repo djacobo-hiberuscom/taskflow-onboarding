@@ -1,5 +1,5 @@
-import { useUpdateProject } from "#hooks/use-project";
-import type { Project } from "#lib/api/types";
+import { useUpdateProject } from "@/hooks/use-project";
+import type { Project } from "@/lib/api/types";
 // COMPONENTES
 import { Dialog, DialogContent, Button, Input } from "@/components/index.comp";
 import { useState } from "react";

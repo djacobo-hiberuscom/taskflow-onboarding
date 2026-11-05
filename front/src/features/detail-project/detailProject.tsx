@@ -18,11 +18,10 @@ import {
   Separator,
   Badge,
 } from "@/components/index.comp";
-import { FilterSeletor, DeailTaskDrawer } from "./components";
+import { FilterSeletor, DeailTaskDrawer, TaskColum, BackButton } from "./components/index";
 
 // ICONS
 import {
-  ArrowBigLeftDashIcon,
   Pen,
   Archive,
   Trash,
@@ -33,7 +32,6 @@ import {
 
 // TYPES
 import type { Task } from "#lib/api/types";
-import { TaskColum } from "./components/colum-task";
 
 // CONST
 import TAREAS from "@/assets/tempdata/tasks.json";
@@ -157,12 +155,7 @@ export function DetailProject() {
         }}
       />
 
-      <div
-        className="absolute top-3 left-17 p-1 rounded-full  border shadow-black z-50"
-        onClick={navBack}
-      >
-        <ArrowBigLeftDashIcon />
-      </div>
+      <BackButton navBack={navBack}/>
 
       <div className="flex flex-col bg-background items-center justify-center gap-8 p-5 m-5 border rounded-xl">
         <div className="p-5 w-full flex justify-between">

@@ -13,28 +13,29 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/index.comp";
+import type { Project } from "#lib/api/types";
 
 interface parameters {
-  id:string
+  proyecto: Project,
   title: string;
   description?: string | null;
   miembros: number;
   tareasAbiertas: number;
   favourite: boolean;
-  onClic: () => void,
-  onEdit: () => void,
-  onArchive: () => void,
-  onDelete: () => void,
+  onOpen: (p: Project) => void,
+  onEdit: (p: Project) => void,
+  onArchive: (p: Project) => void,
+  onDelete: (p: Project) => void,
   isAdmin: boolean
 }
 
 export function ProjectCard({
-  id,
+  proyecto,
   title,
   description,
   //miembros,
   favourite,
-  onClic,
+  onOpen,
   onEdit,
   onDelete,
   onArchive,
@@ -45,11 +46,11 @@ export function ProjectCard({
 
 
   const [isFavourite, setIsFavourite] = useState(favourite);
-  const miembros = getUsernameByProjectId(id).length
-  const nTareas = TAREAS.filter((t) => t.project_id === id).length; // N TAREAS
+  const miembros = getUsernameByProjectId(proyecto.id).length
+  const nTareas = TAREAS.filter((t) => t.project_id === proyecto.id).length; // N TAREAS
   return (
     <ContextMenu>
-      <ContextMenuTrigger className="flex flex-col gap-4 p-4 border rounded-xl bg-background max-w-xs hover:brightness-97" onClick={onClic}>
+      <ContextMenuTrigger className="flex flex-col gap-4 p-4 border rounded-xl bg-background max-w-xs hover:brightness-97" onClick={() => onOpen(proyecto) }>
         <div className="flex justify-between">
           <h1 className="font-bold text-xl truncate">{title}</h1>
           <button
@@ -79,15 +80,15 @@ export function ProjectCard({
       </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuGroup className="font-bold">
-          <ContextMenuItem disabled={!isAdmin} onClick={onEdit}>
+          <ContextMenuItem disabled={!isAdmin} onClick={() => onEdit(proyecto)}>
             <Pen />
             Edit
           </ContextMenuItem>
-          <ContextMenuItem disabled={!isAdmin} onClick={onArchive}>
+          <ContextMenuItem disabled={!isAdmin} onClick={() => onArchive(proyecto)}>
             <Archive />
             Archivar
           </ContextMenuItem>
-          <ContextMenuItem disabled={!isAdmin} className="text-red-600" onClick={onDelete}>
+          <ContextMenuItem disabled={!isAdmin} className="text-red-600" onClick={() => onDelete(proyecto)}>
             <Trash />
             Elimiar
           </ContextMenuItem>

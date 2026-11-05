@@ -15,8 +15,8 @@ import { Archive, Trash, RefreshCw, ArrowRight } from "lucide-react";
 
 // PROYECTOS
 import type { Project } from "#lib/api/types";
-import { ApiError } from "#lib/api/client";
-import { NotFound } from "../../../features";
+import { ApiError } from "@/lib/api/client";
+import { NotFound } from "@/app/layouts/index";
 
 // TAREAS
 import TAREAS from "@/assets/tempdata/tasks.json";

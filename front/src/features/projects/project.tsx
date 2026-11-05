@@ -31,7 +31,7 @@ export function ProjectFeeat() {
   const [toArchive, setToArchive] = useState<Project | null>(null); // popup de archive confirm
 
   const nav = useNavigate();
-
+  const projects = data?.items ?? []
   if (isLoading) return <h1>Cargando...</h1>;
   if (error instanceof ApiError && error.status === 404) return <NotFound />;
   if (error) return <h1>{error.message}</h1>;
@@ -76,7 +76,7 @@ export function ProjectFeeat() {
 
   
       <Projects
-        projects={data?.items ?? []}
+        projects={projects}
         onArchive={setToArchive}
         onDelete={setToDelete}
         onEdit={setToEdit}

@@ -8,7 +8,7 @@ import {
 } from "@/components/index.comp";
 import { useState } from "react";
 // TYPES
-import { useCreateProject } from "#hooks/use-project";
+import { useCreateProject } from "@/hooks/use-project";
 
 const openSuccessToast = () => {
   toast.add({

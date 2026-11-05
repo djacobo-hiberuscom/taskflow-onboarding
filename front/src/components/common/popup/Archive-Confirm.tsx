@@ -11,7 +11,7 @@ import type { Project } from "#lib/api/types";
 import { Archive } from "lucide-react";
 
 // HOOKS
-import { useArchiveProject } from "#hooks/use-project";
+import { useArchiveProject } from "@/hooks/use-project";
 
 const openSuccessToast = () => {
   toast.add({
@@ -75,7 +75,7 @@ export function ArchiveConfirmContainer({
         openSuccessToast();
       },
       onError: () => {
-        onClose()
+        onClose();
         openErrorToast();
       },
     });

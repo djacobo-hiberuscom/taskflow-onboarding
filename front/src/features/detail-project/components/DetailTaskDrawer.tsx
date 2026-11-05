@@ -7,18 +7,18 @@ import {
   Badge,
   DrawerFooter,
 } from "@/components/index.comp";
-import { FilterSeletor } from ".";
+import { FilterSeletor } from "./index";
 // Iconos
 import { Folder } from "lucide-react";
 
 // Pop up de delete confirm
 
 // TYPOS
-import type { Project, Task } from "#lib/api/types";
+import type { Project, Task } from "@/lib/api/types";
 
 import { getUsernameById, getUsernameByProjectId } from "@/tools/getUsername";
 import { useState } from "react";
-import { DeleteConfirmPopUp } from "../../../components/common/popup/Delete-Confirm";
+import { DeleteConfirmPopUp } from "@/components/common/popup/Delete-Confirm";
 interface parameters {
   tarea?: Task | null;
   isOpen: boolean;
