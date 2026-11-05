@@ -284,15 +284,19 @@ public class TaskUpdateApiTests(PostgresFixture postgres) : IClassFixture<Postgr
     }
 
     [Theory]
-    [InlineData("archive", false)]
-    [InlineData("delete-project", false)]
-    [InlineData("delete-task", false)]
-    [InlineData("edit-task", false)]
-    [InlineData("archive", true)]
-    [InlineData("delete-project", true)]
-    [InlineData("delete-task", true)]
-    [InlineData("edit-task", true)]
-    public async Task Write_WaitsForProjectLockAndReadsCurrentTaskAndPermissions(string operation, bool changeStatus)
+    [InlineData("archive", "details")]
+    [InlineData("delete-project", "details")]
+    [InlineData("delete-task", "details")]
+    [InlineData("edit-task", "details")]
+    [InlineData("archive", "status")]
+    [InlineData("delete-project", "status")]
+    [InlineData("delete-task", "status")]
+    [InlineData("edit-task", "status")]
+    [InlineData("archive", "assignee")]
+    [InlineData("delete-project", "assignee")]
+    [InlineData("delete-task", "assignee")]
+    [InlineData("edit-task", "assignee")]
+    public async Task Write_WaitsForProjectLockAndReadsCurrentTaskAndPermissions(string operation, string writeKind)
     {
         var sample = await SeedAsync();
         using var factory = CreateFactory();
@@ -308,8 +312,13 @@ public class TaskUpdateApiTests(PostgresFixture postgres) : IClassFixture<Postgr
         var project = await new ProjectRepository(holder).GetByIdForUpdateAsync(sample.Project.Id, timeout.Token);
         Assert.NotNull(project);
 
-        var route = Route(sample.Task.Id) + (changeStatus ? "/status" : "");
-        object body = changeStatus ? new { status = "ToDo" } : ValidBody();
+        var route = Route(sample.Task.Id) + (writeKind == "details" ? "" : $"/{writeKind}");
+        object body = writeKind switch
+        {
+            "status" => new { status = "ToDo" },
+            "assignee" => new { assigneeId = sample.Assignee.Id },
+            _ => ValidBody()
+        };
         var update = client.PutAsJsonAsync(route, body, timeout.Token);
         try
         {
@@ -343,13 +352,13 @@ public class TaskUpdateApiTests(PostgresFixture postgres) : IClassFixture<Postgr
             if (operation == "edit-task")
             {
                 var detail = await ReadUpdatedAsync(response);
-                Assert.Equal(changeStatus ? "ToDo" : "Done", detail.Status);
-                Assert.Null(detail.Assignee);
-                Assert.Equal(changeStatus ? sample.Task.Title : "Título actualizado", detail.Title);
+                Assert.Equal(writeKind == "status" ? "ToDo" : "Done", detail.Status);
+                Assert.Equal(writeKind == "assignee" ? (Guid?)sample.Assignee.Id : null, detail.Assignee?.Id);
+                Assert.Equal(writeKind == "details" ? "Título actualizado" : sample.Task.Title, detail.Title);
                 await using var verification = CreateContext();
                 var stored = await verification.Tasks.SingleAsync(item => item.Id == sample.Task.Id);
-                Assert.Equal(changeStatus ? TaskState.ToDo : TaskState.Done, stored.Status);
-                Assert.Null(stored.AssignedId);
+                Assert.Equal(writeKind == "status" ? TaskState.ToDo : TaskState.Done, stored.Status);
+                Assert.Equal(writeKind == "assignee" ? (Guid?)sample.Assignee.Id : null, stored.AssignedId);
                 Assert.Equal(detail.Title, stored.Title);
             }
             else
