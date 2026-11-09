@@ -1,16 +1,12 @@
 // TAREAS DEL PROYECTO
 import TAREAS from "@/assets/tempdata/tasks.json";
 
-
-
 // TYPES
 import type { Project } from "#lib/api/types";
 
 // Components
-import { Badge, Button,  } from "@/components/index.comp";
+import { Badge, } from "@/components/index.comp";
 import { FunButtons, ProjectOwner } from "./index";
-// ICONS
-import {  Plus,  } from "lucide-react";
 
 // Parametros
 interface params {

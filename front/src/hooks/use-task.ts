@@ -37,7 +37,7 @@ export function useCreateTask() {
       projectId,
       ...body
     }: CreateTaskInput & { projectId: string }) =>
-      apiFetch<Task>(`${BASE}/${projectId}/tasks`, {
+      apiFetch<Task>(`/api/v1/projects/${projectId}/tasks`, {
         method: "POST",
         body: JSON.stringify(body),
       }),

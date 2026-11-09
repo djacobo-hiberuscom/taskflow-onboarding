@@ -13,7 +13,7 @@ import type { Project } from "@/lib/api/types";
 import { useNavigate } from "@tanstack/react-router";
 
 interface params {
-  proyecto?: Project;
+  proyecto: Project;
   popup: string | null;
   close: () => void;
 }
@@ -42,6 +42,7 @@ export function PopupContainer({ proyecto, popup, close }: params) {
         onOpenChange={close}
       />
       <NewTaskPopup 
+      proyecto={proyecto}
       isOpen={popup === "Create"}
       onClose={close}
       onOpenChange={close}/>
