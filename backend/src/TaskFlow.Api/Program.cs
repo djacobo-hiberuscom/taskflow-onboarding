@@ -5,6 +5,7 @@ using TaskFlow.Application.Abstractions;
 using TaskFlow.Application.Projects;
 using TaskFlow.Infrastructure.Persistence.Repositories;
 using TaskFlow.Api.Authentication;
+using TaskFlow.Application.Tasks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,9 +38,13 @@ builder.Services.AddDbContext<TaskFlowDbContext>(options =>
 
 builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+
 builder.Services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<TaskFlowDbContext>());
 
 builder.Services.AddScoped<ProjectService>();
+
+builder.Services.AddScoped<TaskService>();
 
 builder.Services.AddHealthChecks().AddDbContextCheck<TaskFlowDbContext>();
 

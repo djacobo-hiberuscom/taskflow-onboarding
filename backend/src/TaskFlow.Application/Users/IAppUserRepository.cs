@@ -11,4 +11,6 @@ public interface IAppUserRepository
     Task<AppUser[]> GetByIdsAsync(Guid[] userIds, CancellationToken cancellationToken);
     Task<AppUser?> GetByIdForKeyShareAsync(
         Guid userId, CancellationToken cancellationToken = default);
+    
+    Task<AppUser[]> GetAssignableAsync(CancellationToken cancellationToken);
 }

@@ -50,6 +50,8 @@ public class AppUserRepository(TaskFlowDbContext context) : IAppUserRepository
             .ToArrayAsync(cancellationToken);
     }
 
+    //busca un usuario por su ID y protege su fila para que otra operación no
+    // lo borre mientras se esta usando dentro de una transacción
     public async Task<AppUser?> GetByIdForKeyShareAsync(
         Guid userId, CancellationToken cancellationToken = default)
     {
@@ -65,5 +67,15 @@ public class AppUserRepository(TaskFlowDbContext context) : IAppUserRepository
             .ToArrayAsync(cancellationToken);
 
         return users.SingleOrDefault();
+    }
+
+    public async Task<AppUser[]> GetAssignableAsync(
+        CancellationToken cancellationToken)
+    {
+        return await context.Users
+        .AsNoTracking()
+        .OrderBy(user => user.DisplayName)
+        .ThenBy(user => user.Id)
+        .ToArrayAsync(cancellationToken);
     }
 }

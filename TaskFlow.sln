@@ -21,6 +21,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskFlow.Api.IntegrationTes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskFlow.Domain.Test", "backend\tests\TaskFlow.Domain.Test\TaskFlow.Domain.Test.csproj", "{54135878-9610-4C87-8C9A-0872495DF33E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "infrastructure", "infrastructure", "{DFEE68D8-A7D0-1A41-506C-9B74AA9A7B7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskFlow.AppHost", "infrastructure\TaskFlow.AppHost\TaskFlow.AppHost.csproj", "{2F5466CA-441A-431A-8114-DEE10697BDAF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +107,18 @@ Global
 		{54135878-9610-4C87-8C9A-0872495DF33E}.Release|x64.Build.0 = Release|Any CPU
 		{54135878-9610-4C87-8C9A-0872495DF33E}.Release|x86.ActiveCfg = Release|Any CPU
 		{54135878-9610-4C87-8C9A-0872495DF33E}.Release|x86.Build.0 = Release|Any CPU
+		{2F5466CA-441A-431A-8114-DEE10697BDAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F5466CA-441A-431A-8114-DEE10697BDAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F5466CA-441A-431A-8114-DEE10697BDAF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2F5466CA-441A-431A-8114-DEE10697BDAF}.Debug|x64.Build.0 = Debug|Any CPU
+		{2F5466CA-441A-431A-8114-DEE10697BDAF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2F5466CA-441A-431A-8114-DEE10697BDAF}.Debug|x86.Build.0 = Debug|Any CPU
+		{2F5466CA-441A-431A-8114-DEE10697BDAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F5466CA-441A-431A-8114-DEE10697BDAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F5466CA-441A-431A-8114-DEE10697BDAF}.Release|x64.ActiveCfg = Release|Any CPU
+		{2F5466CA-441A-431A-8114-DEE10697BDAF}.Release|x64.Build.0 = Release|Any CPU
+		{2F5466CA-441A-431A-8114-DEE10697BDAF}.Release|x86.ActiveCfg = Release|Any CPU
+		{2F5466CA-441A-431A-8114-DEE10697BDAF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -116,5 +132,6 @@ Global
 		{F57642F3-C37C-D174-720E-6A6AAD5BEE22} = {1AE8ACA6-933B-BF2A-3671-3E2EAC007D16}
 		{C5E5F9A1-F101-4F39-AB88-560F3787393C} = {F57642F3-C37C-D174-720E-6A6AAD5BEE22}
 		{54135878-9610-4C87-8C9A-0872495DF33E} = {F57642F3-C37C-D174-720E-6A6AAD5BEE22}
+		{2F5466CA-441A-431A-8114-DEE10697BDAF} = {DFEE68D8-A7D0-1A41-506C-9B74AA9A7B7B}
 	EndGlobalSection
 EndGlobal
