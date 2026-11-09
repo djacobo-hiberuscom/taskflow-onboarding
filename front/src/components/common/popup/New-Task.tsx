@@ -79,6 +79,8 @@ export function NewTaskPopup({
     setPrioridad(null);
     setMiembro(null);
     setDate(undefined);
+    setNombre("");
+    setDescripcion("");
   };
   const handleSaveClic = () => {
     if (!nombre.trim() || !prioridad) return;
@@ -94,19 +96,15 @@ export function NewTaskPopup({
       },
       {
         onSuccess: () => {
-          setNombre("");
-          setDescripcion("");
           quitarFilters();
           onClose();
           openSuccessToast();
         },
         onError: (error) => {
-          setNombre("");
-          setDescripcion("");
           quitarFilters();
           onClose();
           openErrorToast();
-          console.log("Error al crear tarea ", error)
+          console.log("Error al crear tarea ", error);
         },
       },
     );
