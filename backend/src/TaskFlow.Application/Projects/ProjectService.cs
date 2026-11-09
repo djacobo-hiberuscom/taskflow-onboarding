@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Data;
 using TaskFlow.Application.Abstractions;
 using TaskFlow.Application.Users;
@@ -47,6 +48,13 @@ public class ProjectService
         },
         cancellationToken);
 
+    }
+
+    public async Task<Project[]> GetByIdsAsync(
+        Guid[] projectIds, CancellationToken cancellationToken)
+    {
+        return await _projectRepository.GetByIdsAsync(
+            projectIds, cancellationToken);
     }
 
     public async Task<ProjectPage> GetProjectsAsync(

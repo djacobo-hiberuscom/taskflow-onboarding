@@ -28,6 +28,19 @@ public class ProjectRepository : IProjectRepository
         _context.ProjectMemberships.Add(membership);
     }
 
+    public async Task<Project[]> GetByIdsAsync(
+        Guid[] projectIds, CancellationToken cancellationToken)
+    {
+        if(projectIds.Length == 0)
+        {
+            return [];
+        }
+
+        return await _context.Projects.Where(
+            project => projectIds.Contains(project.Id))
+            .ToArrayAsync(cancellationToken);
+    }
+
     public async System.Threading.Tasks.Task EnsureMembershipAsync(
         Guid projectId, Guid userId, CancellationToken cancellationToken)
     {
