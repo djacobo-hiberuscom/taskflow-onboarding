@@ -3,6 +3,7 @@ import {
   EditProjectPopUp,
   ArchiveConfirmPopUp,
   DeleteConfirmPopUp,
+  NewTaskPopup
 } from "@/components/common/popup";
 
 // Types
@@ -40,6 +41,10 @@ export function PopupContainer({ proyecto, popup, close }: params) {
         proyecto={proyecto}
         onOpenChange={close}
       />
+      <NewTaskPopup 
+      isOpen={popup === "Create"}
+      onClose={close}
+      onOpenChange={close}/>
     </div>
   );
 }

@@ -1,9 +1,8 @@
 // DIALOG import
-
-import { Dialog, DialogContent, Button } from "@/components/index.comp";
-
 // COMPONENTS
-import { toast } from "@/components/index.comp";
+import { Dialog, DialogContent, Button, toast} from "@/components/index.comp";
+
+
 // TYPES
 import type { Project } from "#lib/api/types";
 

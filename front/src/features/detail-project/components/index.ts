@@ -1,5 +1,5 @@
 export * from "./DetailTaskDrawer"
-export * from "./FilterSelector"
+export * from "../../../components/common/FilterSelector.tsx"
 export * from "./colum-task"
 export * from "./BackButton"
 export * from "./PopupContainer"

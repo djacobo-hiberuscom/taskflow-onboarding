@@ -18,6 +18,7 @@ interface params {
   editClic: () => void;
   archiveClic: () => void;
   deleteClic: () => void;
+  createClic: () => void
 }
 
 // Componente
@@ -26,8 +27,9 @@ export function Header({
   editClic,
   archiveClic,
   deleteClic,
+  createClic
 }: params) {
-  const projectTask = TAREAS.filter((t) => t.project_id === proyecto?.id);
+  const projectTask = TAREAS.filter((t) => t.projectId === proyecto?.id);
 
   return (
     <div className="p-5 w-full flex justify-between">
@@ -45,11 +47,9 @@ export function Header({
           editClic={editClic}
           archiveClic={archiveClic}
           deleteClic={deleteClic}
+          createClic={createClic}
         />
-        <Button>
-          <Plus />
-          Crear tarea
-        </Button>
+        
       </div>
     </div>
   );

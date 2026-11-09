@@ -16,15 +16,16 @@ export function RowTableTask({ tarea, onClictask }: rowParams) {
       onClick={onClictask}
     >
       <span className="truncate">{tarea.title}</span>
-      <span className="truncate">{tarea.project_id}</span>
+      <span className="truncate">{tarea.projectName}</span>
       <Badge className={statusClass(tarea.status)}>{tarea.status}</Badge>
       <Badge className={priorityClass(tarea.priority)}>{tarea.priority}</Badge>
-      <span className="truncate">{tarea.assigned_id}</span>
-      <span>{tarea.due_date}</span>
+      <span className="truncate">{tarea.assignee?.displayName}</span>
+      <span>{tarea.dueDate}</span>
     </div>
   );
 }
 
+// Badge color prioridad
 function priorityClass(prioridad?: Task["priority"]) {
   switch (prioridad) {
     case "High":
@@ -37,13 +38,14 @@ function priorityClass(prioridad?: Task["priority"]) {
       return "";
   }
 }
+// Badge color status
 function statusClass(ststus?: Task["status"]) {
   switch (ststus) {
     case "Done":
       return "bg-[#DCFCE7] text-[#166534]";
-    case "To Do":
+    case "ToDo":
       return "bg-[#FEF3C7] text-[#92400E]";
-    case "In Progress":
+    case "InProgress":
       return "bg-[#DBEAFE] text-[#1E40AF]";
     default:
       return "";

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "@tanstack/react-router";
 
 // HOOKS
 import { useState } from "react";
-import { useProject } from "#hooks/use-project";
+import { useProject } from "@/hooks/use-project";
 
 // COMPONENTES
 import { DataTable } from "@/components/index.comp";
@@ -19,7 +19,8 @@ import {
 import type { Task } from "#lib/api/types";
 
 // CONST
-import TAREAS from "@/assets/tempdata/tasks.json";
+import tareasJson from "@/assets/tempdata/tasks.json";
+const TAREAS = tareasJson as Task[]
 
 import { ApiError } from "#lib/api/client";
 import { NotFound } from "@/app/layouts/index";
@@ -29,6 +30,7 @@ import { FilterAndSearch } from "./components/FilterAndSearch";
 export function DetailProject() {
   // CONST
   const nav = useNavigate();
+  // 
   const { id } = useParams({ from: "/app/projects/$id" }); // ID del proyecto actual
   const { data, isLoading, error } = useProject(id);
   const [selectTask, setSelectTask] = useState<Task | null>(null); // Tarea selecionada para el drawer
@@ -49,14 +51,14 @@ export function DetailProject() {
   const proyecto = data;
 
   // TAREAS DEL PROYECTO
-  const projectTask = TAREAS.filter((t) => t.project_id === id);
+  const projectTask = TAREAS.filter((t) => t.projectId === id);
 
   // Filtrar tareas
   const filterTask = projectTask.filter(
     (t) =>
       (!status || t.status === status) &&
       (!priority || t.priority === priority) &&
-      (!member || t.assigned_id === member) &&
+      (!member || t.assignee?.id === member) &&
       t.title.toLowerCase().startsWith(busqueda.toLowerCase()),
   );
 
@@ -92,6 +94,7 @@ export function DetailProject() {
           editClic={() => setPopup("Edit")}
           archiveClic={() => setPopup("Archive")}
           deleteClic={() => setPopup("Delete")}
+          createClic={() => setPopup("Create")}
         />
         <div
           id="tabla-task"

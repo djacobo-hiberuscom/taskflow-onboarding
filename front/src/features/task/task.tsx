@@ -4,8 +4,9 @@ import { DeailTaskDrawer, BotoneraFooter, FiltersTask, HeaderTableTask, HeaderTa
 import type { Task } from "#lib/api/types";
 
 // CONST
-import TAREAS from "@/assets/tempdata/tasks.json";
+import tareasJson from "@/assets/tempdata/tasks.json";
 import PROYECTOS from "@/assets/tempdata/projects.json";
+const TAREAS = tareasJson as Task[]
 
 import { useState } from "react";
 import { keycloak } from "#lib/auth/keycloak";
@@ -16,6 +17,8 @@ const Nproyectos = PROYECTOS.length;
 
 // FEAT
 export function TaskFeat() {
+  
+
   // IS ADMIN
   const isAdmin = keycloak.hasRealmRole("Admin");
   // FILTERS
@@ -35,10 +38,10 @@ export function TaskFeat() {
   // TAREAS
   const tareasFiltradas = TAREAS.filter(
     (t) =>
-      (!projectFilter || t.project_id === projectFilter) &&
+      (!projectFilter || t.projectId === projectFilter) &&
       (!statusFilter || t.status === statusFilter) &&
       (!priorityFilter || t.priority === priorityFilter) &&
-      (!memberFilter || t.assigned_id === memberFilter) &&
+      (!memberFilter || t.assignee?.id === memberFilter) &&
       t.title.toLocaleLowerCase().includes(buscador.toLocaleLowerCase()),
   ).slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
@@ -59,7 +62,7 @@ export function TaskFeat() {
         isAdmin={isAdmin}
         isOpen={selectTask !== null}
         tarea={selectTask}
-        proyecto={PROYECTOS.find((p) => p.id === selectTask?.project_id)}
+        proyecto={PROYECTOS.find((p) => p.id === selectTask?.projectId)}
         onOpenChange={(open) => {
           if (!open) setSelectTask(null);
         }}
