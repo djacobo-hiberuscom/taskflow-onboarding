@@ -69,65 +69,9 @@ public class TaskController : ControllerBase
             return NotFound();
         }
 
-        //obtener juntos los usuarios asignados a las tareas de una pagina
-        var assigneeIds = taskPage.Items.Select(task => task.AssignedId)
-            .OfType<Guid>()
-            .Distinct()
-            .ToArray();
-        
-        var assignees = await _localUserService.GetByIdsAsync(
-            assigneeIds, cancellationToken);
-        
-        var assigneesById = assignees.ToDictionary(user => user.Id);
+        var response = await BuildPageResponseAsync(taskPage, cancellationToken);
 
-        var projectIds = taskPage.Items
-            .Select(task => task.ProjectId)
-            .Distinct()
-            .ToArray();
-
-        var projects = await _projectService.GetByIdsAsync(
-            projectIds, cancellationToken);
-
-        var projectsById = projects.ToDictionary(project => project.Id);
-
-        var taskResponses =  taskPage.Items.Select(task =>
-        {
-            UserSummaryResponse? assigneeResponse = null;
-
-            if(task.AssignedId.HasValue &&
-                assigneesById.TryGetValue(
-                    task.AssignedId.Value, out var assignee))
-            {
-                assigneeResponse = new UserSummaryResponse
-                {
-                    Id = assignee.Id,
-                    DisplayName = assignee.DisplayName
-                };
-            }
-
-            return new TaskResponse
-            {
-                Id = task.Id,
-                ProjectId = task.ProjectId,
-                ProjectName = projectsById[task.ProjectId].Name,
-                Title = task.Title,
-                Description = task.Description,
-                Status = task.Status.ToString(),
-                Priority = task.Priority.ToString(),
-                DueDate = task.DueDate,
-                Assignee = assigneeResponse,
-                CreatedAt = task.CreatedAt,
-                UpdatedAt = task.UpdatedAt
-            };
-        }).ToArray();
-
-        return Ok(new TaskPageResponse
-        {
-            Items = taskResponses,
-            Page = taskPage.Page,
-            PageSize = taskPage.PageSize,
-            TotalCount = taskPage.TotalCount
-        });
+        return Ok(response);
     }
 
     [HttpGet("{taskId}")]
@@ -470,5 +414,114 @@ public class TaskController : ControllerBase
                 throw new InvalidOperationException(
                     "Resultado de borrado de tarea no reconocido.");
         }
+    }
+
+
+
+    private async Task<TaskPageResponse> BuildPageResponseAsync(
+        TaskPage taskPage, CancellationToken cancellationToken)
+    {
+        //obtener juntos los usuarios asignados a las tareas de una pagina
+        var assigneeIds = taskPage.Items.Select(task => task.AssignedId)
+            .OfType<Guid>()
+            .Distinct()
+            .ToArray();
+        
+        var assignees = await _localUserService.GetByIdsAsync(
+            assigneeIds, cancellationToken);
+        
+        var assigneesById = assignees.ToDictionary(user => user.Id);
+
+        var projectIds = taskPage.Items
+            .Select(task => task.ProjectId)
+            .Distinct()
+            .ToArray();
+
+        var projects = await _projectService.GetByIdsAsync(
+            projectIds, cancellationToken);
+
+        var projectsById = projects.ToDictionary(project => project.Id);
+
+        var taskResponses =  taskPage.Items.Select(task =>
+        {
+            UserSummaryResponse? assigneeResponse = null;
+
+            if(task.AssignedId.HasValue &&
+                assigneesById.TryGetValue(
+                    task.AssignedId.Value, out var assignee))
+            {
+                assigneeResponse = new UserSummaryResponse
+                {
+                    Id = assignee.Id,
+                    DisplayName = assignee.DisplayName
+                };
+            }
+
+            return new TaskResponse
+            {
+                Id = task.Id,
+                ProjectId = task.ProjectId,
+                ProjectName = projectsById[task.ProjectId].Name,
+                Title = task.Title,
+                Description = task.Description,
+                Status = task.Status.ToString(),
+                Priority = task.Priority.ToString(),
+                DueDate = task.DueDate,
+                Assignee = assigneeResponse,
+                CreatedAt = task.CreatedAt,
+                UpdatedAt = task.UpdatedAt
+            };
+        }).ToArray();
+
+        return new TaskPageResponse
+        {
+            Items = taskResponses,
+            Page = taskPage.Page,
+            PageSize = taskPage.PageSize,
+            TotalCount = taskPage.TotalCount
+        };
+    }
+
+    [HttpGet("/api/v1/me/tasks")]
+    public async Task<IActionResult> GetMyTasks(
+        [FromQuery] TaskListQuery request,
+        CancellationToken cancellationToken)
+    {
+        if (Request.Query.ContainsKey("assigneeId"))
+        {
+            ModelState.AddModelError("assigneeId",
+                "Mis tareas utiliza el usuario autenticado, no admite asigneeId.");
+            
+            return ValidationProblem();
+        }
+        
+        var filter = new TaskListFilter
+        {
+            ProjectId = request.ProjectId,
+            Status = request.Status
+                .Select(status => Enum.Parse<TaskState>(status))
+                .ToArray(),
+            Priority = request.Priority
+                .Select(priority => Enum.Parse<TaskPriority>(priority))
+                .ToArray(),
+            Sort = request.Sort,
+            Order = request.Order,
+            Page = request.Page,
+            PageSize = request.PageSize
+        };
+        
+        var myTasksPage = await _taskService.GetMyTasksAsync(
+            filter, _currentUser.UserId,
+            _currentUser.IsAdmin, cancellationToken);
+        
+        if(myTasksPage is null)
+        {
+            return NotFound();
+        }
+
+        var response = await BuildPageResponseAsync(
+            myTasksPage, cancellationToken);
+
+        return Ok(response);
     }
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using TaskFlow.Application.Abstractions;
 using TaskFlow.Application.Projects;
 using TaskFlow.Application.Users;
@@ -355,7 +356,9 @@ public class TaskService
                 cancellationToken);
 
             //si se ha filtrado por un proyecto pero no lo puede ver o no existe
-            if(project is null)
+            if(project is null||
+                (filter.OnlyActiveProjects &&
+                project.ArchivedAt is not null))
             {
                 return null;
             }
@@ -363,6 +366,27 @@ public class TaskService
 
         return await _taskRepository.GetPageAsync(
             filter, userId, isAdmin, cancellationToken);
+    }
+
+    public async Task<TaskPage?> GetMyTasksAsync(
+        TaskListFilter filter, Guid userId, bool isAdmin,
+        CancellationToken cancellationToken)
+    {
+        var myFilter = new TaskListFilter
+        {
+            ProjectId = filter.ProjectId,
+            Status = filter.Status,
+            Priority = filter.Priority,
+            Sort = filter.Sort,
+            Order = filter.Order,
+            Page = filter.Page,
+            PageSize = filter.PageSize,
+            AssigneeId = userId,
+            OnlyUnassigned = false,
+            OnlyActiveProjects = true
+        };
+
+        return await GetTaskPageAsync(myFilter, userId, isAdmin, cancellationToken);
     }
 
 }

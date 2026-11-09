@@ -48,7 +48,9 @@ public class TaskRepository : ITaskRepository
     {
         var visibleProjects = _context.Projects.AsQueryable();
 
-        if(!isAdmin || !filter.ProjectId.HasValue)
+        if(filter.OnlyActiveProjects
+            || !isAdmin
+            || !filter.ProjectId.HasValue)
         {
             visibleProjects = visibleProjects
                 .Where(project => project.ArchivedAt == null);

@@ -12,5 +12,6 @@ public class TaskListFilter
     public string? Order { get; init; }
     public int Page { get; init; } = 1;
     public int PageSize { get; init; } = 20;
+    public bool OnlyActiveProjects { get; init; } = false;
 
 }
