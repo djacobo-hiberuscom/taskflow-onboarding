@@ -45,7 +45,7 @@ export function AppLayout() {
 
       <SidebarInset className="min-w-0 bg-[#F3F5F9]">
         <StickyHeader title={title} />
-        <div className="mx-auto w-full max-w-350 flex-1">
+        <div className="mx-auto w-full max-w-350 flex-1 flex flex-col">
           <Outlet />
         </div>
       </SidebarInset>

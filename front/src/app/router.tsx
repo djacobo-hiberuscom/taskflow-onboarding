@@ -10,6 +10,10 @@ import {
   LoginRoute,
   RegisterRoute,
   CallbackRoute,
+
+  NotFoundRoute,
+  ForbiddenRoute,
+  TimeOutRoute
 } from "./routes";
 // Layouts
 import { AppLayoutRoute } from "./routes";
@@ -22,6 +26,9 @@ const routeTree = rootRoute.addChildren([
   LoginRoute,
   RegisterRoute,
   CallbackRoute,
+  NotFoundRoute,
+  ForbiddenRoute,
+  TimeOutRoute,
   AppLayoutRoute.addChildren([
     DashBoardRoute,
     ProjectsRoute,

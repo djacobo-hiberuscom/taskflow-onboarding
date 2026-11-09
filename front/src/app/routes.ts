@@ -6,6 +6,9 @@ import {
   LoginPage,
   RegisterPage,
   CallbackPage,
+  Forbidden,
+  NotFound,
+  TimeOut
 } from "@/features/index.featues";
 
 // Layout
@@ -94,3 +97,27 @@ export const ProfileRoute = createRoute({
   path: "/me",
   component: MyProfileFeat,
 });
+
+
+// ERROR STATUS
+
+//403
+export const ForbiddenRoute = createRoute ({
+  getParentRoute: () => rootRoute,
+  path: "/403",
+  component: Forbidden
+})
+
+// 404
+export const NotFoundRoute = createRoute ({
+  getParentRoute: () => rootRoute,
+  path: "/404",
+  component: NotFound
+})
+
+// TIMEOUT
+export const TimeOutRoute = createRoute ({
+  getParentRoute: () => rootRoute,
+  path: "/timeout",
+  component: TimeOut
+})

@@ -4,78 +4,116 @@ import {
   ProjectCard,
   AddButton,
   ArchivedButton,
-  
 } from "./components/index.comp";
 
 // Popups
-import { ArchivedPopUp, NewProjectPopup } from "./popups/index.popup";
+import {
+  ArchiveConfirmPopUp,
+  ArchivedPopUp,
+  DeleteConfirmPopUp,
+  EditProjectPopUp,
+  NewProjectPopup,
+} from "./popups/index.popup";
 
 // PROYECTOS
-import PROYECTOS from "@/assets/tempdata/projects.json";
 import { useNavigate } from "@tanstack/react-router";
 
 // USER
 import { keycloak } from "@/lib/auth/keycloak";
+import { useProjects } from "#hooks/use-project";
+import { ApiError } from "#lib/api/client";
+import { NotFound } from "../index.featues";
+import type { Project } from "#lib/api/types";
 
 export function ProjectFeeat() {
-  const isAdmin: boolean = keycloak.hasRealmRole("Admin")
-  const [archivedOpen, setArcivedOpen] = useState(false)
-  const [newProjectOpen, setNewProjectOpen] = useState(false)
-  const nav = useNavigate()
-  const projects = PROYECTOS;
+  const { data, isLoading, error } = useProjects();
+  const isAdmin: boolean = keycloak.hasRealmRole("Admin");
+
+  const [archivedOpen, setArcivedOpen] = useState(false);
+  const [newProjectOpen, setNewProjectOpen] = useState(false);
+
+  const [toEdit, setToEdit] = useState<Project | null>(null); // popUp de aeditar proyecto
+  const [toDelete, setToDelete] = useState<Project | null>(null);
+  const [toArchive, setToArchive] = useState<Project | null>(null);
+
+  const nav = useNavigate();
+
+  if (isLoading) return <h1>Cargando...</h1>;
+  if (error instanceof ApiError && error.status === 404) return <NotFound />;
+  if (error) return <h1>{error.message}</h1>;
+
+  const projects = data?.items ?? [];
 
   const openArchive = () => {
-    setArcivedOpen(!archivedOpen)
-  }
+    setArcivedOpen(!archivedOpen);
+  };
   const openNewProject = () => {
-    setNewProjectOpen(!newProjectOpen)
-  }
+    setNewProjectOpen(!newProjectOpen);
+  };
   return (
-    
-    <div className="p-4 flex flex-col gap-2">
-      <ArchivedPopUp 
-      isOpen={archivedOpen}
-      onOpenChange={ (open) =>{
-        if (!open) setArcivedOpen(false)
-      }}/>
-      <NewProjectPopup 
-      isOpen={newProjectOpen}
-      onOpenChange={(open) => {
-        if (!open) setNewProjectOpen(false)
-      }}/>
+    <div className="p-4 flex flex-col flex-1 gap-2">
+      <ArchivedPopUp
+        isOpen={archivedOpen}
+        onOpenChange={(open) => {
+          if (!open) setArcivedOpen(false);
+        }}
+      />
+      <NewProjectPopup
+        isOpen={newProjectOpen}
+        onOpenChange={(open) => {
+          if (!open) setNewProjectOpen(false);
+        }}
+      />
+      <DeleteConfirmPopUp
+        isOpen={toDelete !== null}
+        proyecto={toDelete ?? undefined}
+        onOpenChange={(open) => {
+          if (!open) setToDelete(null);
+        }}
+      />
+      <ArchiveConfirmPopUp
+        isOpen={toArchive !== null}
+        proyecto={toArchive ?? undefined}
+        onOpenChange={(open) => {
+          if (!open) setToArchive(null);
+        }}
+        onArchived={() => nav({ to: "/projects", replace: true })}
+      />
+      <EditProjectPopUp
+        isOpen={toEdit !== null}
+        onOpenChange={(open) => {
+          if (!open) setToEdit(null);
+        }}
+        proyecto={toEdit}
+      />
 
-        <div className="flex flex-wrap gap-5">
-          {projects.map((p) => (
+      <div className="flex flex-wrap gap-5 content-start">
+        {projects
+          ?.filter((p) => p.archivedAt === null)
+          .map((p) => (
             <ProjectCard
               key={p.id}
               isAdmin={isAdmin}
-              id = {p.id}
-              onClic={() =>  nav({to : "/projects/$id", params: {id: p.id}})}
+              id={p.id}
+              onClic={() => nav({ to: "/projects/$id", params: { id: p.id } })}
               title={p.name}
               description={p.description}
               miembros={1}
               tareasAbiertas={5}
               favourite={false}
+              onDelete={() => setToDelete(p)}
+              onArchive={() => setToArchive(p)}
+              onEdit={() => setToEdit(p)}
             />
           ))}
-        </div>
-        <div id="botonera" className="sticky bottom-4 flex justify-end gap-2">
-          <ArchivedButton isAdmin={isAdmin} onClic={() => openArchive()} />
-          <AddButton onClic={() => openNewProject()} />
-        </div>
       </div>
-  );  
-    {/*
-      <Drawer
-      modal={false}
-      disablePointerDismissal
-      swipeDirection="right"
-      open={selected !== null}
-      onOpenChange={(open) =>  !open && setSelected(null)}
-    >
-      <ProjectDrawer project={selected} />
-    </Drawer>
-      */
-     }  
-  
+      <div
+        id="botonera"
+        className="sticky bottom-4 mt-auto flex justify-end gap-2"
+      >
+        <ArchivedButton isAdmin={isAdmin} onClic={() => openArchive()} />
+        <AddButton onClic={() => openNewProject()} />
+      </div>
+    </div>
+  );
 }
