@@ -11,6 +11,10 @@ public interface IProjectRepository
     Task<Project?> GetVisibleByIdAsync(
         Guid projectId, Guid userId, bool isAdmin,
         CancellationToken cancellationToken);
+    
+    Task<Project[]> GetByIdsAsync(
+        Guid[] projectIds, 
+        CancellationToken cancellationToken);
 
     Task<AppUser[]> GetMembersAsync(
         Guid projectId, CancellationToken cancellationToken);

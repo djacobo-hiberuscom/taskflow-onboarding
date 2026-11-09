@@ -342,4 +342,27 @@ public class TaskService
             }, cancellationToken);
     }
 
+    public async Task<TaskPage?> GetTaskPageAsync(
+        TaskListFilter filter,
+        Guid userId, bool isAdmin,
+        CancellationToken cancellationToken)
+    {
+        if (filter.ProjectId.HasValue)
+        {
+            var project = await _projectRepository.GetVisibleByIdAsync(
+                filter.ProjectId.Value,
+                userId, isAdmin,
+                cancellationToken);
+
+            //si se ha filtrado por un proyecto pero no lo puede ver o no existe
+            if(project is null)
+            {
+                return null;
+            }
+        }
+
+        return await _taskRepository.GetPageAsync(
+            filter, userId, isAdmin, cancellationToken);
+    }
+
 }

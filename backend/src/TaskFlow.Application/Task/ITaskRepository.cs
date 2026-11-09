@@ -14,4 +14,10 @@ public interface ITaskRepository
 
     Task<Guid?> GetProjectIdAsync(
         Guid taskId, CancellationToken cancellationToken);
+
+    Task<TaskPage> GetPageAsync(
+        TaskListFilter filter,
+        Guid userId,
+        bool isAdmin,
+        CancellationToken cancellationToken);
 }
