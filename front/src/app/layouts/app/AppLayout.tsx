@@ -14,7 +14,7 @@ import {
   StickyHeader,
   personalNav,
   NavSection,
-} from "./components/index.comp";
+} from "./components";
 import { Outlet, useLocation } from "@tanstack/react-router";
 
 export function AppLayout() {

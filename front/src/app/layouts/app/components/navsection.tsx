@@ -1,9 +1,12 @@
+// Compoenentes
 import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/index.comp";
-import { type NavItem } from "./index.comp";
+// Types
+import { type NavItem } from ".";
+// route
 import { useLocation, useNavigate } from "@tanstack/react-router";
 
 export function NavSection({ items }: { items: NavItem[] }) {

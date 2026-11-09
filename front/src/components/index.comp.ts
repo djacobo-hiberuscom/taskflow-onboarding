@@ -1,3 +1,4 @@
+// UI
 export * from "./ui/badge"
 export * from "./ui/button"
 export * from "./ui/input"
@@ -13,3 +14,6 @@ export * from "./ui/data-table/data-table"
 export * from "./ui/context-menu"
 export * from "./ui/dialog"
 export * from "./ui/toast"
+
+// COMMON
+export * from "./common/chart/PiChart.comp"

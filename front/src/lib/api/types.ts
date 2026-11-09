@@ -12,6 +12,7 @@ export interface Project {
   archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  members: UserSummary[]
 }
 
 // Projct details
