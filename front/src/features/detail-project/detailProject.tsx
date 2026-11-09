@@ -25,6 +25,7 @@ const TAREAS = tareasJson as Task[]
 import { ApiError } from "#lib/api/client";
 import { NotFound } from "@/app/layouts/index";
 import { FilterAndSearch } from "./components/FilterAndSearch";
+import { useTasks } from "#hooks/use-task";
 
 // COMPONENTE
 export function DetailProject() {
@@ -33,6 +34,8 @@ export function DetailProject() {
   // 
   const { id } = useParams({ from: "/app/projects/$id" }); // ID del proyecto actual
   const { data, isLoading, error } = useProject(id);
+  const {data: tareas, isLoading: tareasLoading, error: tareasError} = useTasks()
+
   const [selectTask, setSelectTask] = useState<Task | null>(null); // Tarea selecionada para el drawer
   const [popup, setPopup] = useState<string | null>(null);
 

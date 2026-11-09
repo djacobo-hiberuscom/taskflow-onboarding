@@ -7,6 +7,7 @@ import { X } from "lucide-react";
 //
 import USUARIOS from "@/assets/tempdata/users.json"
 import PROYECTOS from "@/assets/tempdata/projects.json"
+import type { TaskStatus } from "#lib/api/types";
 
 // Filters
 const project_filter = PROYECTOS.map((p) => ({
@@ -36,9 +37,9 @@ interface filterParams {
   projectFilter: string | null;
   setProjectFilter: (value: string | null) => void;
   statusFilter: string | null;
-  setStatusFilter: (value: string | null) => void;
+  setStatusFilter: (value: TaskStatus | null) => void;
   priorityFilter: string | null;
-  setPrirorityFilter: (value: string | null) => void;
+  setPrirorityFilter: (value: TaskPriority | null) => void;
   memberFilter: string | null;
   setMemberFilter: (value: string | null) => void;
   buscador: string;

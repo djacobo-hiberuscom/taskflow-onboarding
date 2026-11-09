@@ -1,3 +1,5 @@
+import type { TaskListParams } from "./api/types";
+
 // projects
 export const projectKeys = {
     all: ["project"] as const,
@@ -8,5 +10,7 @@ export const projectKeys = {
 // Task
 export const taskKeys = {
     all: ["task"] as const,
+    list: (params: TaskListParams) => ["task", "list", params] as const,
     detail: (id:string) => ["task", id] as const
 }
+

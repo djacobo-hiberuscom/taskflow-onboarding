@@ -35,3 +35,15 @@ export interface UpdateTaskInput {
   dueDate?: string | null,
   assigneeId?: string
 }
+
+// list params
+export interface TaskListParams {
+  projectId?: string,
+  status?: TaskStatus[],
+  priority?: TaskPriority[],
+  assigneeId?: string,
+  sort?: "createdAt" | "dueDate"
+  order?: "asc" | "desc"
+  page?: number,
+  pageSize?: number
+}

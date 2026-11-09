@@ -1,11 +1,13 @@
 import {
   type CreateTaskInput,
+  type Page,
   type Task,
+  type TaskListParams,
   type TaskStatus,
-} from "./../lib/api/types";
+} from "@/lib/api/types";
 import { apiFetch } from "#lib/api/client";
 import { projectKeys, taskKeys } from "#lib/query-keys";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 
 const BASE = "/api/v1/tasks";
 
@@ -16,10 +18,29 @@ function useInvalidateTask() {
     qc.invalidateQueries({ queryKey: projectKeys.all });
   };
 }
+function buildTaskQuery(params: TaskListParams): string {
+  const qs = new URLSearchParams();
+
+  if (params.projectId) qs.set("projectId", params.projectId);
+  params.status?.forEach((s) => qs.append("status", s));
+  params.priority?.forEach((p) => qs.append("priority", p));
+  if (params.assigneeId) qs.set("assigneeId", params.assigneeId);
+  if (params.sort) qs.set("sort", params.sort);
+  if (params.order) qs.set("order", params.order);
+  qs.set("page", String(params.page ?? 1));
+  qs.set("pageSize", String(params.pageSize ?? 20));
+
+  return qs.toString();   // "projectId=…&status=ToDo&status=Done&page=1&pageSize=20"
+}
 
 // GET ALL
-
-export function useTasks() {}
+export function useTasks(params: TaskListParams = {}) {
+  return useQuery({
+    queryKey: taskKeys.list(params),
+    queryFn: () => apiFetch<Page<Task>>(`${BASE}?${buildTaskQuery(params)}`),
+    placeholderData: keepPreviousData,
+  });
+}
 
 // GET ID /tasks/{id}
 export function useTask(id: string | undefined) {
