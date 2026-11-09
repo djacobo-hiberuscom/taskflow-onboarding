@@ -1,8 +1,10 @@
+// icons
 import { Heart, Users, Pen, Archive, Trash } from "lucide-react";
-import { Badge } from "#components/ui/badge";
-import { Separator } from "#components/ui/separator";
+// Compoenentess
+import {Badge, Separator, } from "@/components/index.comp"
+// Hooks
 import { useState } from "react";
-import TAREAS from "@/assets/tempdata/tasks.json"
+import TAREAS from "@/assets/tempdata/tasks.json" // TAREAS
 
 // Contex menu
 import {
@@ -40,9 +42,6 @@ export function ProjectCard({
   onArchive,
   isAdmin
 }: parameters) {
-
-  
-
 
   const [isFavourite, setIsFavourite] = useState(favourite);
   const miembros = proyecto.members?.length ?? 0
