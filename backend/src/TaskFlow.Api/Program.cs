@@ -7,6 +7,7 @@ using TaskFlow.Infrastructure.Persistence.Repositories;
 using TaskFlow.Api.Authentication;
 using TaskFlow.Application.Tasks;
 using TaskFlow.Infrastructure.Persistence.Seeding;
+using TaskFlow.Application.Dashboard;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,12 @@ builder.Services.AddScoped<TaskService>();
 builder.Services.AddHealthChecks().AddDbContextCheck<TaskFlowDbContext>();
 
 builder.Services.AddScoped<DemoUserSeeder>();
+
+builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+
+builder.Services.AddScoped<DashboardService>();
+
+builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
 
 
 
