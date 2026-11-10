@@ -45,7 +45,7 @@ export function ProjectCard({
 
   const [isFavourite, setIsFavourite] = useState(favourite);
   const miembros = proyecto.members?.length ?? 0
-  const nTareas = TAREAS.filter((t) => t.project_id === proyecto.id).length; // N TAREAS
+  const nTareas = TAREAS.filter((t) => t.projectId === proyecto.id).length; // N TAREAS
   return (
     <ContextMenu>
       <ContextMenuTrigger className="flex flex-col gap-4 p-4 border rounded-xl bg-background max-w-xs hover:brightness-97" onClick={() => onOpen(proyecto) }>

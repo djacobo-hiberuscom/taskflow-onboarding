@@ -8,13 +8,13 @@ import {
   RowTableTask,
 } from "./components/index.comp";
 // TYPES
-import type { Task, TaskStatus, TaskPriority } from "@/lib/api/types";
+import type { TaskStatus, TaskPriority } from "@/lib/api/types";
 
 // CONST
 
 import { useState } from "react";
 import { keycloak } from "#lib/auth/keycloak";
-import { useTasks } from "#hooks/use-task";
+import { useTasks, useTask } from "#hooks/use-task";
 import { ApiError } from "#lib/api/client";
 import { NotFound } from "@/app/layouts";
 import { useProjects } from "#hooks/use-project";
@@ -34,7 +34,8 @@ export function TaskFeat() {
   const [buscador, setbuscador] = useState("");
 
   // Select task
-  const [selectTask, setSelectTask] = useState<Task | null>(null);
+  const [selectTaskId, setSelectTaskId] = useState<string | null>(null);
+  const { data: selectTask } = useTask(selectTaskId ?? undefined);
   // PAGE
   const PAGE_SIZE = 10;
   const [page, setPage] = useState(1);
@@ -87,11 +88,11 @@ export function TaskFeat() {
     <div className="flex flex-1 flex-col gap-8 justify-start p-3">
       <DeailTaskDrawer
         isAdmin={isAdmin}
-        isOpen={selectTask !== null}
+        isOpen={selectTaskId !== null}
         tarea={selectTask}
         proyecto={selectTask?.projectId}
         onOpenChange={(open) => {
-          if (!open) setSelectTask(null);
+          if (!open) setSelectTaskId(null);
         }}
       />
       <HeaderTask Ntareas={Ntareas} Nproyectos={Nproyectos} />
@@ -117,7 +118,7 @@ export function TaskFeat() {
             return (
               <RowTableTask
                 tarea={t}
-                onClictask={() => setSelectTask(t === selectTask ? null : t)}
+                onClictask={() => setSelectTaskId(t.id === selectTaskId ? null : t.id)}
               />
             );
           })}
