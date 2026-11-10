@@ -11,7 +11,6 @@ import {
 import type { Task, TaskStatus, TaskPriority } from "@/lib/api/types";
 
 // CONST
-import PROYECTOS from "@/assets/tempdata/projects.json";
 
 import { useState } from "react";
 import { keycloak } from "#lib/auth/keycloak";
@@ -90,7 +89,7 @@ export function TaskFeat() {
         isAdmin={isAdmin}
         isOpen={selectTask !== null}
         tarea={selectTask}
-        proyecto={PROYECTOS.find((p) => p.id === selectTask?.projectId)}
+        proyecto={selectTask?.projectId}
         onOpenChange={(open) => {
           if (!open) setSelectTask(null);
         }}

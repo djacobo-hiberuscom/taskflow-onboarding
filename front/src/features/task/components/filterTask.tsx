@@ -49,8 +49,8 @@ export function FiltersTask({
   const status_filter = [
     // ESTADO
     { label: "Hecho", value: "Done" },
-    { label: "Sin hacer", value: "To Do" },
-    { label: "En proceso", value: "In Progress" },
+    { label: "Sin hacer", value: "ToDo" },
+    { label: "En proceso", value: "InProgress" },
   ];
   const priority_filter = [
     // PRIORIDAD
@@ -69,28 +69,28 @@ export function FiltersTask({
   return (
     <div id="Filtros" className="flex gap-2">
       <FilterSeletor
-        isAdmin={isAdmin}
+        disabled={!isAdmin}
         items={project_filter}
         placeholder="Proyectos"
         value={projectFilter}
         onChange={setProjectFilter}
       />
       <FilterSeletor
-        isAdmin={isAdmin}
+        disabled={!isAdmin}
         items={status_filter}
         placeholder="Estados"
         value={statusFilter}
         onChange={setStatusFilter.toString}
       />
       <FilterSeletor
-        isAdmin={isAdmin}
+        disabled={!isAdmin}
         items={priority_filter}
         placeholder="Priorida"
         value={priorityFilter}
         onChange={setPrirorityFilter.toString}
       />
       <FilterSeletor
-        isAdmin={isAdmin}
+        disabled={!isAdmin}
         items={usuarios_filter}
         placeholder="Miembros"
         value={memberFilter}

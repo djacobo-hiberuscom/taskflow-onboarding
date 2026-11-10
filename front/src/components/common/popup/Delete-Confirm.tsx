@@ -10,28 +10,12 @@ import type { Project } from "@/lib/api/types";
 // ICON
 import { Trash, TriangleAlertIcon } from "lucide-react";
 
-// HOOKS
-import { useDeleteProject } from "@/hooks/use-project";
-import { useNavigate } from "@tanstack/react-router";
-
-const openSuccessToast = () => {
-  toast.add({
-    type: "success",
-    description: "Proyecto eliminado correctamente",
-  });
-};
-const openErrorToast = () => {
-  toast.add({
-    type: "error",
-    description: "Error al eliminar el proyecto",
-  });
-};
-
 interface popParameters {
   modal?: boolean;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   proyecto?: Project;
+  onClic: () => void
 }
 
 export function DeleteConfirmPopUp({
@@ -39,11 +23,13 @@ export function DeleteConfirmPopUp({
   isOpen,
   onOpenChange,
   proyecto,
+  onClic
 }: popParameters) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange} modal={modal}>
       <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col p-4 gap-3">
         <DeleteConfirmContainer
+          onClic={onClic}
           proyecto={proyecto}
           onClose={() => onOpenChange(false)}
         />
@@ -55,26 +41,13 @@ export function DeleteConfirmPopUp({
 interface parameters {
   proyecto?: Project;
   onClose: () => void;
+  onClic: () => void;
 }
-export function DeleteConfirmContainer({ proyecto, onClose }: parameters) {
-  const nav = useNavigate();
-  const deleteProject = useDeleteProject();
-
-  const handleClicDelete = () => {
-    if (!proyecto) return;
-    deleteProject.mutate(proyecto.id, {
-      onSuccess: () => {
-        onClose();
-        nav({ to: "/projects", replace: true });
-        openSuccessToast()
-      },
-      onError: () => {
-        onClose()
-        openErrorToast()
-      }
-    });
-  };
-
+export function DeleteConfirmContainer({
+  proyecto,
+  onClose,
+  onClic,
+}: parameters) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-col gap-2 ">
@@ -102,7 +75,7 @@ export function DeleteConfirmContainer({ proyecto, onClose }: parameters) {
         <Button
           variant="outline"
           className="bg-red-500 text-white"
-          onClick={handleClicDelete}
+          onClick={onClic}
         >
           Eliminar
         </Button>

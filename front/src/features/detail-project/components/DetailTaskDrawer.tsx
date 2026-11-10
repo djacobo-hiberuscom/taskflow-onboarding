@@ -8,10 +8,9 @@ import {
   DrawerFooter,
 } from "@/components/index.comp";
 import { FilterSeletor } from "./index";
+
 // Iconos
 import { Folder } from "lucide-react";
-
-// Pop up de delete confirm
 
 // TYPOS
 import type { Project, Task, TaskStatus } from "@/lib/api/types";
@@ -20,6 +19,7 @@ import { getUsernameById, getUsernameByProjectId } from "@/tools/getUsername";
 import { useState } from "react";
 import { DeleteConfirmPopUp } from "@/components/common/popup/Delete-Confirm";
 import { useChangeTaskAssignee, useChangeTaskStatus } from "#hooks/use-task";
+
 interface parameters {
   tarea?: Task | null;
   isOpen: boolean;
@@ -48,6 +48,7 @@ export function DeailTaskDrawer({
       onOpenChange={onOpenChange}
     >
       <DeleteConfirmPopUp
+        onClic={() => {}}
         modal={false}
         isOpen={confirmDeleteIsOpen}
         onOpenChange={(open) => {

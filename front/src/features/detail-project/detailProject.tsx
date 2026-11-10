@@ -16,7 +16,7 @@ import {
 } from "./components/index";
 
 // TYPES
-import type { Task, TaskStatus, TaskPriority } from "#lib/api/types";
+import type { TaskStatus, TaskPriority } from "#lib/api/types";
 
 // CONST
 import { ApiError } from "#lib/api/client";

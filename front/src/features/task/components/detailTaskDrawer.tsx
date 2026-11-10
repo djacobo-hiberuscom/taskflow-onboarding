@@ -11,20 +11,22 @@ import { FilterSeletor } from "./index.comp";
 // Iconos
 import { Folder } from "lucide-react";
 
-// Pop up de delete confirm
-
 // TYPOS
-import type { Project, Task } from "#lib/api/types";
+import type { Project, Task, TaskStatus } from "@/lib/api/types";
 
 import { getUsernameById, getUsernameByProjectId } from "@/tools/getUsername";
 import { useState } from "react";
-import { DeleteConfirmPopUp } from "@/components/common/popup/index";
+import { DeleteConfirmPopUp } from "@/components/common/popup/Delete-Confirm";
+import { useChangeTaskAssignee, useChangeTaskStatus } from "@/hooks/use-task";
+import { useProject } from "@/hooks/use-project";
+import { ApiError } from "@/lib/api/client";
+import { NotFound } from "@/app/layouts";
 interface parameters {
+  isAdmin?: boolean;
   tarea?: Task | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  proyecto?: Project;
-  isAdmin: boolean;
+  proyecto?: string;
 }
 
 export function DeailTaskDrawer({
@@ -32,9 +34,19 @@ export function DeailTaskDrawer({
   isOpen,
   onOpenChange,
   proyecto,
-  isAdmin,
+  isAdmin
 }: parameters) {
   const [confirmDeleteIsOpen, setConfirmDeleteIsOpen] = useState(false);
+  const {
+    data: proyectoDetail,
+    isLoading: proyectoLoading,
+    error: proyectoError,
+  } = useProject(proyecto);
+
+  if (proyectoLoading) return <h1>Cargando</h1>;
+  if (proyectoError instanceof ApiError && proyectoError.status === 404)
+    return <NotFound />;
+  if (proyectoError) return <h1>{proyectoError.message}</h1>;
 
   const openDeleteConfirm = () => {
     setConfirmDeleteIsOpen(!confirmDeleteIsOpen);
@@ -49,6 +61,7 @@ export function DeailTaskDrawer({
       onOpenChange={onOpenChange}
     >
       <DeleteConfirmPopUp
+        onClic={() => {}}
         modal={false}
         isOpen={confirmDeleteIsOpen}
         onOpenChange={(open) => {
@@ -56,13 +69,9 @@ export function DeailTaskDrawer({
         }}
       />
       <DrawerContent>
-        <DetailTaskDrawerContainer
-          isAdmin={isAdmin}
-          tarea={tarea}
-          proyecto={proyecto}
-        />
+        <DetailTaskDrawerContainer tarea={tarea} proyecto={proyectoDetail} isAdmin={isAdmin}/>
         <DrawerFooter>
-          <DrawerBotonera isAdmin={isAdmin} onDeleteClic={openDeleteConfirm} />
+          <DrawerBotonera onDeleteClic={openDeleteConfirm} />
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
@@ -74,19 +83,23 @@ export function DeailTaskDrawer({
 interface containerParameters {
   tarea?: Task | null;
   proyecto?: Project;
-  isAdmin: boolean;
+  isAdmin?: boolean;
 }
 function DetailTaskDrawerContainer({
   tarea,
   proyecto,
   isAdmin,
 }: containerParameters) {
+  const changeStatus = useChangeTaskStatus();
+  const changeAssegnee = useChangeTaskAssignee();
   const [status, setStatus] = useState<string | null>(tarea?.status ?? null);
   const [member, setMember] = useState<string | null>(
     tarea?.assignee?.displayName ?? null,
   );
 
   if (proyecto === undefined) return <h1>Error al cargar el proyecto</h1>;
+
+  // Filtros
   const item_f1 = [
     { label: "Hecho", value: "Done" },
     { label: "Sin hacer", value: "ToDo" },
@@ -97,6 +110,7 @@ function DetailTaskDrawerContainer({
     value: iid,
   }));
 
+  // Componente
   return (
     <div className="p-2">
       <div className="border-b p-2 flex gap-2">
@@ -113,23 +127,34 @@ function DetailTaskDrawerContainer({
           <div className="min-w-0 flex flex-col gap-1">
             <span>Etado</span>
             <FilterSeletor
-              isAdmin={null}
+              disabled={!isAdmin}
               className="w-full"
               items={item_f1}
               placeholder="Estado actual"
               value={status}
-              onChange={setStatus}
+              onChange={(v) => {
+                if (v && v !== tarea?.status)
+                  changeStatus.mutate({
+                    id: tarea?.id ?? "",
+                    status: v as TaskStatus,
+                  });
+                setStatus(v);
+              }}
             />
           </div>
           <div className="min-w-0 flex flex-col gap-1">
             <span>Asignado</span>
             <FilterSeletor
-              isAdmin={isAdmin}
+              disabled={!isAdmin}
               className="w-full"
               items={item_f2}
               placeholder="Miembro asignado"
               value={member}
-              onChange={setMember}
+              onChange={(v) => {
+                if (v && v !== tarea?.assignee?.id)
+                  changeAssegnee.mutate({ id: tarea?.id ?? "", assigneeId: v });
+                setMember(v);
+              }}
             />
           </div>
         </div>
@@ -163,30 +188,17 @@ function DetailTaskDrawerContainer({
           </div>
         </div>
       </div>
-      <div> </div>
     </div>
   );
 }
 
 interface par {
   onDeleteClic: () => void;
-  isAdmin: boolean;
 }
-function DrawerBotonera({ onDeleteClic, isAdmin }: par) {
+function DrawerBotonera({ onDeleteClic }: par) {
   return (
-    <div className="flex justify-between">
-      <Button
-        variant="outline"
-        className="text-white bg-[#4F46E5] hover:bg-[#4338CA] hover:text-white"
-      >
-        Save
-      </Button>
-      <Button
-        disabled={!isAdmin}
-        variant="outline"
-        className="text-[#B91C1C]"
-        onClick={onDeleteClic}
-      >
+    <div className="flex justify-end">
+      <Button variant="destructive" onClick={onDeleteClic}>
         Eliminar
       </Button>
     </div>
