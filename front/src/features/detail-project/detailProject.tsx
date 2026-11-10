@@ -16,12 +16,9 @@ import {
 } from "./components/index";
 
 // TYPES
-import type { Task } from "#lib/api/types";
+import type { Task, TaskStatus, TaskPriority } from "#lib/api/types";
 
 // CONST
-import tareasJson from "@/assets/tempdata/tasks.json";
-const TAREAS = tareasJson as Task[]
-
 import { ApiError } from "#lib/api/client";
 import { NotFound } from "@/app/layouts/index";
 import { FilterAndSearch } from "./components/FilterAndSearch";
@@ -31,18 +28,33 @@ import { useTasks } from "#hooks/use-task";
 export function DetailProject() {
   // CONST
   const nav = useNavigate();
-  // 
+  // PAGE
+  const PAGE_SIZE = 10;
+  const [page, setPage] = useState(1);
+  //
   const { id } = useParams({ from: "/app/projects/$id" }); // ID del proyecto actual
   const { data, isLoading, error } = useProject(id);
-  const {data: tareas, isLoading: tareasLoading, error: tareasError} = useTasks()
+
+  const [busqueda, setBusqueda] = useState("");
+  const [status, setStatus] = useState<TaskStatus | null>(null);
+  const [priority, setPriority] = useState<TaskPriority | null>(null);
+  const [member, setMember] = useState<string | null>(null);
+
+  const {
+    data: tareasFiltradas,
+    isLoading: tareasLoading,
+    error: tareasError,
+  } = useTasks({
+    projectId: id ?? undefined,
+    status: status?.toString ? [status] : undefined,
+    priority: priority?.toString ? [priority] : undefined,
+    assigneeId: member ?? undefined,
+    page,
+    pageSize: PAGE_SIZE,
+  });
 
   const [selectTask, setSelectTask] = useState<Task | null>(null); // Tarea selecionada para el drawer
   const [popup, setPopup] = useState<string | null>(null);
-
-  const [busqueda, setBusqueda] = useState("");
-  const [status, setStatus] = useState<string | null>(null);
-  const [priority, setPriority] = useState<string | null>(null);
-  const [member, setMember] = useState<string | null>(null);
 
   // Error stados
   if (isLoading) return <h1>Cargando</h1>;
@@ -50,20 +62,14 @@ export function DetailProject() {
   if (error) return <h1>{error.message}</h1>;
   if (!data) return <NotFound />;
 
+  if (tareasLoading) return <h1>Cargando</h1>;
+  if (tareasError instanceof ApiError && tareasError.status === 404)
+    return <NotFound />;
+  if (tareasError) return <h1>{tareasError.message}</h1>;
+  if (!tareasFiltradas) return <NotFound />;
+
   // OBtener proyecto
   const proyecto = data;
-
-  // TAREAS DEL PROYECTO
-  const projectTask = TAREAS.filter((t) => t.projectId === id);
-
-  // Filtrar tareas
-  const filterTask = projectTask.filter(
-    (t) =>
-      (!status || t.status === status) &&
-      (!priority || t.priority === priority) &&
-      (!member || t.assignee?.id === member) &&
-      t.title.toLowerCase().startsWith(busqueda.toLowerCase()),
-  );
 
   // NAV atras
   const navBack = () => {
@@ -117,7 +123,7 @@ export function DetailProject() {
 
           <DataTable
             columns={TaskColum}
-            data={filterTask}
+            data={tareasFiltradas.items}
             onClic={(t) => {
               setSelectTask(t === selectTask ? null : t);
             }}

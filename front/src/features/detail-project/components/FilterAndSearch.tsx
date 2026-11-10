@@ -5,7 +5,7 @@ import { X } from "lucide-react";
 import { FilterSeletor } from "./index";
 import { Button, Input } from "@/components/index.comp";
 // Types
-import type { UserSummary } from "@/lib/api/types";
+import type { UserSummary, TaskPriority, TaskStatus } from "@/lib/api/types";
 
 
 // parametros del componente
@@ -13,9 +13,9 @@ interface params {
   busqueda: string;
   onBusquedaChange: (v: string) => void;
   status: string | null;
-  onStatuseChange: (v: string | null) => void;
+  onStatuseChange: (v: TaskStatus | null) => void;
   priority: string | null;
-  onPriorityChange: (v: string | null) => void;
+  onPriorityChange: (v: TaskPriority | null) => void;
   member: string | null;
   onMemberChange: (v: string | null) => void;
   miembros: UserSummary[];
@@ -37,8 +37,8 @@ export function FilterAndSearch({
   // FILTROS
   const ESTADO = [
     { label: "Hecho", value: "Done" },
-    { label: "Sin hacer", value: "To Do" },
-    { label: "En proceso", value: "In Progress" },
+    { label: "Sin hacer", value: "ToDo" },
+    { label: "En proceso", value: "InProgress" },
   ];
   const PRIORIDAD = [
     { label: "Alta", value: "High" },
@@ -63,13 +63,13 @@ export function FilterAndSearch({
         items={ESTADO}
         placeholder="Seleciona estados"
         value={status}
-        onChange={onStatuseChange}
+        onChange={(v) => onStatuseChange(v as TaskStatus | null)}
       />
       <FilterSeletor
         items={PRIORIDAD}
         placeholder="Seleciona prioridad"
         value={priority}
-        onChange={onPriorityChange}
+        onChange={(v) => onPriorityChange(v as TaskPriority | null)}
       />
       <FilterSeletor
         items={MIEMBROS}

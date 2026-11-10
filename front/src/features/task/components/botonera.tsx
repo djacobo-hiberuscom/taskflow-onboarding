@@ -15,7 +15,7 @@ export function BotoneraFooter({
   totalPages,
 }: botonParameters) {
   return (
-    <div className="flex gap-3 items-center justify-end">
+    <div className="sticky bottom-5 mt-auto flex justify-end items-center gap-2">
       <Button onClick={previousClic} variant="outline">
         Anterior
       </Button>

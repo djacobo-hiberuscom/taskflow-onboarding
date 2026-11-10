@@ -2,7 +2,6 @@ import { createColumnHelper } from "@tanstack/react-table"
 import { Button } from "#components/ui/button"
 import { type DataTableFeatures } from "@/components/ui/data-table/data-table-features"
 import type { Task } from "@/lib/api/types"
-import { getUsernameById } from "@/tools/getUsername"
 
 const columnHelper = createColumnHelper<DataTableFeatures, Task>()
 
@@ -20,7 +19,7 @@ export const TaskColum = columnHelper.columns([
       </Button>
     ),
   }),
-  columnHelper.accessor("assigned_id", {
+  columnHelper.accessor("assignee", {
     header :({
       column
     }) => (
@@ -30,9 +29,10 @@ export const TaskColum = columnHelper.columns([
         {column.getIsSorted() === "desc" && " ↓"}
       </Button>
     ),
-    cell: (info) => (
-      <span>{getUsernameById(info.getValue())}</span>
-    )
+    cell: (info) => {
+      const assignee = info.getValue();
+      return <span>{assignee?.displayName ?? "Sin asignar"}</span>
+    }
   })
   ,
   columnHelper.accessor("priority", {
@@ -57,7 +57,7 @@ export const TaskColum = columnHelper.columns([
       </Button>
     )
   }),
-  columnHelper.accessor("update_at", {
+  columnHelper.accessor("updatedAt", {
     header: ({
       column
     }) => (

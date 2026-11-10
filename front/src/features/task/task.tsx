@@ -1,33 +1,35 @@
 // COMPONENTS
-import { DeailTaskDrawer, BotoneraFooter, FiltersTask, HeaderTableTask, HeaderTask, RowTableTask } from "./components/index.comp";
+import {
+  DeailTaskDrawer,
+  BotoneraFooter,
+  FiltersTask,
+  HeaderTableTask,
+  HeaderTask,
+  RowTableTask,
+} from "./components/index.comp";
 // TYPES
-import type { Task, TaskStatus, TaskPriority } from "#lib/api/types";
+import type { Task, TaskStatus, TaskPriority } from "@/lib/api/types";
 
 // CONST
-import tareasJson from "@/assets/tempdata/tasks.json";
 import PROYECTOS from "@/assets/tempdata/projects.json";
-const TAREAS = tareasJson as Task[]
 
 import { useState } from "react";
 import { keycloak } from "#lib/auth/keycloak";
 import { useTasks } from "#hooks/use-task";
 import { ApiError } from "#lib/api/client";
 import { NotFound } from "@/app/layouts";
-
-// CONST
-const Ntareas = TAREAS.length;
-const Nproyectos = PROYECTOS.length;
+import { useProjects } from "#hooks/use-project";
 
 // FEAT
 export function TaskFeat() {
-  
-
   // IS ADMIN
   const isAdmin = keycloak.hasRealmRole("Admin");
   // FILTERS
   const [projectFilter, setProjectFilter] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<TaskStatus | null>(null);
-  const [priorityFilter, setPrirorityFilter] = useState<TaskPriority | null>(null);
+  const [priorityFilter, setPrirorityFilter] = useState<TaskPriority | null>(
+    null,
+  );
   const [memberFilter, setMemberFilter] = useState<string | null>(null);
   // BUSCADOR
   const [buscador, setbuscador] = useState("");
@@ -37,21 +39,39 @@ export function TaskFeat() {
   // PAGE
   const PAGE_SIZE = 10;
   const [page, setPage] = useState(1);
+  // PROYECTOS
+  const {
+    data: proyectos,
+    isLoading: proyectosLoading,
+    error: proyectosError,
+  } = useProjects(); // Proyectos
 
   // TAREAS
-  const {data: tareasFiltradas, isLoading, error} = useTasks({
+  const {
+    data: tareasFiltradas,
+    isLoading: tareasLoading,
+    error: tareasError,
+  } = useTasks({
     projectId: projectFilter ?? undefined,
     status: statusFilter ? [statusFilter] : undefined,
     priority: priorityFilter ? [priorityFilter] : undefined,
     assigneeId: memberFilter ?? undefined,
     page,
-    pageSize: PAGE_SIZE
-  })
-   if (isLoading) return <h1>Cargando</h1>;
-    if (error instanceof ApiError && error.status === 404) return <NotFound />;
-    if (error) return <h1>{error.message}</h1>;
-    if (!tareasFiltradas) return <NotFound />;
-  
+    pageSize: PAGE_SIZE,
+  });
+  if (proyectosLoading) return <h1>Cargando</h1>;
+  if (proyectosError instanceof ApiError && proyectosError.status === 404)
+    return <NotFound />;
+  if (proyectosError) return <h1>{proyectosError.message}</h1>;
+  if (!proyectos) return <NotFound />;
+  if (tareasLoading) return <h1>Cargando</h1>;
+  if (tareasError instanceof ApiError && tareasError.status === 404)
+    return <NotFound />;
+  if (tareasError) return <h1>{tareasError.message}</h1>;
+  if (!tareasFiltradas) return <NotFound />;
+  // CONST
+  const Ntareas = tareasFiltradas.items.length;
+  const Nproyectos = proyectos.items.length;
 
   const totalPages = Math.ceil(Ntareas / PAGE_SIZE);
 
@@ -65,7 +85,7 @@ export function TaskFeat() {
   };
 
   return (
-    <div className="flex flex-col gap-8 justify-start p-3">
+    <div className="flex flex-1 flex-col gap-8 justify-start p-3">
       <DeailTaskDrawer
         isAdmin={isAdmin}
         isOpen={selectTask !== null}
@@ -75,9 +95,10 @@ export function TaskFeat() {
           if (!open) setSelectTask(null);
         }}
       />
-      <HeaderTask Ntareas={Ntareas} Nproyectos={Nproyectos}/>
+      <HeaderTask Ntareas={Ntareas} Nproyectos={Nproyectos} />
       <FiltersTask
         isAdmin={null}
+        itemProject={proyectos.items}
         projectFilter={projectFilter}
         setProjectFilter={setProjectFilter}
         statusFilter={statusFilter}
@@ -91,10 +112,10 @@ export function TaskFeat() {
         quitarFiltros={quitarFiltros}
         setPage={() => setPage(1)}
       />
-      <div>
+      <div className="">
         <HeaderTableTask />
         <div id="Tabla" className=" flex-1">
-          {tareasFiltradas.map((t) => {
+          {tareasFiltradas.items.map((t) => {
             return (
               <RowTableTask
                 tarea={t}

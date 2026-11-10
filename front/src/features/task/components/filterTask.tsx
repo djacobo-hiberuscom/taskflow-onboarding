@@ -1,39 +1,16 @@
 // componentes
-import {Button, Input} from "@/components/index.comp"
+import { Button, Input } from "@/components/index.comp";
 import { FilterSeletor } from "./index.comp";
 // ICON
 import { X } from "lucide-react";
 
 //
-import USUARIOS from "@/assets/tempdata/users.json"
-import PROYECTOS from "@/assets/tempdata/projects.json"
-import type { TaskStatus } from "#lib/api/types";
+import USUARIOS from "@/assets/tempdata/users.json";
+import type { TaskStatus, TaskPriority, Project } from "#lib/api/types";
 
-// Filters
-const project_filter = PROYECTOS.map((p) => ({
-  // PROYECTOS
-  label: p.name,
-  value: p.id,
-}));
-const status_filter = [
-  // ESTADO
-  { label: "Hecho", value: "Done" },
-  { label: "Sin hacer", value: "To Do" },
-  { label: "En proceso", value: "In Progress" },
-];
-const priority_filter = [
-  // PRIORIDAD
-  { label: "Alta", value: "High" },
-  { label: "Madia", value: "Medium" },
-  { label: "Baja", value: "Low" },
-];
-const usuarios_filter = USUARIOS.map((u) => ({
-  // USUARIOS
-  label: u.display_name,
-  value: u.id,
-}));
 interface filterParams {
   isAdmin: boolean | null;
+  itemProject: Project[]
   projectFilter: string | null;
   setProjectFilter: (value: string | null) => void;
   statusFilter: string | null;
@@ -49,6 +26,7 @@ interface filterParams {
 }
 export function FiltersTask({
   isAdmin,
+  itemProject,
   projectFilter,
   setProjectFilter,
   statusFilter,
@@ -62,6 +40,30 @@ export function FiltersTask({
   quitarFiltros,
   setPage,
 }: filterParams) {
+  // Filters
+  const project_filter = itemProject.map((p) => ({
+    // PROYECTOS
+    label: p.name,
+    value: p.id,
+  }));
+  const status_filter = [
+    // ESTADO
+    { label: "Hecho", value: "Done" },
+    { label: "Sin hacer", value: "To Do" },
+    { label: "En proceso", value: "In Progress" },
+  ];
+  const priority_filter = [
+    // PRIORIDAD
+    { label: "Alta", value: "High" },
+    { label: "Madia", value: "Medium" },
+    { label: "Baja", value: "Low" },
+  ];
+  const usuarios_filter = USUARIOS.map((u) => ({
+    // USUARIOS
+    label: u.display_name,
+    value: u.id,
+  }));
+
   // Componente
 
   return (
@@ -78,14 +80,14 @@ export function FiltersTask({
         items={status_filter}
         placeholder="Estados"
         value={statusFilter}
-        onChange={setStatusFilter}
+        onChange={setStatusFilter.toString}
       />
       <FilterSeletor
         isAdmin={isAdmin}
         items={priority_filter}
         placeholder="Priorida"
         value={priorityFilter}
-        onChange={setPrirorityFilter}
+        onChange={setPrirorityFilter.toString}
       />
       <FilterSeletor
         isAdmin={isAdmin}
