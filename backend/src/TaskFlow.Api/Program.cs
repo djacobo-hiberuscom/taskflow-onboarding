@@ -6,6 +6,7 @@ using TaskFlow.Application.Projects;
 using TaskFlow.Infrastructure.Persistence.Repositories;
 using TaskFlow.Api.Authentication;
 using TaskFlow.Application.Tasks;
+using TaskFlow.Infrastructure.Persistence.Seeding;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,11 +49,39 @@ builder.Services.AddScoped<TaskService>();
 
 builder.Services.AddHealthChecks().AddDbContextCheck<TaskFlowDbContext>();
 
+builder.Services.AddScoped<DemoUserSeeder>();
+
 
 
 
 //Build app
 var app = builder.Build();
+
+
+
+var realmFilePath =
+    builder.Configuration["SeedDemoUsers:RealmFile"];
+
+if (!string.IsNullOrWhiteSpace(realmFilePath))
+{
+    if (!app.Environment.IsDevelopment())
+    {
+        throw new InvalidOperationException(
+            "La semilla de demostración solo se permite en Development.");
+    }
+
+    await using var scope = app.Services.CreateAsyncScope();
+
+    var seeder = scope.ServiceProvider
+        .GetRequiredService<DemoUserSeeder>();
+
+    await seeder.SeedAsync(
+        realmFilePath, CancellationToken.None);
+
+    Console.WriteLine("Semilla de usuarios completada.");
+
+    return;
+}
 
 
 //Problem details
