@@ -96,7 +96,6 @@ export function TaskFeat() {
       />
       <HeaderTask Ntareas={Ntareas} Nproyectos={Nproyectos} />
       <FiltersTask
-        isAdmin={null}
         itemProject={proyectos.items}
         projectFilter={projectFilter}
         setProjectFilter={setProjectFilter}

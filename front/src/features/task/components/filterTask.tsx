@@ -9,7 +9,7 @@ import USUARIOS from "@/assets/tempdata/users.json";
 import type { TaskStatus, TaskPriority, Project } from "#lib/api/types";
 
 interface filterParams {
-  isAdmin: boolean | null;
+  isAdmin?: boolean | null;
   itemProject: Project[]
   projectFilter: string | null;
   setProjectFilter: (value: string | null) => void;
@@ -25,7 +25,6 @@ interface filterParams {
   setPage: (value: number) => void;
 }
 export function FiltersTask({
-  isAdmin,
   itemProject,
   projectFilter,
   setProjectFilter,
@@ -69,28 +68,28 @@ export function FiltersTask({
   return (
     <div id="Filtros" className="flex gap-2">
       <FilterSeletor
-        disabled={!isAdmin}
+        disabled={false}
         items={project_filter}
         placeholder="Proyectos"
         value={projectFilter}
         onChange={setProjectFilter}
       />
       <FilterSeletor
-        disabled={!isAdmin}
+        disabled={false}
         items={status_filter}
         placeholder="Estados"
         value={statusFilter}
         onChange={setStatusFilter.toString}
       />
       <FilterSeletor
-        disabled={!isAdmin}
+        disabled={false}
         items={priority_filter}
-        placeholder="Priorida"
+        placeholder="Prioridad"
         value={priorityFilter}
         onChange={setPrirorityFilter.toString}
       />
       <FilterSeletor
-        disabled={!isAdmin}
+        disabled={false}
         items={usuarios_filter}
         placeholder="Miembros"
         value={memberFilter}
