@@ -83,14 +83,14 @@ function DetailTaskDrawerContainer({
 }: containerParameters) {
   const [status, setStatus] = useState<string | null>(tarea?.status ?? null);
   const [member, setMember] = useState<string | null>(
-    tarea?.assigned_id ?? null,
+    tarea?.assignee?.displayName ?? null,
   );
 
   if (proyecto === undefined) return <h1>Error al cargar el proyecto</h1>;
   const item_f1 = [
     { label: "Hecho", value: "Done" },
-    { label: "Sin hacer", value: "To Do" },
-    { label: "En proceso", value: "In Progress" },
+    { label: "Sin hacer", value: "ToDo" },
+    { label: "En proceso", value: "InProgress" },
   ];
   const item_f2 = getUsernameByProjectId(proyecto.id).map((iid) => ({
     label: getUsernameById(iid) ?? "SinNombre",
@@ -147,7 +147,7 @@ function DetailTaskDrawerContainer({
           </div>
           <div id="Vencimiento" className="border-y p-5 flex">
             <h1 className="flex-1">Vencimiento</h1>
-            <span>{tarea?.due_date}</span>
+            <span>{tarea?.dueDate}</span>
           </div>
           <div id="Prioridad" className="border-y p-5 flex">
             <h1 className="flex-1">Proyecto</h1>
@@ -155,11 +155,11 @@ function DetailTaskDrawerContainer({
           </div>
           <div id="Prioridad" className="border-y p-5 flex">
             <h1 className="flex-1">Creada</h1>
-            <span>{tarea?.created_at}</span>
+            <span>{tarea?.createdAt}</span>
           </div>
           <div id="Prioridad" className="border-y p-5 flex">
             <h1 className="flex-1">Ultimo cambio</h1>
-            <span>{tarea?.update_at}</span>
+            <span>{tarea?.updatedAt}</span>
           </div>
         </div>
       </div>

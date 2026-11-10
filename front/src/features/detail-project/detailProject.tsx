@@ -22,7 +22,7 @@ import type { Task, TaskStatus, TaskPriority } from "#lib/api/types";
 import { ApiError } from "#lib/api/client";
 import { NotFound } from "@/app/layouts/index";
 import { FilterAndSearch } from "./components/FilterAndSearch";
-import { useTasks } from "#hooks/use-task";
+import { useTask, useTasks } from "#hooks/use-task";
 
 // COMPONENTE
 export function DetailProject() {
@@ -53,7 +53,8 @@ export function DetailProject() {
     pageSize: PAGE_SIZE,
   });
 
-  const [selectTask, setSelectTask] = useState<Task | null>(null); // Tarea selecionada para el drawer
+  const [selectTaskId, setSelectTaskId] = useState<string | null>(null);
+  const { data: selectTask } = useTask(selectTaskId ?? undefined);
   const [popup, setPopup] = useState<string | null>(null);
 
   // Error stados
@@ -82,11 +83,11 @@ export function DetailProject() {
   return (
     <div>
       <DeailTaskDrawer
-        isOpen={selectTask !== null}
-        tarea={selectTask}
+        isOpen={selectTaskId !== null}
+        tarea={selectTask ?? null}
         proyecto={proyecto}
         onOpenChange={(open) => {
-          if (!open) setSelectTask(null);
+          if (!open) setSelectTaskId(null);
         }}
       />
       <PopupContainer
@@ -125,7 +126,7 @@ export function DetailProject() {
             columns={TaskColum}
             data={tareasFiltradas.items}
             onClic={(t) => {
-              setSelectTask(t === selectTask ? null : t);
+              setSelectTaskId(t.id === selectTaskId ? null : t.id);
             }}
           />
         </div>

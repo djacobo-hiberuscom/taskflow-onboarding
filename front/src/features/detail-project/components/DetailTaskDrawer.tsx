@@ -14,11 +14,12 @@ import { Folder } from "lucide-react";
 // Pop up de delete confirm
 
 // TYPOS
-import type { Project, Task } from "@/lib/api/types";
+import type { Project, Task, TaskStatus } from "@/lib/api/types";
 
 import { getUsernameById, getUsernameByProjectId } from "@/tools/getUsername";
 import { useState } from "react";
 import { DeleteConfirmPopUp } from "@/components/common/popup/Delete-Confirm";
+import { useChangeTaskAssignee, useChangeTaskStatus } from "#hooks/use-task";
 interface parameters {
   tarea?: Task | null;
   isOpen: boolean;
@@ -32,12 +33,11 @@ export function DeailTaskDrawer({
   onOpenChange,
   proyecto,
 }: parameters) {
-
-  const [confirmDeleteIsOpen, setConfirmDeleteIsOpen] = useState(false)
+  const [confirmDeleteIsOpen, setConfirmDeleteIsOpen] = useState(false);
 
   const openDeleteConfirm = () => {
-    setConfirmDeleteIsOpen(!confirmDeleteIsOpen)
-  }
+    setConfirmDeleteIsOpen(!confirmDeleteIsOpen);
+  };
 
   return (
     <Drawer
@@ -47,15 +47,17 @@ export function DeailTaskDrawer({
       open={isOpen}
       onOpenChange={onOpenChange}
     >
-      <DeleteConfirmPopUp 
-      modal={false}
-      isOpen= {confirmDeleteIsOpen}
-      onOpenChange={(open)=> {if (!open) setConfirmDeleteIsOpen(false)}}
+      <DeleteConfirmPopUp
+        modal={false}
+        isOpen={confirmDeleteIsOpen}
+        onOpenChange={(open) => {
+          if (!open) setConfirmDeleteIsOpen(false);
+        }}
       />
       <DrawerContent>
         <DetailTaskDrawerContainer tarea={tarea} proyecto={proyecto} />
         <DrawerFooter>
-          <DrawerBotonera onDeleteClic={openDeleteConfirm}/>
+          <DrawerBotonera onDeleteClic={openDeleteConfirm} />
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
@@ -69,16 +71,18 @@ interface containerParameters {
   proyecto?: Project;
 }
 function DetailTaskDrawerContainer({ tarea, proyecto }: containerParameters) {
+  const changeStatus = useChangeTaskStatus();
+  const changeAssegnee = useChangeTaskAssignee();
   const [status, setStatus] = useState<string | null>(tarea?.status ?? null);
   const [member, setMember] = useState<string | null>(
-    tarea?.assigned_id ?? null,
+    tarea?.assignee?.displayName ?? null,
   );
 
   if (proyecto === undefined) return <h1>Error al cargar el proyecto</h1>;
   const item_f1 = [
     { label: "Hecho", value: "Done" },
-    { label: "Sin hacer", value: "To Do" },
-    { label: "En proceso", value: "In Progress" },
+    { label: "Sin hacer", value: "ToDo" },
+    { label: "En proceso", value: "InProgress" },
   ];
   const item_f2 = getUsernameByProjectId(proyecto.id).map((iid) => ({
     label: getUsernameById(iid) ?? "SinNombre",
@@ -105,7 +109,14 @@ function DetailTaskDrawerContainer({ tarea, proyecto }: containerParameters) {
               items={item_f1}
               placeholder="Estado actual"
               value={status}
-              onChange={setStatus}
+              onChange={(v) => {
+                if (v && v !== tarea?.status)
+                  changeStatus.mutate({
+                    id: tarea?.id ?? "",
+                    status: v as TaskStatus,
+                  });
+                setStatus(v);
+              }}
             />
           </div>
           <div className="min-w-0 flex flex-col gap-1">
@@ -115,7 +126,11 @@ function DetailTaskDrawerContainer({ tarea, proyecto }: containerParameters) {
               items={item_f2}
               placeholder="Miembro asignado"
               value={member}
-              onChange={setMember}
+              onChange={(v) => {
+                if (v && v !== tarea?.assignee?.id)
+                  changeAssegnee.mutate({ id: tarea?.id ?? "", assigneeId: v });
+                setMember(v);
+              }}
             />
           </div>
         </div>
@@ -127,11 +142,13 @@ function DetailTaskDrawerContainer({ tarea, proyecto }: containerParameters) {
         <div id="Data">
           <div id="Prioridad" className="border-y p-5 flex">
             <h1 className="flex-1">Prioridad</h1>
-            <Badge className={priorityClass(tarea?.priority)}>{tarea?.priority}</Badge>
+            <Badge className={priorityClass(tarea?.priority)}>
+              {tarea?.priority}
+            </Badge>
           </div>
           <div id="Vencimiento" className="border-y p-5 flex">
             <h1 className="flex-1">Vencimiento</h1>
-            <span>{tarea?.due_date}</span>
+            <span>{tarea?.dueDate}</span>
           </div>
           <div id="Prioridad" className="border-y p-5 flex">
             <h1 className="flex-1">Proyecto</h1>
@@ -139,30 +156,29 @@ function DetailTaskDrawerContainer({ tarea, proyecto }: containerParameters) {
           </div>
           <div id="Prioridad" className="border-y p-5 flex">
             <h1 className="flex-1">Creada</h1>
-            <span>{tarea?.created_at}</span>
+            <span>{tarea?.createdAt}</span>
           </div>
           <div id="Prioridad" className="border-y p-5 flex">
             <h1 className="flex-1">Ultimo cambio</h1>
-            <span>{tarea?.update_at}</span>
+            <span>{tarea?.updatedAt}</span>
           </div>
         </div>
       </div>
-      <div> </div>
     </div>
   );
 }
 
-
-interface par{
-  onDeleteClic: () => void
+interface par {
+  onDeleteClic: () => void;
 }
-function DrawerBotonera ({onDeleteClic}:par){
+function DrawerBotonera({ onDeleteClic }: par) {
   return (
-    <div className="flex justify-between">
-      <Button variant="outline" className="text-white bg-[#4F46E5] hover:bg-[#4338CA] hover:text-white">Save</Button>
-      <Button variant="outline" className="text-[#B91C1C]" onClick={onDeleteClic}>Eliminar</Button>
+    <div className="flex justify-end">
+      <Button variant="destructive" onClick={onDeleteClic}>
+        Eliminar
+      </Button>
     </div>
-  )
+  );
 }
 
 function priorityClass(prioridad?: Task["priority"]) {
