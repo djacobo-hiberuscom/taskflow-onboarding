@@ -43,7 +43,11 @@ export function ProjectForm({
       <div className="flex flex-col gap-4">
         <label className="space-y-2">
           <span>Nombre*</span>
-          <Input placeholder="Nombre" value={name} onChange={(e) => setName(e.target.value)} />
+          <Input
+            placeholder="Nombre"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
         </label>
         <label className="space-y-2">
           <span>Descripción</span>

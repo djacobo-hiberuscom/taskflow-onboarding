@@ -39,7 +39,7 @@ import { formatDate } from "@/lib/format";
 import { notify } from "@/lib/notify";
 import { DeleteProjectPopUp } from "./Delete-Project";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 7;
 
 interface ArchivedPopUpProps {
   isOpen: boolean;
@@ -176,7 +176,7 @@ function ArchivedRow({
 
   return (
     <TableRow>
-      <TableCell className="py-2">
+      <TableCell className="py-3">
         <p className="font-medium text-sm">{proyecto.name}</p>
         {proyecto.description && (
           <p className="text-xs text-muted-foreground truncate max-w-70">

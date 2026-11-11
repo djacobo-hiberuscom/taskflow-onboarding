@@ -46,8 +46,15 @@ export function DetailProjectFeat() {
 
   return (
     <div className="relative">
-      <TaskDetailDrawer taskId={selectedTaskId} onClose={() => setSelectedTaskId(null)} />
-      <PopupContainer proyecto={proyecto} popup={popup} close={() => setPopup(null)} />
+      <TaskDetailDrawer
+        taskId={selectedTaskId}
+        onClose={() => setSelectedTaskId(null)}
+      />
+      <PopupContainer
+        proyecto={proyecto}
+        popup={popup}
+        close={() => setPopup(null)}
+      />
 
       <BackButton />
 
@@ -59,7 +66,6 @@ export function DetailProjectFeat() {
           onFiltersChange={setFilters}
           busqueda={busqueda}
           onBusquedaChange={setBusqueda}
-          miembros={proyecto.members}
           onNewTask={() => setPopup("create-task")}
         />
 
@@ -70,7 +76,9 @@ export function DetailProjectFeat() {
             columns={TaskColum}
             data={tareas}
             itemLabel="tareas"
-            onClic={(t) => setSelectedTaskId(t.id === selectedTaskId ? null : t.id)}
+            onClic={(t) =>
+              setSelectedTaskId(t.id === selectedTaskId ? null : t.id)
+            }
           />
         )}
       </div>

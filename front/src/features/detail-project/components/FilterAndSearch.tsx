@@ -1,7 +1,11 @@
 import { Plus, Search, X } from "lucide-react";
 import { Button, FilterSelector, Input } from "@/components";
 import type { UserSummary } from "@/lib/api/types";
-import { TASK_PRIORITY_OPTIONS, TASK_STATUS_OPTIONS } from "@/lib/constants/task";
+import { useAssignableUsers } from "@/hooks/use-users";
+import {
+  TASK_PRIORITY_OPTIONS,
+  TASK_STATUS_OPTIONS,
+} from "@/lib/constants/task";
 import { EMPTY_FILTERS, type TaskFilters } from "./types";
 
 interface FilterAndSearchProps {
@@ -9,7 +13,6 @@ interface FilterAndSearchProps {
   onFiltersChange: (filters: TaskFilters) => void;
   busqueda: string;
   onBusquedaChange: (v: string) => void;
-  miembros: UserSummary[];
   onNewTask: () => void;
 }
 
@@ -19,15 +22,21 @@ export function FilterAndSearch({
   onFiltersChange,
   busqueda,
   onBusquedaChange,
-  miembros,
   onNewTask,
 }: FilterAndSearchProps) {
-  const memberOptions = miembros.map((m) => ({ label: m.displayName, value: m.id }));
+  const { data: usuarios = [] } = useAssignableUsers();
+  const memberOptions = usuarios.map((u) => ({
+    label: u.displayName,
+    value: u.id,
+  }));
+
   const hayFiltros = Object.values(filters).some(Boolean) || busqueda !== "";
 
   // Cambia un solo filtro
-  const set = <K extends keyof TaskFilters>(key: K) => (value: TaskFilters[K]) =>
-    onFiltersChange({ ...filters, [key]: value });
+  const set =
+    <K extends keyof TaskFilters>(key: K) =>
+    (value: TaskFilters[K]) =>
+      onFiltersChange({ ...filters, [key]: value });
 
   return (
     <div className="flex w-full flex-wrap items-center gap-2">

@@ -1,15 +1,17 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowBigLeftDashIcon } from "lucide-react";
-
+import { ArrowLeft } from "lucide-react";
+import { cn } from "@/lib/utils";
 // Volver al listado de proyectos
 export function BackButton() {
   return (
     <Link
       to="/projects"
       aria-label="Volver a proyectos"
-      className="absolute top-3 left-17 p-1 rounded-full border z-50 hover:bg-muted"
+      className={cn(
+        "absolute left-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-lg bg-background/80 text-muted-foreground shadow-md backdrop-blur-sm transition-colors hover:bg-background/90 hover:text-foreground sm:left-6 sm:top-6"
+      )}
     >
-      <ArrowBigLeftDashIcon />
+      <ArrowLeft />
     </Link>
   );
 }

@@ -95,7 +95,7 @@ export function DataTable<TData extends RowData>({
             <ChevronLeft />
             Anterior
           </Button>
-          <span className="flex size-8 items-center justify-center rounded-md border border-primary/30 bg-primary/10 text-xs font-medium text-primary tabular-nums">
+          <span className="flex size-8 items-center justify-center rounded-md border text-xs font-medium text-foreground tabular-nums">
             {pageIndex + 1}
           </span>
           <Button

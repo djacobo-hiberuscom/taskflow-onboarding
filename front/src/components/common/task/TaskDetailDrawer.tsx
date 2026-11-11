@@ -9,14 +9,14 @@ import { FilterSelector } from "@/components/common/FilterSelector";
 import { ConfirmDeletePopUp } from "@/components/common/popup/Delete-Confirm";
 import { QueryState } from "@/components/common/QueryState";
 import { useAuth } from "@/hooks/use-auth";
-import { useProject } from "@/hooks/use-project";
 import {
   useChangeTaskAssignee,
   useChangeTaskStatus,
   useDeleteTask,
   useTask,
 } from "@/hooks/use-task";
-import type { ProjectDetail, Task } from "@/lib/api/types";
+import { useAssignableUsers } from "@/hooks/use-users";
+import type { Task } from "@/lib/api/types";
 import { TASK_STATUS_OPTIONS } from "@/lib/constants/task";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { notify } from "@/lib/notify";
@@ -31,7 +31,7 @@ export function TaskDetailDrawer({ taskId, onClose }: TaskDetailDrawerProps) {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const { data: task, isLoading, error } = useTask(taskId ?? undefined);
-  const { data: project } = useProject(task?.projectId);
+
   const deleteTask = useDeleteTask();
 
   const handleDelete = () => {
@@ -70,13 +70,17 @@ export function TaskDetailDrawer({ taskId, onClose }: TaskDetailDrawerProps) {
       />
       <DrawerContent>
         {task ? (
-          <TaskDetail task={task} project={project} />
+          <TaskDetail task={task} />
         ) : (
           <QueryState isLoading={isLoading} error={error} />
         )}
         <DrawerFooter>
           <div className="flex justify-end">
-            <Button variant="destructive" disabled={!task} onClick={() => setConfirmDelete(true)}>
+            <Button
+              variant="destructive"
+              disabled={!task}
+              onClick={() => setConfirmDelete(true)}
+            >
               Eliminar
             </Button>
           </div>
@@ -87,12 +91,13 @@ export function TaskDetailDrawer({ taskId, onClose }: TaskDetailDrawerProps) {
 }
 
 // Contenido del drawer
-function TaskDetail({ task, project }: { task: Task; project?: ProjectDetail }) {
+function TaskDetail({ task }: { task: Task }) {
   const { isAdmin } = useAuth();
   const changeStatus = useChangeTaskStatus();
   const changeAssignee = useChangeTaskAssignee();
+  const { data: usuarios = [] } = useAssignableUsers();
 
-  const memberOptions = (project?.members ?? []).map((m) => ({
+  const memberOptions = usuarios.map((m) => ({
     label: m.displayName,
     value: m.id,
   }));
@@ -106,7 +111,6 @@ function TaskDetail({ task, project }: { task: Task; project?: ProjectDetail }) 
 
       <div className="flex flex-col flex-1 p-2 gap-4">
         <h1 className="text-xl font-bold">{task.title}</h1>
-
         <div className="grid grid-cols-2 gap-2">
           <div className="min-w-0 flex flex-col gap-1">
             <span>Estado</span>
@@ -139,12 +143,10 @@ function TaskDetail({ task, project }: { task: Task; project?: ProjectDetail }) 
         </div>
 
         <Separator />
-
         <div>
           <h2 className="font-bold">Descripción</h2>
           <p>{task.description}</p>
         </div>
-
         <div>
           <DetailRow label="Prioridad">
             <TaskPriorityBadge priority={task.priority} />
@@ -152,14 +154,22 @@ function TaskDetail({ task, project }: { task: Task; project?: ProjectDetail }) 
           <DetailRow label="Vencimiento">{formatDate(task.dueDate)}</DetailRow>
           <DetailRow label="Proyecto">{task.projectName}</DetailRow>
           <DetailRow label="Creada">{formatDateTime(task.createdAt)}</DetailRow>
-          <DetailRow label="Último cambio">{formatDateTime(task.updatedAt)}</DetailRow>
+          <DetailRow label="Último cambio">
+            {formatDateTime(task.updatedAt)}
+          </DetailRow>
         </div>
       </div>
     </div>
   );
 }
 
-function DetailRow({ label, children }: { label: string; children: ReactNode }) {
+function DetailRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: ReactNode;
+}) {
   return (
     <div className="border-y p-5 flex">
       <h3 className="flex-1">{label}</h3>

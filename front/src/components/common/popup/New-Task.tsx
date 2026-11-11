@@ -8,8 +8,12 @@ import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/common/DatePicker";
 import { FilterSelector } from "@/components/common/FilterSelector";
 import { useCreateTask } from "@/hooks/use-task";
+import { useAssignableUsers } from "@/hooks/use-users";
 import type { ProjectDetail, TaskPriority, TaskStatus } from "@/lib/api/types";
-import { TASK_PRIORITY_OPTIONS, TASK_STATUS_OPTIONS } from "@/lib/constants/task";
+import {
+  TASK_PRIORITY_OPTIONS,
+  TASK_STATUS_OPTIONS,
+} from "@/lib/constants/task";
 import { notify } from "@/lib/notify";
 
 interface NewTaskPopupProps {
@@ -19,7 +23,11 @@ interface NewTaskPopupProps {
 }
 
 // Crear una tarea dentro de un proyecto
-export function NewTaskPopup({ isOpen, onOpenChange, proyecto }: NewTaskPopupProps) {
+export function NewTaskPopup({
+  isOpen,
+  onOpenChange,
+  proyecto,
+}: NewTaskPopupProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-3xl">
@@ -29,8 +37,13 @@ export function NewTaskPopup({ isOpen, onOpenChange, proyecto }: NewTaskPopupPro
   );
 }
 
-// El formulario se monta al abrir el diálogo -> el estado se resetea solo
-function NewTaskForm({ proyecto, onClose }: { proyecto: ProjectDetail; onClose: () => void }) {
+function NewTaskForm({
+  proyecto,
+  onClose,
+}: {
+  proyecto: ProjectDetail;
+  onClose: () => void;
+}) {
   const createTask = useCreateTask();
 
   const [nombre, setNombre] = useState("");
@@ -40,8 +53,14 @@ function NewTaskForm({ proyecto, onClose }: { proyecto: ProjectDetail; onClose: 
   const [prioridad, setPrioridad] = useState<TaskPriority | null>(null);
   const [fecha, setFecha] = useState<Date | undefined>(undefined);
 
-  const memberOptions = proyecto.members.map((u) => ({ label: u.displayName, value: u.id }));
-  const canSave = nombre.trim().length > 0 && prioridad !== null && !createTask.isPending;
+  const { data: usuarios = [] } = useAssignableUsers();
+  const memberOptions = usuarios.map((u) => ({
+    label: u.displayName,
+    value: u.id,
+  }));
+
+  const canSave =
+    nombre.trim().length > 0 && prioridad !== null && !createTask.isPending;
 
   const limpiar = () => {
     setNombre("");
@@ -79,7 +98,11 @@ function NewTaskForm({ proyecto, onClose }: { proyecto: ProjectDetail; onClose: 
       <h1 className="text-xl">Crear una nueva tarea</h1>
 
       <span>Nombre*</span>
-      <Input placeholder="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} />
+      <Input
+        placeholder="Nombre"
+        value={nombre}
+        onChange={(e) => setNombre(e.target.value)}
+      />
 
       <span>Descripción</span>
       <Input
@@ -116,14 +139,27 @@ function NewTaskForm({ proyecto, onClose }: { proyecto: ProjectDetail; onClose: 
             onChange={setPrioridad}
           />
         </div>
-        <DatePicker id="new-task-due-date" label="Vencimiento" value={fecha} onChange={setFecha} />
+        <DatePicker
+          id="new-task-due-date"
+          label="Vencimiento"
+          value={fecha}
+          onChange={setFecha}
+        />
       </div>
 
       <div className="flex gap-2 justify-end">
-        <Button variant="outline" className="text-destructive hover:text-destructive" onClick={limpiar}>
+        <Button
+          variant="outline"
+          className="text-destructive hover:text-destructive"
+          onClick={limpiar}
+        >
           <X />
         </Button>
-        <Button variant="outline" className="text-destructive hover:text-destructive" onClick={onClose}>
+        <Button
+          variant="outline"
+          className="text-destructive hover:text-destructive"
+          onClick={onClose}
+        >
           Cancelar
         </Button>
         <Button disabled={!canSave} onClick={handleSave}>
