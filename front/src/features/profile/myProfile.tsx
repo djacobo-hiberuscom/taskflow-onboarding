@@ -1,4 +1,4 @@
-import { DetallesMe, LastChanges, MeCard, StatsMe } from "./components";
+import { MeCard, StatsMe } from "./components";
 
 // FEAT: Mi perfil
 export function MyProfileFeat() {

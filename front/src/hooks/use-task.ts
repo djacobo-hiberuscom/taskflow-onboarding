@@ -20,12 +20,16 @@ export function useTasks(params: TaskListParams = {}) {
 }
 
 // Solo el total de tareas que cumplen unos filtros (pide 1 item)
-export function useTaskCount(params: Omit<TaskListParams, "page" | "pageSize"> = {}) {
+export function useTaskCount(
+  params: Omit<TaskListParams, "page" | "pageSize"> = {},
+  options: { enabled?: boolean } = {},
+) {
   const listParams = { ...params, page: 1, pageSize: 1 };
   return useQuery({
     queryKey: taskKeys.list(listParams),
     queryFn: () => tasksApi.list(listParams),
     select: (page) => page.totalCount,
+    ...options,
   });
 }
 

@@ -4,20 +4,19 @@ import { useAuth } from "@/hooks/use-auth";
 export function DetallesMe() {
   const { user, roles } = useAuth();
   const rows = [
-    { label: "Nombre completo", value: user?.name },
-    { label: "Correo electrónico", value: user?.email },
-    { label: "Rol", value: roles.join(", ") },
+    {label: "Nombre", value: user?.given_name},
+    {label: "Correo electronico", value: user?.email},
+    {label: "Role en la app", value: roles[0]}
   ];
 
   return (
-    <div className="bg-background p-5 flex flex-col gap-3 border rounded-xl">
-      <h1>Detalles</h1>
+    <dl className="mx-8 mb-4 divide-y border-t">
       {rows.map(({ label, value }) => (
-        <div key={label} className="flex gap-2">
-          <h2 className="flex flex-1">{label}</h2>
-          <span>{value ?? "—"}</span>
+        <div key={label} className="grid grid-cols-[180px_1fr] gap-4 py-3 text-sm">
+          <dt className="text-muted-foreground">{label}</dt>
+          <dd className="font-medium">{(value as string) || "—"}</dd>
         </div>
       ))}
-    </div>
+    </dl>
   );
 }
