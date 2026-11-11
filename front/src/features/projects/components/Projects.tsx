@@ -10,16 +10,13 @@ interface ProjectsProps {
   onDelete: (p: Project) => void;
 }
 
-// Grid de tarjetas de proyecto
+// Grid de tarjetas de proyecto (el empty state lo decide el padre)
 export function Projects({ projects, onEdit, onArchive, onDelete }: ProjectsProps) {
   const { isAdmin } = useAuth();
   const nav = useNavigate();
 
-  if (projects.length === 0)
-    return <p className="p-10 text-center text-muted-foreground">Todavía no hay proyectos</p>;
-
   return (
-    <div className="flex flex-wrap gap-5 content-start">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {projects.map((p) => (
         <ProjectCard
           key={p.id}

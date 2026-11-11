@@ -1,7 +1,7 @@
 import { LoaderCircle, TriangleAlert } from "lucide-react";
 import { ApiError } from "@/lib/api/client";
 
-// Spinner de carga
+// espiner de carga
 export function Loading({ label = "Cargando..." }: { label?: string }) {
   return (
     <div className="flex flex-1 items-center justify-center gap-2 p-10 text-muted-foreground">
@@ -29,7 +29,7 @@ export function ErrorMessage({ error }: { error: unknown }) {
   );
 }
 
-// Uso: if (isLoading || error) return <QueryState isLoading={isLoading} error={error} />
+//  if (isLoading || error) return <QueryState isLoading={isLoading} error={error} />
 export function QueryState({ isLoading, error }: { isLoading: boolean; error: unknown }) {
   if (isLoading) return <Loading />;
   return <ErrorMessage error={error} />;

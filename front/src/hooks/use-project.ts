@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData,useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { projectsApi } from "@/lib/api/endpoints";
 import type { ProjectInput, ProjectListParams } from "@/lib/api/types";
 import { projectKeys } from "@/lib/query-keys";
@@ -8,14 +8,16 @@ import { projectKeys } from "@/lib/query-keys";
 // GET /projects
 export function useProjects(
   params: ProjectListParams = {},
-  options: { enabled?: boolean } = {},
+  options: { enabled?: boolean; keepPrevious?: boolean } = {},
 ) {
   const { archived = false, page = 1, pageSize = 20 } = params;
   const normalized = { archived, page, pageSize };
   return useQuery({
     queryKey: projectKeys.list(normalized),
     queryFn: () => projectsApi.list(normalized),
-    ...options,
+    enabled: options.enabled,
+    // Mantiene la página anterior visible mientras carga la siguiente
+    placeholderData: options.keepPrevious ? keepPreviousData : undefined,
   });
 }
 
