@@ -12,7 +12,7 @@ interface RowTableTaskProps {
 export function RowTableTask({ tarea, onClick }: RowTableTaskProps) {
   return (
     <div
-      className={`${TASK_GRID} w-full bg-background p-4 border-b hover:brightness-95 cursor-pointer`}
+      className={`${TASK_GRID} w-full bg-card p-4 border-b hover:brightness-95 cursor-pointer`}
       onClick={onClick}
     >
       <span className="truncate">{tarea.title}</span>

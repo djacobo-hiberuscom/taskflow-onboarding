@@ -70,8 +70,8 @@ export function TaskFeat() {
         buscador={buscador}
         onBuscadorChange={setBuscador}
       />
-
-      <div>
+  
+      <div >
         <HeaderTableTask />
         {tareas.length === 0 ? (
           <p className="p-6 text-center text-muted-foreground bg-background">
