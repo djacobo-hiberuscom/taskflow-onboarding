@@ -1,110 +1,77 @@
-// componentes
-import { Button, Input } from "@/components/index.comp";
-import { FilterSeletor } from "./index.comp";
-// ICON
 import { X } from "lucide-react";
+import { Button, FilterSelector, Input } from "@/components/index.comp";
+import { useAssignableUsers } from "@/hooks/use-users";
+import type { Project } from "@/lib/api/types";
+import { TASK_PRIORITY_OPTIONS, TASK_STATUS_OPTIONS } from "@/lib/constants/task";
+import { EMPTY_FILTERS, type TaskFilters } from "./types";
 
-//
-import USUARIOS from "@/assets/tempdata/users.json";
-import type { TaskStatus, TaskPriority, Project } from "#lib/api/types";
-
-interface filterParams {
-  isAdmin?: boolean | null;
-  itemProject: Project[]
-  projectFilter: string | null;
-  setProjectFilter: (value: string | null) => void;
-  statusFilter: string | null;
-  setStatusFilter: (value: TaskStatus | null) => void;
-  priorityFilter: string | null;
-  setPrirorityFilter: (value: TaskPriority | null) => void;
-  memberFilter: string | null;
-  setMemberFilter: (value: string | null) => void;
+interface FiltersTaskProps {
+  proyectos: Project[];
+  filters: TaskFilters;
+  onFiltersChange: (filters: TaskFilters) => void;
   buscador: string;
-  setbuscador: (value: string) => void;
-  quitarFiltros: () => void;
-  setPage: (value: number) => void;
+  onBuscadorChange: (value: string) => void;
 }
-export function FiltersTask({
-  itemProject,
-  projectFilter,
-  setProjectFilter,
-  statusFilter,
-  setStatusFilter,
-  priorityFilter,
-  setPrirorityFilter,
-  memberFilter,
-  setMemberFilter,
-  buscador,
-  setbuscador,
-  quitarFiltros,
-  setPage,
-}: filterParams) {
-  // Filters
-  const project_filter = itemProject.map((p) => ({
-    // PROYECTOS
-    label: p.name,
-    value: p.id,
-  }));
-  const status_filter = [
-    // ESTADO
-    { label: "Hecho", value: "Done" },
-    { label: "Sin hacer", value: "ToDo" },
-    { label: "En proceso", value: "InProgress" },
-  ];
-  const priority_filter = [
-    // PRIORIDAD
-    { label: "Alta", value: "High" },
-    { label: "Madia", value: "Medium" },
-    { label: "Baja", value: "Low" },
-  ];
-  const usuarios_filter = USUARIOS.map((u) => ({
-    // USUARIOS
-    label: u.display_name,
-    value: u.id,
-  }));
 
-  // Componente
+// Filtros + buscador
+export function FiltersTask({
+  proyectos,
+  filters,
+  onFiltersChange,
+  buscador,
+  onBuscadorChange,
+}: FiltersTaskProps) {
+  const { data: usuarios = [] } = useAssignableUsers();
+
+  const projectOptions = proyectos.map((p) => ({ label: p.name, value: p.id }));
+  const memberOptions = [
+    { label: "Sin asignar", value: "unassigned" },
+    ...usuarios.map((u) => ({ label: u.displayName, value: u.id })),
+  ];
+
+  // Cambia un solo filtro
+  const set = <K extends keyof TaskFilters>(key: K) => (value: TaskFilters[K]) =>
+    onFiltersChange({ ...filters, [key]: value });
 
   return (
-    <div id="Filtros" className="flex gap-2">
-      <FilterSeletor
-        disabled={false}
-        items={project_filter}
+    <div className="flex gap-2">
+      <FilterSelector
+        items={projectOptions}
         placeholder="Proyectos"
-        value={projectFilter}
-        onChange={setProjectFilter}
+        value={filters.project}
+        onChange={set("project")}
       />
-      <FilterSeletor
-        disabled={false}
-        items={status_filter}
+      <FilterSelector
+        items={TASK_STATUS_OPTIONS}
         placeholder="Estados"
-        value={statusFilter}
-        onChange={setStatusFilter.toString}
+        value={filters.status}
+        onChange={set("status")}
       />
-      <FilterSeletor
-        disabled={false}
-        items={priority_filter}
+      <FilterSelector
+        items={TASK_PRIORITY_OPTIONS}
         placeholder="Prioridad"
-        value={priorityFilter}
-        onChange={setPrirorityFilter.toString}
+        value={filters.priority}
+        onChange={set("priority")}
       />
-      <FilterSeletor
-        disabled={false}
-        items={usuarios_filter}
+      <FilterSelector
+        items={memberOptions}
         placeholder="Miembros"
-        value={memberFilter}
-        onChange={setMemberFilter}
+        value={filters.member}
+        onChange={set("member")}
       />
-      <Button onClick={quitarFiltros} variant="outline">
+      <Button
+        variant="outline"
+        onClick={() => {
+          onFiltersChange(EMPTY_FILTERS);
+          onBuscadorChange("");
+        }}
+      >
         <X />
         Quitar filtros
       </Button>
       <Input
         value={buscador}
-        onChange={(e) => {
-          setbuscador(e.target.value);
-          setPage(1);
-        }}
+        onChange={(e) => onBuscadorChange(e.target.value)}
         placeholder="Buscar por nombre"
       />
     </div>

@@ -1,47 +1,40 @@
-// Popups
-import type { Project } from "#lib/api/types";
 import {
   ArchiveConfirmPopUp,
   ArchivedPopUp,
-  DeleteConfirmPopUp,
+  DeleteProjectPopUp,
   EditProjectPopUp,
   NewProjectPopup,
-} from "@/components/common/popup";
+} from "@/components/index.comp";
+import type { Project } from "@/lib/api/types";
+import type { ProjectsPopup } from "./types";
 
-// hooks
-import { useNavigate } from "@tanstack/react-router";
-
-// Parameters
-interface params {
-  popup: string | null;
-  close: (open: boolean) => void;
-  proyecto: Project | undefined;
+interface PopupContainerProps {
+  popup: ProjectsPopup | null;
+  proyecto?: Project;
+  close: () => void;
 }
-// contenedor
-export function PopupContainer({ popup, close, proyecto }: params) {
-    const nav = useNavigate()
+
+// Todos los popups de la feat de proyectos
+export function PopupContainer({ popup, proyecto, close }: PopupContainerProps) {
+  const onOpenChange = (open: boolean) => {
+    if (!open) close();
+  };
 
   return (
-    <div>
-      <ArchivedPopUp isOpen={popup === "Archive"} onOpenChange={close} />
-      <NewProjectPopup isOpen={popup === "New"} onOpenChange={close} />
-
-      <DeleteConfirmPopUp
-        isOpen={popup === "Delete"}
-        proyecto={proyecto}
-        onOpenChange={close}
-      />
+    <>
+      <NewProjectPopup isOpen={popup === "new"} onOpenChange={onOpenChange} />
+      <ArchivedPopUp isOpen={popup === "archived-list"} onOpenChange={onOpenChange} />
+      <EditProjectPopUp isOpen={popup === "edit"} onOpenChange={onOpenChange} proyecto={proyecto} />
       <ArchiveConfirmPopUp
-        isOpen={popup === "ArchiveConfirm"}
-        proyecto={proyecto}
-        onOpenChange={close}
-        onArchived={() => nav({ to: "/projects", replace: true })}
-      />
-      <EditProjectPopUp
-        isOpen={popup === "Edit"}
-        onOpenChange={close}
+        isOpen={popup === "archive"}
+        onOpenChange={onOpenChange}
         proyecto={proyecto}
       />
-    </div>
+      <DeleteProjectPopUp
+        isOpen={popup === "delete"}
+        onOpenChange={onOpenChange}
+        proyecto={proyecto}
+      />
+    </>
   );
 }

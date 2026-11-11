@@ -1,6 +1,7 @@
-import { type UserSummary } from "../types";
+import type { PageParams } from "./common";
+import type { UserSummary } from "./user";
 
-// PROYECTOS
+// GET /api/v1/projects (el listado NO incluye miembros)
 export interface Project {
   id: string;
   name: string;
@@ -9,24 +10,20 @@ export interface Project {
   archivedAt: string | null;
   createdAt: string;
   updatedAt: string;
-  members: UserSummary[]
 }
 
-// Projct details
+// GET /api/v1/projects/{id}
 export interface ProjectDetail extends Project {
-    members: UserSummary[]
+  members: UserSummary[];
 }
 
-// PAGE
-export interface Page<T> {
-    items: T[],
-    page: number,
-    pageSize: number
-    totalCount:number
-}
-
-// PRoject input
+// POST / PUT
 export interface ProjectInput {
-    name:string,
-    description?: string | null
+  name: string;
+  description?: string | null;
+}
+
+// Filtros del listado
+export interface ProjectListParams extends PageParams {
+  archived?: boolean;
 }

@@ -1,29 +1,86 @@
-import { rootRoute } from "./router";
-import { createRoute, redirect } from "@tanstack/react-router";
+import { createRootRoute, createRoute, Outlet, redirect } from "@tanstack/react-router";
 
 import { keycloak } from "@/lib/auth/keycloak";
+
+// Layouts
 import {
-  LoginLayout,
-  RegisterLayout,
+  AppLayout,
   CallbackLayout,
   Forbidden,
+  LoginLayout,
   NotFound,
-  TimeOut
+  RegisterLayout,
+  TimeOut,
 } from "@/app/layouts";
 
-// Layout
-import { AppLayout } from "@/app/layouts";
-
-// FEATURES
+// Features
 import {
   DashboardFeat,
-  ProjectFeeat,
-  TaskFeat,
+  DetailProjectFeat,
   MyProfileFeat,
-  DetailProject,
+  ProjectsFeat,
+  TaskFeat,
 } from "@/features";
 
-// LAYOUT
+// =====================================================
+// ROOT
+// =====================================================
+export const rootRoute = createRootRoute({
+  component: Outlet,
+});
+
+// =====================================================
+// PÚBLICAS (sin sesión)
+// =====================================================
+export const LoginRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/login",
+  component: LoginLayout,
+});
+
+export const RegisterRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/register",
+  component: RegisterLayout,
+});
+
+// Vuelta de Keycloak: si hay sesión, redirige a donde estaba el usuario
+export const CallbackRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/callback",
+  beforeLoad: () => {
+    if (!keycloak.authenticated) return;
+    const href = sessionStorage.getItem("returnTo") ?? "/";
+    sessionStorage.removeItem("returnTo");
+    throw redirect({ href, replace: true });
+  },
+  component: CallbackLayout,
+});
+
+// =====================================================
+// ERRORES
+// =====================================================
+export const ForbiddenRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/403",
+  component: Forbidden,
+});
+
+export const NotFoundRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/404",
+  component: NotFound,
+});
+
+export const TimeOutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/timeout",
+  component: TimeOut,
+});
+
+// =====================================================
+// APP (layout con sidebar, requiere sesión)
+// =====================================================
 export const AppLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: "app",
@@ -35,89 +92,33 @@ export const AppLayoutRoute = createRoute({
   component: AppLayout,
 });
 
-// LOGIN
-export const LoginRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/login",
-
-  component: LoginLayout,
-});
-// ---------
-// REGISTER
-export const RegisterRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/register",
-  component: RegisterLayout,
-});
-// ---------
-// CallbackRoute
-export const CallbackRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "callback",
-  beforeLoad: () => {
-    if (!keycloak.authenticated) return;
-    const href = sessionStorage.getItem("returnTo") ?? "/";
-    sessionStorage.removeItem("returnTo");
-    throw redirect({ href, replace: true });
-  },
-  component: CallbackLayout ,
-});
-// ---------
-// Feats
-// DASHBOARD
+// ---------- FEATS (se pintan dentro del <Outlet /> del AppLayout) ----------
 export const DashBoardRoute = createRoute({
   getParentRoute: () => AppLayoutRoute,
   path: "/",
   component: DashboardFeat,
 });
-// -------
-// PROJECT
+
 export const ProjectsRoute = createRoute({
   getParentRoute: () => AppLayoutRoute,
   path: "/projects",
-  component: ProjectFeeat,
+  component: ProjectsFeat,
 });
-// -------
-// DETAIL PROJECT
+
 export const DetailProjectRoute = createRoute({
   getParentRoute: () => AppLayoutRoute,
   path: "/projects/$id",
-  component: DetailProject,
+  component: DetailProjectFeat,
 });
-// -------
-// TASK
+
 export const TasksRoute = createRoute({
   getParentRoute: () => AppLayoutRoute,
   path: "/tasks",
   component: TaskFeat,
 });
-// --------
-// PROFILE
+
 export const ProfileRoute = createRoute({
   getParentRoute: () => AppLayoutRoute,
   path: "/me",
   component: MyProfileFeat,
 });
-// ---------
-// ERROR STATUS
-//403
-export const ForbiddenRoute = createRoute ({
-  getParentRoute: () => rootRoute,
-  path: "/403",
-  component: Forbidden
-})
-// -----
-// 404
-export const NotFoundRoute = createRoute ({
-  getParentRoute: () => rootRoute,
-  path: "/404",
-  component: NotFound
-})
-// -------
-// TIMEOUT
-export const TimeOutRoute = createRoute ({
-  getParentRoute: () => rootRoute,
-  path: "/timeout",
-  component: TimeOut
-})
-// -------

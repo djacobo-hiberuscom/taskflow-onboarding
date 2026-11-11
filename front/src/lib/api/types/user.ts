@@ -1,14 +1,13 @@
-// User sumary
+// Resumen de usuario que devuelve el back (miembros, asignados, creador...)
 export interface UserSummary {
   id: string;
   displayName: string;
 }
 
-// USER
-export interface User {
+// GET /api/v1/me
+export interface CurrentUser {
   id: string;
-  keycloak_sub: string;
-  display_name: string;
-  email: string;
-  created_at: Date;
+  displayName: string;
+  email: string | null;
+  roles: string[];
 }

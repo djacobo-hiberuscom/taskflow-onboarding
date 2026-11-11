@@ -1,24 +1,11 @@
-// COMPOENENTES
+import { DetallesMe, LastChanges, MeCard, StatsMe } from "./components";
 
-import { DetallesMe, MeCard, StatsMe } from "./components/index";
-// Keycloak
-import { keycloak } from "@/lib/auth/keycloak";
-import { LastChanges } from "./components/LastChanges";
-
-// Compoenente
+// FEAT: Mi perfil
 export function MyProfileFeat() {
-  // USUAIRO LOGEADO
-  const usuario = keycloak.tokenParsed;
   return (
-    <div className="grid grid-cols-3 gap-3 p-5">
-      
-      <MeCard usuario={usuario}/>
-
-      <div className="flex flex-col gap-4">
-        <DetallesMe usuario={usuario}/>
-        <StatsMe />
-      </div>
-      <LastChanges />
+    <div className="flex flex-col gap-5 p-5">
+      <MeCard />
+      <StatsMe />
     </div>
   );
 }

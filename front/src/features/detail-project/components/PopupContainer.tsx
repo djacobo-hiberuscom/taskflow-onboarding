@@ -1,85 +1,47 @@
-// popups
-import { useDeleteProject } from "#hooks/use-project";
-import {
-  EditProjectPopUp,
-  ArchiveConfirmPopUp,
-  DeleteConfirmPopUp,
-  NewTaskPopup,
-} from "@/components/common/popup";
-
-// COMponents
-import {toast} from "@/components/index.comp"
-
-// Types
-import type { Project } from "@/lib/api/types";
-
-// NAV
 import { useNavigate } from "@tanstack/react-router";
+import {
+  ArchiveConfirmPopUp,
+  DeleteProjectPopUp,
+  EditProjectPopUp,
+  NewTaskPopup,
+} from "@/components/index.comp";
+import type { ProjectDetail } from "@/lib/api/types";
+import type { DetailProjectPopup } from "./types";
 
-interface params {
-  proyecto: Project;
-  popup: string | null;
+interface PopupContainerProps {
+  proyecto: ProjectDetail;
+  popup: DetailProjectPopup | null;
   close: () => void;
 }
 
-// Contenedors
-export function PopupContainer({ proyecto, popup, close }: params) {
+// Todos los popups del detalle de proyecto
+export function PopupContainer({ proyecto, popup, close }: PopupContainerProps) {
   const nav = useNavigate();
-  // DELETE
-  const deleteProject = useDeleteProject();
-
-  const handleClicDeleteProject = () => {
-    if (!proyecto) return;
-    deleteProject.mutate(proyecto.id, {
-      onSuccess: () => {
-        close()
-        nav({ to: "/projects", replace: true });
-        openToast("Se ha borrado el proyecto correctamente", "success")
-      },
-      onError: () => {
-        close()
-        openToast("Error al borrar el proyecto", "error")
-      }
-    });
+  const backToProjects = () => nav({ to: "/projects", replace: true });
+  const onOpenChange = (open: boolean) => {
+    if (!open) close();
   };
 
-
-
   return (
-    <div>
-      <EditProjectPopUp
-        isOpen={popup === "Edit"}
-        onOpenChange={close}
-        proyecto={proyecto}
-      />
-
+    <>
+      <EditProjectPopUp isOpen={popup === "edit"} onOpenChange={onOpenChange} proyecto={proyecto} />
       <ArchiveConfirmPopUp
-        isOpen={popup === "Archive"}
+        isOpen={popup === "archive"}
+        onOpenChange={onOpenChange}
         proyecto={proyecto}
-        onOpenChange={close}
-        onArchived={() => nav({ to: "/projects", replace: true })}
+        onArchived={backToProjects}
       />
-      <DeleteConfirmPopUp
-        onClic={handleClicDeleteProject}
-        isOpen={popup === "Delete"}
+      <DeleteProjectPopUp
+        isOpen={popup === "delete"}
+        onOpenChange={onOpenChange}
         proyecto={proyecto}
-        onOpenChange={close}
+        onDeleted={backToProjects}
       />
       <NewTaskPopup
+        isOpen={popup === "create-task"}
+        onOpenChange={onOpenChange}
         proyecto={proyecto}
-        isOpen={popup === "Create"}
-        onClose={close}
-        onOpenChange={close}
       />
-    </div>
+    </>
   );
 }
-
-
-// Abrir un toast
-const openToast = (message: string, type: string) => {
-  toast.add({
-    type: type,
-    description: message,
-  });
-};

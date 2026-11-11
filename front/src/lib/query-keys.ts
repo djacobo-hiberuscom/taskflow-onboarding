@@ -1,16 +1,23 @@
-import type { TaskListParams } from "./api/types";
+import type { ProjectListParams, TaskListParams } from "./api/types";
 
-// projects
+// Claves de caché de TanStack Query.
+// Invalidar `xxxKeys.all` refresca listados y detalles a la vez.
+
 export const projectKeys = {
-    all: ["project"] as const,
-    list: (p: {archived: boolean; page: number; pageSize: number}) => ["project", p] as const,
-    detail: (id:string) => ["project", id] as const
-}
+  all: ["projects"] as const,
+  list: (params: ProjectListParams) =>
+    [...projectKeys.all, "list", params] as const,
+  detail: (id: string) => [...projectKeys.all, "detail", id] as const,
+};
 
-// Task
 export const taskKeys = {
-    all: ["task"] as const,
-    list: (params: TaskListParams) => ["task", "list", params] as const,
-    detail: (id:string) => ["task", id] as const
-}
+  all: ["tasks"] as const,
+  list: (params: TaskListParams) => [...taskKeys.all, "list", params] as const,
+  detail: (id: string) => [...taskKeys.all, "detail", id] as const,
+};
 
+export const userKeys = {
+  all: ["users"] as const,
+  me: () => [...userKeys.all, "me"] as const,
+  assignable: () => [...userKeys.all, "assignable"] as const,
+};

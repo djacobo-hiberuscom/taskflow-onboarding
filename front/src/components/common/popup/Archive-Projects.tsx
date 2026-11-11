@@ -1,4 +1,9 @@
-// COMPONENTES
+import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { Archive, ArrowRight, RefreshCw, Trash } from "lucide-react";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -6,186 +11,126 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  Button,
-  Badge,
-  toast,
-} from "@/components/index.comp";
-// ICONOS
-import { Archive, Trash, RefreshCw, ArrowRight } from "lucide-react";
+} from "@/components/ui/dialog";
+import { Pagination } from "@/components/common/Pagination";
+import { QueryState } from "@/components/common/QueryState";
+import { useProject, useProjects, useRestoreProject } from "@/hooks/use-project";
+import { useTaskCount } from "@/hooks/use-task";
+import type { Project } from "@/lib/api/types";
+import { formatDate } from "@/lib/format";
+import { notify } from "@/lib/notify";
+import { DeleteProjectPopUp } from "./Delete-Project";
 
-// PROYECTOS
-import type { Project } from "#lib/api/types";
-import { ApiError } from "@/lib/api/client";
-import { NotFound } from "@/app/layouts/index";
+const PAGE_SIZE = 5;
 
-// TAREAS
-import TAREAS from "@/assets/tempdata/tasks.json";
-
-// HOOKS
-
-import { getUsernameByProjectId } from "@/tools/getUsername";
-import { useState } from "react";
-import { useProjects, useRestoreProject } from "#hooks/use-project";
-import { DeleteConfirmPopUp } from "./Delete-Confirm";
-import { useNavigate } from "@tanstack/react-router";
-
-const openSuccessToast = () => {
-  toast.add({
-    type: "success",
-    description: "Proyecto restaurado correctamente",
-  });
-};
-const openErrorToast = () => {
-  toast.add({
-    type: "error",
-    description: "Error al restaurar el proyecto",
-  });
-};
-
-interface parameters {
+interface ArchivedPopUpProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function ArchivedPopUp({ isOpen, onOpenChange }: parameters) {
-  const { data, isLoading, error } = useProjects({ archived: true });
-  const useRestore = useRestoreProject();
-  const [page, setPage] = useState(1);
+// Listado de proyectos archivados (solo admin)
+export function ArchivedPopUp({ isOpen, onOpenChange }: ArchivedPopUpProps) {
   const nav = useNavigate();
+  const [page, setPage] = useState(1);
   const [toDelete, setToDelete] = useState<Project | null>(null);
 
-  const PAGE_SIZE = 5;
+  const { data, isLoading, error } = useProjects(
+    { archived: true, page, pageSize: PAGE_SIZE },
+    { enabled: isOpen },
+  );
+  const restoreProject = useRestoreProject();
 
-  const visibles = data?.items.filter((p) => p.archivedAt !== null) ?? [];
+  const totalPages = Math.ceil((data?.totalCount ?? 0) / PAGE_SIZE);
 
-  if (isLoading) return <h1>Cargando...</h1>;
-  if (error instanceof ApiError && error.status === 404) return <NotFound />;
-  if (error) return <h1>{error.message}</h1>;
-
-  const totalPage = Math.ceil(visibles.length / PAGE_SIZE);
-
-  const handleClicRestore = (proeycto: Project) => {
-    useRestore.mutate(proeycto.id, {
-      onSuccess: () => {
-        onOpenChange(false);
-        openSuccessToast();
-      },
-      onError: () => {
-        onOpenChange(false);
-        openErrorToast();
-      },
+  const handleRestore = (proyecto: Project) => {
+    restoreProject.mutate(proyecto.id, {
+      onSuccess: () => notify.success("Proyecto restaurado correctamente"),
+      onError: () => notify.error("Error al restaurar el proyecto"),
     });
   };
 
-  const handleClicOpen = (proyeto: Project) => {
+  const handleOpen = (proyecto: Project) => {
     onOpenChange(false);
-    nav({ to: "/projects/$id", params: { id: proyeto.id } });
+    nav({ to: "/projects/$id", params: { id: proyecto.id } });
   };
 
   return (
-    <div>
-      <DeleteConfirmPopUp
+    <>
+      <DeleteProjectPopUp
+        isOpen={toDelete !== null}
+        proyecto={toDelete ?? undefined}
         onOpenChange={(open) => {
           if (!open) setToDelete(null);
         }}
-        isOpen={toDelete !== null}
-        proyecto={toDelete ?? undefined}
       />
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-6xl max-h-[90vh] flex flex-col p-4 gap-3">
           <DialogHeader>
-            <DialogTitle className="text-2xl"> Archivados</DialogTitle>
+            <DialogTitle className="text-2xl">Archivados</DialogTitle>
             <DialogDescription>Proyectos archivados</DialogDescription>
           </DialogHeader>
+
           <div className="flex-1 overflow-y-auto">
-            {visibles
-              .slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
-              .map((pa) => {
-                return (
-                  <ArchivedRow
-                    proyecto={pa}
-                    onDeleteProject={() => {
-                      setToDelete(pa);
-                      onOpenChange(false)
-                    }}
-                    onOpenProject={() => {
-                      handleClicOpen(pa);
-                    }}
-                    onRestoreProject={() => {
-                      handleClicRestore(pa);
-                    }}
-                  />
-                );
-              })}
+            {isLoading || error ? (
+              <QueryState isLoading={isLoading} error={error} />
+            ) : data?.items.length ? (
+              data.items.map((p) => (
+                <ArchivedRow
+                  key={p.id}
+                  proyecto={p}
+                  onOpen={() => handleOpen(p)}
+                  onRestore={() => handleRestore(p)}
+                  onDelete={() => setToDelete(p)}
+                />
+              ))
+            ) : (
+              <p className="p-6 text-center text-muted-foreground">No hay proyectos archivados</p>
+            )}
           </div>
 
           <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (page - 1 > 0) setPage(page - 1);
-              }}
-            >
-              Anterior
-            </Button>
-            <h1 className="text-2xl">
-              {page}/{totalPage}
-            </h1>
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (page + 1 <= totalPage) setPage(page + 1);
-              }}
-            >
-              Siguiente
-            </Button>
+            <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
 
-// COMPONENTES DEL POPUP
-interface recyclerParam {
+// Fila de un proyecto archivado
+interface ArchivedRowProps {
   proyecto: Project;
-  onOpenProject: () => void;
-  onRestoreProject: () => void;
-  onDeleteProject: () => void;
+  onOpen: () => void;
+  onRestore: () => void;
+  onDelete: () => void;
 }
-function ArchivedRow({
-  proyecto,
-  onOpenProject,
-  onRestoreProject,
-  onDeleteProject,
-}: recyclerParam) {
-  const nTareas = TAREAS.filter((t) => t.project_id === proyecto.id).length;
+function ArchivedRow({ proyecto, onOpen, onRestore, onDelete }: ArchivedRowProps) {
+  const { data: detail } = useProject(proyecto.id);
+  const { data: nTareas = 0 } = useTaskCount({ projectId: proyecto.id });
+  const nMiembros = detail?.members.length ?? 0;
+
   return (
-    <div className="border-t border-b flex justify-between items-center gap-4 p-6">
+    <div className="border-y flex justify-between items-center gap-4 p-6">
       <div className="flex-1">
         <h1 className="text-xl">{proyecto.name}</h1>
         <div className="flex gap-4">
-          <span>{getUsernameByProjectId(proyecto.id).length} miembros</span>
+          <span>{nMiembros} miembros</span>
           <span>{nTareas} tareas</span>
         </div>
       </div>
 
       <Badge className="p-4 text-2xs bg-[#DCFCE7] text-[#166534]">
-        <Archive /> Archivado {proyecto.archivedAt}
+        <Archive /> Archivado {formatDate(proyecto.archivedAt)}
       </Badge>
 
       <div className="flex gap-1">
-        <Button variant="outline" onClick={onOpenProject}>
+        <Button variant="outline" onClick={onOpen}>
           <ArrowRight /> Abrir
         </Button>
-        <Button variant="outline" onClick={onRestoreProject}>
+        <Button variant="outline" onClick={onRestore}>
           <RefreshCw /> Restaurar
         </Button>
-        <Button
-          variant="outline"
-          className="text-red-500"
-          onClick={onDeleteProject}
-        >
+        <Button variant="outline" className="text-red-500" onClick={onDelete}>
           <Trash /> Eliminar
         </Button>
       </div>

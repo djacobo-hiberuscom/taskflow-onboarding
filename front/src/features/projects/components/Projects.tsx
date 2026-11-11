@@ -1,47 +1,36 @@
-// types
-import type { Project } from "#lib/api/types";
-// hooks
 import { useNavigate } from "@tanstack/react-router";
-// Compoenentes
-import { ProjectCard } from "./index";
+import { useAuth } from "@/hooks/use-auth";
+import type { Project } from "@/lib/api/types";
+import { ProjectCard } from "./Project-Card";
 
-// keycloak
-import { keycloak } from "@/lib/auth/keycloak";
-// Parametros
-interface params {
+interface ProjectsProps {
   projects: Project[];
   onEdit: (p: Project) => void;
   onArchive: (p: Project) => void;
   onDelete: (p: Project) => void;
 }
 
-// Component
-export function Projects({ projects, onEdit, onArchive, onDelete }: params) {
-  const isAdmin = keycloak.hasRealmRole("Admin")
+// Grid de tarjetas de proyecto
+export function Projects({ projects, onEdit, onArchive, onDelete }: ProjectsProps) {
+  const { isAdmin } = useAuth();
   const nav = useNavigate();
-  const openProject = (p: Project) => {
-    nav({ to: "/projects/$id", params: { id: p.id } })
-  }
+
+  if (projects.length === 0)
+    return <p className="p-10 text-center text-muted-foreground">Todavía no hay proyectos</p>;
+
   return (
     <div className="flex flex-wrap gap-5 content-start">
-      {projects
-        ?.filter((p) => p.archivedAt === null)
-        .map((p) => (
-          <ProjectCard
-            key={p.id}
-            isAdmin={isAdmin}
-            proyecto={p}
-            title={p.name}
-            description={p.description}
-            miembros={1}
-            tareasAbiertas={5}
-            favourite={false}
-            onOpen={openProject}
-            onDelete={onDelete}
-            onArchive={onArchive}
-            onEdit={onEdit}
-          />
-        ))}
+      {projects.map((p) => (
+        <ProjectCard
+          key={p.id}
+          proyecto={p}
+          isAdmin={isAdmin}
+          onOpen={() => nav({ to: "/projects/$id", params: { id: p.id } })}
+          onEdit={onEdit}
+          onArchive={onArchive}
+          onDelete={onDelete}
+        />
+      ))}
     </div>
   );
 }

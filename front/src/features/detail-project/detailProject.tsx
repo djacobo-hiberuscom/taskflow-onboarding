@@ -1,134 +1,77 @@
-// router
-import { useNavigate, useParams } from "@tanstack/react-router";
-
-// HOOKS
 import { useState } from "react";
+import { useParams } from "@tanstack/react-router";
+import { DataTable, QueryState, TaskDetailDrawer } from "@/components/index.comp";
 import { useProject } from "@/hooks/use-project";
-
-// COMPONENTES
-import { DataTable } from "@/components/index.comp";
+import { useTasks } from "@/hooks/use-task";
 import {
-  TaskColum,
   BackButton,
-  DeailTaskDrawer,
-  PopupContainer,
+  EMPTY_FILTERS,
+  FilterAndSearch,
   Header,
-} from "./components/index";
+  PopupContainer,
+  TaskColum,
+  type DetailProjectPopup,
+  type TaskFilters,
+} from "./components";
 
-// TYPES
-import type { TaskStatus, TaskPriority } from "#lib/api/types";
+// Máximo permitido por el back; la DataTable pagina y ordena en cliente
+const MAX_PAGE_SIZE = 100;
 
-// CONST
-import { ApiError } from "#lib/api/client";
-import { NotFound } from "@/app/layouts/index";
-import { FilterAndSearch } from "./components/FilterAndSearch";
-import { useTask, useTasks } from "#hooks/use-task";
+// FEAT: Detalle de proyecto
+export function DetailProjectFeat() {
+  const { id } = useParams({ from: "/app/projects/$id" });
 
-// COMPONENTE
-export function DetailProject() {
-  // CONST
-  const nav = useNavigate();
-  // PAGE
-  const PAGE_SIZE = 10;
-  const [page, setPage] = useState(1);
-  //
-  const { id } = useParams({ from: "/app/projects/$id" }); // ID del proyecto actual
-  const { data, isLoading, error } = useProject(id);
-
+  const [popup, setPopup] = useState<DetailProjectPopup | null>(null);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [filters, setFilters] = useState<TaskFilters>(EMPTY_FILTERS);
   const [busqueda, setBusqueda] = useState("");
-  const [status, setStatus] = useState<TaskStatus | null>(null);
-  const [priority, setPriority] = useState<TaskPriority | null>(null);
-  const [member, setMember] = useState<string | null>(null);
 
-  const {
-    data: tareasFiltradas,
-    isLoading: tareasLoading,
-    error: tareasError,
-  } = useTasks({
-    projectId: id ?? undefined,
-    status: status?.toString ? [status] : undefined,
-    priority: priority?.toString ? [priority] : undefined,
-    assigneeId: member ?? undefined,
-    page,
-    pageSize: PAGE_SIZE,
+  const project = useProject(id);
+  const tasks = useTasks({
+    projectId: id,
+    status: filters.status ? [filters.status] : undefined,
+    priority: filters.priority ? [filters.priority] : undefined,
+    assigneeId: filters.member ?? undefined,
+    pageSize: MAX_PAGE_SIZE,
   });
 
-  const [selectTaskId, setSelectTaskId] = useState<string | null>(null);
-  const { data: selectTask } = useTask(selectTaskId ?? undefined);
-  const [popup, setPopup] = useState<string | null>(null);
+  if (project.isLoading || project.error || !project.data)
+    return <QueryState isLoading={project.isLoading} error={project.error} />;
 
-  // Error stados
-  if (isLoading) return <h1>Cargando</h1>;
-  if (error instanceof ApiError && error.status === 404) return <NotFound />;
-  if (error) return <h1>{error.message}</h1>;
-  if (!data) return <NotFound />;
+  const proyecto = project.data;
+  // Búsqueda por nombre en cliente
+  const tareas = (tasks.data?.items ?? []).filter((t) =>
+    t.title.toLowerCase().includes(busqueda.trim().toLowerCase()),
+  );
 
-  if (tareasLoading) return <h1>Cargando</h1>;
-  if (tareasError instanceof ApiError && tareasError.status === 404)
-    return <NotFound />;
-  if (tareasError) return <h1>{tareasError.message}</h1>;
-  if (!tareasFiltradas) return <NotFound />;
-
-  // OBtener proyecto
-  const proyecto = data;
-
-  // NAV atras
-  const navBack = () => {
-    nav({
-      to: "/projects",
-    });
-  };
-
-  // COMPONENTE
   return (
     <div>
-      <DeailTaskDrawer
-        isOpen={selectTaskId !== null}
-        tarea={selectTask ?? null}
-        proyecto={proyecto}
-        onOpenChange={(open) => {
-          if (!open) setSelectTaskId(null);
-        }}
-      />
-      <PopupContainer
-        proyecto={proyecto}
-        popup={popup}
-        close={() => setPopup(null)}
-      />
+      <TaskDetailDrawer taskId={selectedTaskId} onClose={() => setSelectedTaskId(null)} />
+      <PopupContainer proyecto={proyecto} popup={popup} close={() => setPopup(null)} />
 
-      <BackButton navBack={navBack} />
+      <BackButton />
 
       <div className="flex flex-col bg-background items-center justify-center gap-8 p-5 m-5 border rounded-xl">
-        <Header
-          proyecto={proyecto}
-          editClic={() => setPopup("Edit")}
-          archiveClic={() => setPopup("Archive")}
-          deleteClic={() => setPopup("Delete")}
-          createClic={() => setPopup("Create")}
-        />
-        <div
-          id="tabla-task"
-          className="flex flex-col overflow-hidden rounded-md bg-background shadow-2xs p-3 gap-4 w-full"
-        >
+        <Header proyecto={proyecto} open={setPopup} />
+
+        <div className="flex flex-col overflow-hidden rounded-md bg-background shadow-2xs p-3 gap-4 w-full">
           <FilterAndSearch
+            filters={filters}
+            onFiltersChange={setFilters}
             busqueda={busqueda}
-            member={member}
-            miembros={proyecto.members}
-            status={status}
-            priority={priority}
             onBusquedaChange={setBusqueda}
-            onMemberChange={setMember}
-            onStatuseChange={setStatus}
-            onPriorityChange={setPriority}
+            miembros={proyecto.members}
           />
 
-          <DataTable
-            columns={TaskColum}
-            data={tareasFiltradas.items}
-            onClic={(t) => {
-              setSelectTaskId(t.id === selectTaskId ? null : t.id);
-            }}
-          />
+          {tasks.isLoading || tasks.error ? (
+            <QueryState isLoading={tasks.isLoading} error={tasks.error} />
+          ) : (
+            <DataTable
+              columns={TaskColum}
+              data={tareas}
+              onClic={(t) => setSelectedTaskId(t.id === selectedTaskId ? null : t.id)}
+            />
+          )}
         </div>
       </div>
     </div>

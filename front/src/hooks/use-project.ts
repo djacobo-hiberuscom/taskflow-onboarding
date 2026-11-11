@@ -1,101 +1,81 @@
-import { apiFetch } from "#lib/api/client";
-import {
-  type Project,
-  type Page,
-  type ProjectDetail,
-  type ProjectInput,
-} from "#lib/api/types";
-import { projectKeys } from "#lib/query-keys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { projectsApi } from "@/lib/api/endpoints";
+import type { ProjectInput, ProjectListParams } from "@/lib/api/types";
+import { projectKeys } from "@/lib/query-keys";
 
-const BASE = "/api/v1/projects";
+// ---------- QUERIES ----------
 
-// Get all
-export function useProjects({
-  archived = false,
-  page = 1,
-  pageSize = 20,
-} = {}) {
+// GET /projects
+export function useProjects(
+  params: ProjectListParams = {},
+  options: { enabled?: boolean } = {},
+) {
+  const { archived = false, page = 1, pageSize = 20 } = params;
+  const normalized = { archived, page, pageSize };
   return useQuery({
-    queryKey: projectKeys.list({ archived, page, pageSize }),
-    queryFn: () => {
-      return apiFetch<Page<Project>>(
-        `${BASE}?archived=${archived}&page=${page}&pageSize=${pageSize}`,
-      );
-    },
+    queryKey: projectKeys.list(normalized),
+    queryFn: () => projectsApi.list(normalized),
+    ...options,
   });
 }
-// Get id
+
+// GET /projects/{id}
 export function useProject(id: string | undefined) {
   return useQuery({
     queryKey: projectKeys.detail(id ?? ""),
-    queryFn: () => {
-      return apiFetch<ProjectDetail>(`${BASE}/${id}`);
-    },
+    queryFn: () => projectsApi.get(id!),
     enabled: !!id,
   });
 }
 
-// Crear proyecto
+// ---------- MUTATIONS ----------
+
+// Invalida todo lo de proyectos tras una mutación
+function useInvalidateProjects() {
+  const qc = useQueryClient();
+  return () => qc.invalidateQueries({ queryKey: projectKeys.all });
+}
+
+// POST /projects
 export function useCreateProject() {
-  const qc = useQueryClient();
+  const invalidate = useInvalidateProjects();
   return useMutation({
-    mutationFn: (body: ProjectInput) => {
-      return apiFetch<Project>(BASE, {
-        method: "POST",
-        body: JSON.stringify(body),
-      });
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: projectKeys.all }),
+    mutationFn: (body: ProjectInput) => projectsApi.create(body),
+    onSuccess: invalidate,
   });
 }
-// editar
+
+// PUT /projects/{id}
 export function useUpdateProject() {
-  const qc = useQueryClient();
+  const invalidate = useInvalidateProjects();
   return useMutation({
-    mutationFn: ({ id, ...body }: ProjectInput & { id: string }) => {
-      return apiFetch<Project>(`${BASE}/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(body),
-      });
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: projectKeys.all }),
+    mutationFn: ({ id, ...body }: ProjectInput & { id: string }) =>
+      projectsApi.update(id, body),
+    onSuccess: invalidate,
   });
 }
 
-// ARCHIVAR RESTAURAR ELIMINAR (SOLO ADMIN)
-function useProjectAction(action: (id: string) => Promise<void>) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: action,
-    onSuccess: () => qc.invalidateQueries({ queryKey: projectKeys.all }),
-  });
-}
-
-
-
-// RESTORE
-export function useRestoreProject() {
-  return useProjectAction((id) =>
-    apiFetch(`${BASE}/${id}/restore`, { method: "POST" }),
-  );
-}
-
-// ARCHIVAR
+// POST /projects/{id}/archive (solo admin)
 export function useArchiveProject() {
-  return useProjectAction((id) =>
-    apiFetch(`${BASE}/${id}/archive`, { method: "POST" }),
-  );
+  const invalidate = useInvalidateProjects();
+  return useMutation({ mutationFn: projectsApi.archive, onSuccess: invalidate });
 }
 
-// DELETE
+// POST /projects/{id}/restore (solo admin)
+export function useRestoreProject() {
+  const invalidate = useInvalidateProjects();
+  return useMutation({ mutationFn: projectsApi.restore, onSuccess: invalidate });
+}
+
+// DELETE /projects/{id} (solo admin)
 export function useDeleteProject() {
-  const qc = useQueryClient() 
+  const qc = useQueryClient();
+  const invalidate = useInvalidateProjects();
   return useMutation({
-    mutationFn: (id: string) => apiFetch(`${BASE}/${id}`, { method: "DELETE" }),
-    onSuccess: (__data, id) => {
-        qc.removeQueries({queryKey: projectKeys.detail(id)})
-        qc.invalidateQueries({queryKey:projectKeys.all})
-    }
-  })
+    mutationFn: projectsApi.remove,
+    onSuccess: (_data, id) => {
+      qc.removeQueries({ queryKey: projectKeys.detail(id) });
+      invalidate();
+    },
+  });
 }

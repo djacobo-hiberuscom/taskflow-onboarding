@@ -1,7 +1,6 @@
-// componentes
 import { Separator, SidebarTrigger } from "@/components/index.comp";
 
-// formato de fecha
+// Fecha de hoy ("lunes, 10 de noviembre")
 const today = new Intl.DateTimeFormat("es-ES", {
   weekday: "long",
   day: "numeric",
@@ -9,23 +8,14 @@ const today = new Intl.DateTimeFormat("es-ES", {
   timeZone: "Europe/Madrid",
 }).format(new Date());
 
-// Parametros del compoenente
-interface params {
-  title: string;
-}
-
-// Componente
-export function StickyHeader({ title }: params) {
+// Header superior del layout
+export function StickyHeader({ title }: { title: string }) {
   return (
     <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-3 border-b border-[#E3E7EF] bg-[#F3F5F9]/85 px-4 backdrop-blur-md">
       <SidebarTrigger className="-ml-1 text-[#4A5568] hover:bg-[#E6EAF2]" />
       <Separator orientation="vertical" className="h-5 bg-[#D5DAE5]" />
-      <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-[#101826]">
-        {title}
-      </h2>
-      <time className="ml-auto text-[13px] text-[#6B778C] first-letter:uppercase">
-        {today}
-      </time>
+      <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-[#101826]">{title}</h2>
+      <time className="ml-auto text-[13px] text-[#6B778C] first-letter:uppercase">{today}</time>
     </header>
   );
 }

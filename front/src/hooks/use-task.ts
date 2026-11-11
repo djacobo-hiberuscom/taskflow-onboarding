@@ -1,112 +1,90 @@
 import {
-  type CreateTaskInput,
-  type Page,
-  type Task,
-  type TaskListParams,
-  type TaskStatus,
-} from "@/lib/api/types";
-import { apiFetch } from "#lib/api/client";
-import { projectKeys, taskKeys } from "#lib/query-keys";
-import { useMutation, useQuery, useQueryClient, keepPreviousData } from "@tanstack/react-query";
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { tasksApi } from "@/lib/api/endpoints";
+import type { CreateTaskInput, TaskListParams, TaskStatus } from "@/lib/api/types";
+import { projectKeys, taskKeys } from "@/lib/query-keys";
 
-const BASE = "/api/v1/tasks";
+// ---------- QUERIES ----------
 
-function useInvalidateTask() {
+// GET /tasks
+export function useTasks(params: TaskListParams = {}) {
+  return useQuery({
+    queryKey: taskKeys.list(params),
+    queryFn: () => tasksApi.list(params),
+    placeholderData: keepPreviousData,
+  });
+}
+
+// Solo el total de tareas que cumplen unos filtros (pide 1 item)
+export function useTaskCount(params: Omit<TaskListParams, "page" | "pageSize"> = {}) {
+  const listParams = { ...params, page: 1, pageSize: 1 };
+  return useQuery({
+    queryKey: taskKeys.list(listParams),
+    queryFn: () => tasksApi.list(listParams),
+    select: (page) => page.totalCount,
+  });
+}
+
+// GET /tasks/{id}
+export function useTask(id: string | undefined) {
+  return useQuery({
+    queryKey: taskKeys.detail(id ?? ""),
+    queryFn: () => tasksApi.get(id!),
+    enabled: !!id,
+  });
+}
+
+// ---------- MUTATIONS ----------
+
+// Una tarea afecta a listados de tareas y a contadores de proyectos
+function useInvalidateTasks() {
   const qc = useQueryClient();
   return () => {
     qc.invalidateQueries({ queryKey: taskKeys.all });
     qc.invalidateQueries({ queryKey: projectKeys.all });
   };
 }
-function buildTaskQuery(params: TaskListParams): string {
-  const qs = new URLSearchParams();
 
-  if (params.projectId) qs.set("projectId", params.projectId);
-  params.status?.forEach((s) => qs.append("status", s));
-  params.priority?.forEach((p) => qs.append("priority", p));
-  if (params.assigneeId) qs.set("assigneeId", params.assigneeId);
-  if (params.sort) qs.set("sort", params.sort);
-  if (params.order) qs.set("order", params.order);
-  qs.set("page", String(params.page ?? 1));
-  qs.set("pageSize", String(params.pageSize ?? 20));
-
-  return qs.toString();   // "projectId=…&status=ToDo&status=Done&page=1&pageSize=20"
-}
-
-// GET ALL
-export function useTasks(params: TaskListParams = {}) {
-  return useQuery({
-    queryKey: taskKeys.list(params),
-    queryFn: () => apiFetch<Page<Task>>(`${BASE}?${buildTaskQuery(params)}`),
-    placeholderData: keepPreviousData,
-  });
-}
-
-// GET ID /tasks/{id}
-export function useTask(id: string | undefined) {
-  return useQuery({
-    queryKey: taskKeys.detail(id ?? ""),
-    queryFn: () => apiFetch<Task>(`${BASE}/${id}`),
-    enabled: !!id,
-  });
-}
-// Crear task /projects/{projectId}/tasks
+// POST /projects/{projectId}/tasks
 export function useCreateTask() {
-  const invalidate = useInvalidateTask();
+  const invalidate = useInvalidateTasks();
   return useMutation({
-    mutationFn: ({
-      projectId,
-      ...body
-    }: CreateTaskInput & { projectId: string }) =>
-      apiFetch<Task>(`/api/v1/projects/${projectId}/tasks`, {
-        method: "POST",
-        body: JSON.stringify(body),
-      }),
+    mutationFn: ({ projectId, ...body }: CreateTaskInput & { projectId: string }) =>
+      tasksApi.create(projectId, body),
     onSuccess: invalidate,
   });
 }
 
-// actualizar estado task /tasks/{id}/status
+// PUT /tasks/{id}/status
 export function useChangeTaskStatus() {
-  const invalidate = useInvalidateTask();
+  const invalidate = useInvalidateTasks();
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: TaskStatus }) =>
-      apiFetch<Task>(`${BASE}/${id}/status`, {
-        method: "PUT",
-        body: JSON.stringify({ status }),
-      }),
+      tasksApi.changeStatus(id, status),
     onSuccess: invalidate,
   });
 }
 
-// asignar /task/{id}/assignee null = designar
+// PUT /tasks/{id}/assignee (assigneeId null = desasignar)
 export function useChangeTaskAssignee() {
-  const invalidate = useInvalidateTask();
+  const invalidate = useInvalidateTasks();
   return useMutation({
-    mutationFn: ({
-      id,
-      assigneeId,
-    }: {
-      id: string;
-      assigneeId: string | null;
-    }) =>
-      apiFetch<Task>(`${BASE}/${id}/assignee`, {
-        method: "PUT",
-        body: JSON.stringify({ assigneeId }),
-      }),
+    mutationFn: ({ id, assigneeId }: { id: string; assigneeId: string | null }) =>
+      tasksApi.changeAssignee(id, assigneeId),
     onSuccess: invalidate,
   });
 }
 
-// delete task /task/{id}
+// DELETE /tasks/{id}
 export function useDeleteTask() {
   const qc = useQueryClient();
-  const invalidate = useInvalidateTask();
+  const invalidate = useInvalidateTasks();
   return useMutation({
-    mutationFn: (id: string) =>
-      apiFetch(`${BASE}/${id}`, {
-        method: "DELETE",
-      }),
+    mutationFn: tasksApi.remove,
     onSuccess: (_data, id) => {
       qc.removeQueries({ queryKey: taskKeys.detail(id) });
       invalidate();

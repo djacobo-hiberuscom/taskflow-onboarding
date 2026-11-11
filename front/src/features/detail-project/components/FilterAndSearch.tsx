@@ -1,89 +1,54 @@
-// ICONS
 import { X } from "lucide-react";
+import { Button, FilterSelector, Input } from "@/components/index.comp";
+import type { UserSummary } from "@/lib/api/types";
+import { TASK_PRIORITY_OPTIONS, TASK_STATUS_OPTIONS } from "@/lib/constants/task";
+import { EMPTY_FILTERS, type TaskFilters } from "./types";
 
-// Componentes
-import { FilterSeletor } from "./index";
-import { Button, Input } from "@/components/index.comp";
-// Types
-import type { UserSummary, TaskPriority, TaskStatus } from "@/lib/api/types";
-
-
-// parametros del componente
-interface params {
+interface FilterAndSearchProps {
+  filters: TaskFilters;
+  onFiltersChange: (filters: TaskFilters) => void;
   busqueda: string;
   onBusquedaChange: (v: string) => void;
-  status: string | null;
-  onStatuseChange: (v: TaskStatus | null) => void;
-  priority: string | null;
-  onPriorityChange: (v: TaskPriority | null) => void;
-  member: string | null;
-  onMemberChange: (v: string | null) => void;
   miembros: UserSummary[];
 }
 
-// Componente
+// Filtros + buscador de la tabla de tareas del proyecto
 export function FilterAndSearch({
+  filters,
+  onFiltersChange,
   busqueda,
   onBusquedaChange,
-  status,
-  onStatuseChange,
-  priority,
-  onPriorityChange,
-  member,
-  onMemberChange,
   miembros,
-}: params) {
+}: FilterAndSearchProps) {
+  const memberOptions = miembros.map((m) => ({ label: m.displayName, value: m.id }));
 
-  // FILTROS
-  const ESTADO = [
-    { label: "Hecho", value: "Done" },
-    { label: "Sin hacer", value: "ToDo" },
-    { label: "En proceso", value: "InProgress" },
-  ];
-  const PRIORIDAD = [
-    { label: "Alta", value: "High" },
-    { label: "Madia", value: "Medium" },
-    { label: "Baja", value: "Low" },
-  ];
-  const MIEMBROS = miembros.map((m) => ({
-    label: m.displayName,
-    value: m.id,
-  }));
-
-  // DESACTIVAR FILTROS
-  const quitarFilters = () => {
-    onStatuseChange(null)
-    onMemberChange(null)
-    onPriorityChange(null)
-  };
+  // Cambia un solo filtro
+  const set = <K extends keyof TaskFilters>(key: K) => (value: TaskFilters[K]) =>
+    onFiltersChange({ ...filters, [key]: value });
 
   return (
     <div className="flex gap-2 items-center">
-      <FilterSeletor
-        items={ESTADO}
-        placeholder="Seleciona estados"
-        value={status}
-        onChange={(v) => onStatuseChange(v as TaskStatus | null)}
+      <FilterSelector
+        items={TASK_STATUS_OPTIONS}
+        placeholder="Selecciona estado"
+        value={filters.status}
+        onChange={set("status")}
       />
-      <FilterSeletor
-        items={PRIORIDAD}
-        placeholder="Seleciona prioridad"
-        value={priority}
-        onChange={(v) => onPriorityChange(v as TaskPriority | null)}
+      <FilterSelector
+        items={TASK_PRIORITY_OPTIONS}
+        placeholder="Selecciona prioridad"
+        value={filters.priority}
+        onChange={set("priority")}
       />
-      <FilterSeletor
-        items={MIEMBROS}
-        placeholder="Seleciona miembros"
-        value={member}
-        onChange={onMemberChange}
+      <FilterSelector
+        items={memberOptions}
+        placeholder="Selecciona miembro"
+        value={filters.member}
+        onChange={set("member")}
       />
-      <Button
-        variant="ghost"
-        className="flex justify-center items-center"
-        onClick={quitarFilters}
-      >
+      <Button variant="ghost" onClick={() => onFiltersChange(EMPTY_FILTERS)}>
         <X />
-        Quitar filtro
+        Quitar filtros
       </Button>
       <Input
         value={busqueda}

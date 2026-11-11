@@ -1,29 +1,22 @@
-// Compoenentes
-import {
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-} from "@/components/index.comp";
-// Types
-import { type NavItem } from ".";
-// route
-import { useLocation, useNavigate } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/index.comp";
+import { cn } from "@/lib/utils";
+import { isNavItemActive, type NavItem } from "./personalNav";
 
+// Lista de tabs del sidebar
 export function NavSection({ items }: { items: NavItem[] }) {
   const { pathname } = useLocation();
-  const navigate = useNavigate();
+
   return (
     <SidebarMenu className="gap-0.5">
-      {items.map(({ id, label, icon: Icon, to }) => {
-        const isActive = pathname === to;
+      {items.map((item) => {
+        const { id, label, icon: Icon, to } = item;
         return (
           <SidebarMenuItem key={id}>
             <SidebarMenuButton
-              isActive={isActive}
-              onClick={() => {
-                navigate({ to });
-              }}
-              className={[
+              isActive={isNavItemActive(item, pathname)}
+              render={<Link to={to} />}
+              className={cn(
                 "relative h-9 gap-3 rounded-lg px-3 text-[13.5px] font-normal text-foreground transition-colors",
                 "hover:brightness-95",
                 "data-active:bg-white/9 data-active:font-medium data-active:text-foreground",
@@ -31,12 +24,9 @@ export function NavSection({ items }: { items: NavItem[] }) {
                 // indicador lateral del elemento activo
                 "before:absolute before:-left-2 before:top-2 before:bottom-2 before:w-0.75 before:rounded-full before:bg-[#6F8BFF] before:opacity-0 before:transition-opacity",
                 "data-active:before:opacity-100",
-              ].join(" ")}
+              )}
             >
-              <Icon
-                className={isActive ? "text-foreground" : "text-foreground"}
-                strokeWidth={1.75}
-              />
+              <Icon className="text-foreground" strokeWidth={1.75} />
               <span>{label}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>

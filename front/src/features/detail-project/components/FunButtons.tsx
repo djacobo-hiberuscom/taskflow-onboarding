@@ -1,48 +1,35 @@
-// Compoenents
-import { Separator, Button } from "@/components/index.comp";
+import { Archive, Pen, Plus, Trash } from "lucide-react";
+import { Button, Separator } from "@/components/index.comp";
+import { useAuth } from "@/hooks/use-auth";
+import type { DetailProjectPopup } from "./types";
 
-// icons
-import { Pen, Archive, Trash, Plus } from "lucide-react";
-
-// Parametros
-interface params {
-  editClic: () => void;
-  archiveClic: () => void;
-  deleteClic: () => void;
-  createClic: () => void;
-}
-
-// compoenente
-export function FunButtons({
-  editClic,
-  archiveClic,
-  deleteClic,
-  createClic,
-}: params) {
+// Acciones del proyecto
+export function FunButtons({ open }: { open: (popup: DetailProjectPopup) => void }) {
+  const { isAdmin } = useAuth();
   return (
     <div className="flex flex-col gap-2 h-fit">
       <div className="flex gap-1">
-        <Button variant="outline" onClick={editClic}>
+        <Button variant="outline" disabled={!isAdmin} onClick={() => open("edit")}>
           <Pen />
           Editar
         </Button>
-
-        <Button variant="outline" onClick={archiveClic}>
+        <Button variant="outline" disabled={!isAdmin} onClick={() => open("archive")}>
           <Archive />
           Archivar
         </Button>
-    <Separator orientation="vertical"/>
+        <Separator orientation="vertical" />
         <Button
           variant="outline"
+          disabled={!isAdmin}
           className="text-red-400 hover:text-red-400"
-          onClick={deleteClic}
+          onClick={() => open("delete")}
         >
           <Trash />
           Eliminar
         </Button>
       </div>
-      
-      <Button onClick={createClic}>
+
+      <Button onClick={() => open("create-task")}>
         <Plus />
         Crear tarea
       </Button>

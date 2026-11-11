@@ -1,85 +1,58 @@
-// DIALOG import
-
-import { Dialog, DialogContent, Button } from "@/components/index.comp";
-
-// COMPONENTS
-import { toast } from "@/components/index.comp";
-// TYPES
-import type { Project } from "@/lib/api/types";
-
-// ICON
 import { Trash, TriangleAlertIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
-interface popParameters {
-  modal?: boolean;
+interface ConfirmDeletePopUpProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  proyecto?: Project;
-  onClic: () => void
+  title: string;
+  description: string;
+  warning?: string;
+  onConfirm: () => void;
+  isPending?: boolean;
+  modal?: boolean;
 }
 
-export function DeleteConfirmPopUp({
-  modal,
+// Diálogo genérico de "¿Seguro que quieres eliminar...?"
+export function ConfirmDeletePopUp({
   isOpen,
   onOpenChange,
-  proyecto,
-  onClic
-}: popParameters) {
+  title,
+  description,
+  warning,
+  onConfirm,
+  isPending = false,
+  modal,
+}: ConfirmDeletePopUpProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange} modal={modal}>
       <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col p-4 gap-3">
-        <DeleteConfirmContainer
-          onClic={onClic}
-          proyecto={proyecto}
-          onClose={() => onOpenChange(false)}
-        />
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-interface parameters {
-  proyecto?: Project;
-  onClose: () => void;
-  onClic: () => void;
-}
-export function DeleteConfirmContainer({
-  proyecto,
-  onClose,
-  onClic,
-}: parameters) {
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-col gap-2 ">
         <div className="flex gap-2">
           <div className="p-1">
             <Trash />
           </div>
           <div className="flex flex-col gap-1">
-            <h1 className="text-xl">¿Eliminar: {proyecto?.name}?</h1>
-            <p>El proyecto se borrara de forma permananente</p>
+            <h1 className="text-xl">{title}</h1>
+            <p>{description}</p>
           </div>
         </div>
-        <div className="flex gap-2 bg-red-200 rounded-xl p-3 border-red-800 text-red-900 items-center">
-          <TriangleAlertIcon />
-          <p>
-            Se eliminar las tareas asociadas al proyecto. Esta accion no se
-            puede deshacer
-          </p>
+
+        {warning && (
+          <div className="flex gap-2 bg-red-200 rounded-xl p-3 text-red-900 items-center">
+            <TriangleAlertIcon />
+            <p>{warning}</p>
+          </div>
+        )}
+
+        <div className="flex gap-1 justify-end">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancelar
+          </Button>
+          <Button variant="destructive" disabled={isPending} onClick={onConfirm}>
+            {isPending ? "Eliminando..." : "Eliminar"}
+          </Button>
         </div>
-      </div>
-      <div className="flex gap-1 justify-end">
-        <Button variant="outline" onClick={onClose}>
-          Cancelar
-        </Button>
-        <Button
-          variant="outline"
-          className="bg-red-500 text-white"
-          onClick={onClic}
-        >
-          Eliminar
-        </Button>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

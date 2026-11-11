@@ -1,35 +1,32 @@
-// Router
-import { createRootRoute, createRouter, Outlet } from "@tanstack/react-router";
+import { createRouter } from "@tanstack/react-router";
 
-// Routes
+import { NotFound } from "@/app/layouts";
 import {
-  // Layouts
-  AppLayoutRoute,
+  rootRoute,
+  // Públicas
   LoginRoute,
   RegisterRoute,
   CallbackRoute,
-  NotFoundRoute,
+  // Errores
   ForbiddenRoute,
+  NotFoundRoute,
   TimeOutRoute,
-  // Feat
+  // App + feats
+  AppLayoutRoute,
   DashBoardRoute,
   ProjectsRoute,
+  DetailProjectRoute,
   TasksRoute,
   ProfileRoute,
-  DetailProjectRoute,
 } from "./routes";
 
-export const rootRoute = createRootRoute({
-  component: () => <Outlet />,
-});
-
-// Arbol de rutas
+// Árbol de rutas
 const routeTree = rootRoute.addChildren([
   LoginRoute,
   RegisterRoute,
   CallbackRoute,
-  NotFoundRoute,
   ForbiddenRoute,
+  NotFoundRoute,
   TimeOutRoute,
   AppLayoutRoute.addChildren([
     DashBoardRoute,
@@ -40,8 +37,10 @@ const routeTree = rootRoute.addChildren([
   ]),
 ]);
 
-// Router
-export const router = createRouter({ routeTree });
+export const router = createRouter({
+  routeTree,
+  defaultNotFoundComponent: NotFound,
+});
 
 declare module "@tanstack/react-router" {
   interface Register {

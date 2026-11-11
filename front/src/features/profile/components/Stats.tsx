@@ -1,32 +1,16 @@
-// Keycloak
-import type { KeycloakTokenParsed } from "keycloak-js";
-
-// Param
-interface param{
-    usuario?: KeycloakTokenParsed | undefined
-}
-
-// Componente
-export function StatsMe({usuario}:param) {
+// Estadísticas del usuario (TODO: conectar con la API)
+export function StatsMe() {
+  const rows = ["Tareas completadas", "Tareas pendientes", "Proyectos"];
   return (
-    <div
-      id="stats"
-      className="bg-background p-5 flex flex-col gap-3 border rounded-xl"
-    >
-      <h1>Mis estadisticas / Actividad</h1>
+    <div className="bg-background p-5 flex flex-col gap-3 border rounded-xl">
+      <h1>Mis estadísticas / Actividad</h1>
       <div>
-        <div className="flex gap-2">
-          <h2 className="flex flex-1">Tareas completadas</h2>
-          <span>N</span>
-        </div>
-        <div className="flex gap-2">
-          <h2 className="flex flex-1">Tareas pendientes</h2>
-          <span>N</span>
-        </div>
-        <div className="flex gap-2">
-          <h2 className="flex flex-1">Proyectos</h2>
-          <span>N</span>
-        </div>
+        {rows.map((label) => (
+          <div key={label} className="flex gap-2">
+            <h2 className="flex flex-1">{label}</h2>
+            <span>N</span>
+          </div>
+        ))}
       </div>
     </div>
   );

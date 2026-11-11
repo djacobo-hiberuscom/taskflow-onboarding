@@ -1,3 +1,51 @@
+# TaskFlow · Front
+
+## Estructura
+
+```
+src/
+├── main.tsx                 Arranque: Keycloak → QueryClient → Router
+├── app/                     NAVEGACIÓN (TanStack Router)
+│   ├── routes.ts            Todas las rutas (públicas, errores y feats)
+│   ├── router.tsx           Árbol de rutas + router
+│   └── layouts/
+│       ├── app/             AppLayout (sidebar + header). La feat activa va en <Outlet />
+│       │   └── components/  personalNav.ts = tabs del sidebar
+│       └── public/          Login, Register, Callback y páginas de error
+├── features/                UNA CARPETA POR PÁGINA
+│   └── <feat>/
+│       ├── <feat>.tsx       Componente página (estado + queries)
+│       └── components/      Componentes solo de esa feat (+ index.ts y types.ts)
+├── components/
+│   ├── ui/                  shadcn (generado, no editar a mano)
+│   ├── common/              Compartido entre feats: popups, drawer de tarea,
+│   │                        FilterSelector, Pagination, QueryState, badges...
+│   └── index.comp.ts        Barrel: importa todo desde "@/components/index.comp"
+├── hooks/                   Hooks de TanStack Query (use-project, use-task, use-users) y use-auth
+└── lib/
+    ├── api/
+    │   ├── client.ts        apiFetch + token + ApiError
+    │   ├── endpoints/       UNA función por endpoint del back (projectsApi, tasksApi, usersApi)
+    │   └── types/           Tipos de las respuestas del back
+    ├── auth/keycloak.ts     login / logout / isAdmin / token
+    ├── constants/task.ts    Labels, opciones y colores de estado/prioridad
+    ├── query-keys.ts        Claves de caché
+    ├── query-client.ts      Configuración global de TanStack Query
+    ├── notify.ts            notify.success / notify.error (toasts)
+    └── format.ts            formatDate / formatDateTime
+```
+
+### ¿Dónde toco...?
+
+| Quiero...                         | Archivo                                                        |
+| --------------------------------- | -------------------------------------------------------------- |
+| Añadir una página nueva           | `features/<nueva>/` → exportar en `features/index.ts` → ruta en `app/routes.ts` + `app/router.tsx` → tab en `personalNav.ts` |
+| Llamar a un endpoint nuevo        | `lib/api/endpoints/*.ts` → hook en `hooks/use-*.ts` → key en `lib/query-keys.ts` |
+| Cambiar textos/colores de estado  | `lib/constants/task.ts`                                        |
+| Un componente usado en 2+ feats   | `components/common/` y exportarlo en `components/index.comp.ts` |
+
+---
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.

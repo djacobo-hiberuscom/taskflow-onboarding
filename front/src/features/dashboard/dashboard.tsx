@@ -1,50 +1,26 @@
-import Proyectos from "@/assets/tempdata/projects.json";
-import Tareas from "@/assets/tempdata/tasks.json";
-const PROYECTOS = Proyectos;
-const TAREAS = Tareas;
+import { CheckCircle2, CircleDashed, FolderKanban, ListTodo } from "lucide-react";
+import { ChartPieDonutText } from "@/components/index.comp";
+import { useProjects } from "@/hooks/use-project";
+import { useTaskCount } from "@/hooks/use-task";
+import { StatCard } from "./components";
 
-// COMPONENTS
-import { ChartPieDonutText} from "@/components/index.comp"
-import { StatCard } from "./components/index";
-
-
-
-
-// FEAT
+// FEAT: Panel
 export function DashboardFeat() {
-  // (Start proyectos activos)
-  const proyectosActivos = PROYECTOS.filter(
-    (p) => p.archived_at !== null,
-  ).length;
+  // Solo necesitamos los totales -> pageSize 1
+  const { data: proyectos } = useProjects({ pageSize: 1 });
+  const { data: todo = 0 } = useTaskCount({ status: ["ToDo"] });
+  const { data: inProgress = 0 } = useTaskCount({ status: ["InProgress"] });
+  const { data: done = 0 } = useTaskCount({ status: ["Done"] });
 
-  // (Start ToDo)
-  const tareasToDo = TAREAS.filter((t) => t.status === "ToDo").length;
-
-  // (Start tareas completadas)
-  const tareasCompletadas = TAREAS.filter((t) => t.status === "Done").length
-
-  // (Start tareas inprogres)
-  const tareasInProgress = TAREAS.filter((t) => t.status === "In Progress").length
-
-  // (Start tareas incompletas) 
-  const tareasIncompletas = tareasInProgress + tareasToDo
-
-
-  // ------------
   return (
-    <div className="p-5 h-full">
-      <div id="title" className="flex flex-col gap-5"></div>
-      <div id="body" className="flex flex-col gap-4">
-        <div id="stats-contenedors" className="flex gap-5 justify-between">
-          <StatCard name="Proyectos Activos" number={proyectosActivos}/>
-          <StatCard name="Tareas abiertas" number={tareasIncompletas}/>
-          <StatCard name="Tareas completadas" number={tareasCompletadas}/>
-          <StatCard name="Proyectos Activos" number={12}/>
-        </div>
-        <div id="barra-tareas-estado">
-          <ChartPieDonutText todo={tareasToDo} inProgress={tareasInProgress} done={tareasCompletadas}/>
-        </div>
+    <div className="p-5 h-full flex flex-col gap-4">
+      <div className="flex gap-5 justify-between">
+        <StatCard name="Proyectos activos" number={proyectos?.totalCount ?? 0} icon={FolderKanban} />
+        <StatCard name="Tareas abiertas" number={todo + inProgress} icon={ListTodo} />
+        <StatCard name="Tareas en curso" number={inProgress} icon={CircleDashed} />
+        <StatCard name="Tareas completadas" number={done} icon={CheckCircle2} />
       </div>
+      <ChartPieDonutText todo={todo} inProgress={inProgress} done={done} />
     </div>
   );
 }

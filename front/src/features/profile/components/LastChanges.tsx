@@ -1,24 +1,14 @@
-import { RowLastTareas } from "./index";
+import { RowLastTareas } from "./TaskRow";
 
-// Parametros
-
-// COMPONENTE
+// Últimas tareas (TODO: conectar con la API)
 export function LastChanges() {
   return (
-    <div
-      id="LasChanges"
-      className="flex flex-col gap-3 border rounded-xl overflow-hidden p-4 bg-background"
-    >
-      <h1>Ultimas tareas</h1>
+    <div className="flex flex-col gap-3 border rounded-xl overflow-hidden p-4 bg-background">
+      <h1>Últimas tareas</h1>
       <div className="flex flex-col flex-1">
-        <RowLastTareas />
-        <RowLastTareas />
-        <RowLastTareas />
-        <RowLastTareas />
-        <RowLastTareas />
-        <RowLastTareas />
-        <RowLastTareas />
-        <RowLastTareas />
+        {Array.from({ length: 8 }, (_, i) => (
+          <RowLastTareas key={i} />
+        ))}
       </div>
     </div>
   );

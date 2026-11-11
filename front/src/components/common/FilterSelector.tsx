@@ -6,27 +6,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {cn} from "@/lib/utils"
-interface item {
-  label: string,
-  value: string
+import { cn } from "@/lib/utils";
+
+export interface SelectOption<T extends string = string> {
+  label: string;
+  value: T;
 }
 
-interface parameters {
-  items: item[],
-  placeholder: string,
-  value?: string | null,
-  onChange?: (value: string | null) => void
-  className?: string
+interface FilterSelectorProps<T extends string> {
+  items: SelectOption<T>[];
+  placeholder: string;
+  value?: T | null;
+  onChange?: (value: T | null) => void;
+  className?: string;
+  disabled?: boolean;
 }
 
-export function FilterSeletor({items, placeholder, value, onChange, className}: parameters) {
+// Select de shadcn simplificado (tipado según los valores de las opciones)
+export function FilterSelector<T extends string>({
+  items,
+  placeholder,
+  value,
+  onChange,
+  className,
+  disabled = false,
+}: FilterSelectorProps<T>) {
   return (
-    <Select items={items} value={value} onValueChange={onChange}>
+    <Select
+      disabled={disabled}
+      items={items}
+      value={value ?? null}
+      onValueChange={(v) => onChange?.((v as T | null) ?? null)}
+    >
       <SelectTrigger className={cn("w-45", className)}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="max-h-100 w-fit min-w-(--anchor-width) max-w-(--available-width)">
         <SelectGroup>
           {items.map((item) => (
             <SelectItem key={item.value} value={item.value}>

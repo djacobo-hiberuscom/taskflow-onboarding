@@ -1,112 +1,69 @@
-// DIALOG import
-// COMPONENTS
-import { Dialog, DialogContent, Button, toast} from "@/components/index.comp";
-
-
-// TYPES
-import type { Project } from "#lib/api/types";
-
-// ICON
 import { Archive } from "lucide-react";
-
-// HOOKS
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useArchiveProject } from "@/hooks/use-project";
+import type { Project } from "@/lib/api/types";
+import { notify } from "@/lib/notify";
 
-const openSuccessToast = () => {
-  toast.add({
-    type: "success",
-    description: "Proyecto archivado correctamente",
-  });
-};
-const openErrorToast = () => {
-  toast.add({
-    type: "error",
-    description: "Error al archivar el proyecto",
-  });
-};
-
-interface popParameters {
+interface ArchiveConfirmPopUpProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   proyecto?: Project;
-  onArchived: () => void;
+  onArchived?: () => void;
 }
 
+// Confirmar y archivar un proyecto
 export function ArchiveConfirmPopUp({
   isOpen,
   onOpenChange,
   proyecto,
   onArchived,
-}: popParameters) {
-  return (
-    <div>
-      <Dialog open={isOpen} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col p-4 gap-3">
-          <ArchiveConfirmContainer
-            proyecto={proyecto}
-            onClose={() => onOpenChange(false)}
-            onArchived={onArchived}
-          />
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-}
-
-interface parameters {
-  proyecto?: Project;
-  onClose: () => void;
-  onArchived?: () => void;
-}
-export function ArchiveConfirmContainer({
-  proyecto,
-  onClose,
-  onArchived,
-}: parameters) {
+}: ArchiveConfirmPopUpProps) {
   const archiveProject = useArchiveProject();
 
-  const handleClicArchive = () => {
+  const handleArchive = () => {
     if (!proyecto) return;
     archiveProject.mutate(proyecto.id, {
       onSuccess: () => {
-        onClose();
+        onOpenChange(false);
         onArchived?.();
-        openSuccessToast();
+        notify.success("Proyecto archivado correctamente");
       },
       onError: () => {
-        onClose();
-        openErrorToast();
+        onOpenChange(false);
+        notify.error("Error al archivar el proyecto");
       },
     });
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-row gap-2 ">
-        <div className="p-1">
-          <Archive />
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col p-4 gap-3">
+        <div className="flex flex-row gap-2">
+          <div className="p-1">
+            <Archive />
+          </div>
+          <div>
+            <h1 className="text-xl">¿Archivar: {proyecto?.name}?</h1>
+            <p>
+              El proyecto dejará de ser visible para los usuarios, solo el admin podrá
+              restaurarlo
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-xl">¿Archivar: {proyecto?.name}?</h1>
-          <p>
-            El proyecto dejara de ser vidible para los usuario, solo el admin
-            podra restaurarlo
-          </p>
+        <div className="flex gap-1 justify-end">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancelar
+          </Button>
+          <Button
+            className="bg-blue-500 text-white hover:bg-blue-600"
+            disabled={!proyecto || archiveProject.isPending}
+            onClick={handleArchive}
+          >
+            {archiveProject.isPending ? "Archivando..." : "Archivar"}
+          </Button>
         </div>
-      </div>
-      <div className="flex gap-1 justify-end">
-        <Button variant="outline" onClick={onClose}>
-          Cancelar
-        </Button>
-        <Button
-          variant="outline"
-          className="bg-blue-500 text-white"
-          disabled={!proyecto || archiveProject.isPending}
-          onClick={handleClicArchive}
-        >
-          {archiveProject.isPending ? "Archivando..." : "Archivar"}
-        </Button>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

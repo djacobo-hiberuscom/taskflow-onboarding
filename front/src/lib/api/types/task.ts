@@ -1,49 +1,50 @@
-import { type UserSummary } from "../types";
-// TAREAS
-export type TaskStatus = "ToDo" | "InProgress" | "Done"
-export type TaskPriority = "Low" | "Medium" | "High"
+import type { PageParams } from "./common";
+import type { UserSummary } from "./user";
 
-export interface Task { // TASK
-  id: string,
-  projectId: string,
-  projectName: string,
-  title:string,
-  description: string | null,
-  status: TaskStatus,
-  priority: TaskPriority,
-  dueDate: string | null,
-  assignee: UserSummary | null,
-  createdAt: string,
-  updatedAt: string
+export type TaskStatus = "ToDo" | "InProgress" | "Done";
+export type TaskPriority = "Low" | "Medium" | "High";
+
+// GET /api/v1/tasks
+export interface Task {
+  id: string;
+  projectId: string;
+  projectName: string;
+  title: string;
+  description: string | null;
+  status: TaskStatus;
+  priority: TaskPriority;
+  dueDate: string | null;
+  assignee: UserSummary | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
-// crear task
-export interface CreateTaskInput { 
-  title: string,
-  description? : string,
-  status?: TaskStatus
-  priority: TaskPriority,
-  dueDate?: string | null,
-  assigneeId? : string | null
+// POST /api/v1/projects/{projectId}/tasks
+export interface CreateTaskInput {
+  title: string;
+  description?: string;
+  status?: TaskStatus;
+  priority: TaskPriority;
+  dueDate?: string | null;
+  assigneeId?: string | null;
 }
-// Update task
+
+// PUT /api/v1/tasks/{id}
 export interface UpdateTaskInput {
-  title: string,
-  description?: null,
-  status? : TaskStatus,
-  priority: TaskPriority,
-  dueDate?: string | null,
-  assigneeId?: string
+  title: string;
+  description?: string | null;
+  status?: TaskStatus;
+  priority: TaskPriority;
+  dueDate?: string | null;
+  assigneeId?: string | null;
 }
 
-// list params
-export interface TaskListParams {
-  projectId?: string,
-  status?: TaskStatus[],
-  priority?: TaskPriority[],
-  assigneeId?: string,
-  sort?: "createdAt" | "dueDate"
-  order?: "asc" | "desc"
-  page?: number,
-  pageSize?: number
+// Filtros del listado ("unassigned" en assigneeId = tareas sin asignar)
+export interface TaskListParams extends PageParams {
+  projectId?: string;
+  status?: TaskStatus[];
+  priority?: TaskPriority[];
+  assigneeId?: string;
+  sort?: "createdAt" | "dueDate";
+  order?: "asc" | "desc";
 }

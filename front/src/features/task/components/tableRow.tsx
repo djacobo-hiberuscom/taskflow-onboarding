@@ -1,53 +1,30 @@
-// Types
-import type { Task } from "#lib/api/types";
-// compoenentes
-import { Badge } from "@/components/index.comp";
+import { TaskPriorityBadge, TaskStatusBadge } from "@/components/index.comp";
+import type { Task } from "@/lib/api/types";
+import { formatDate } from "@/lib/format";
+import { TASK_GRID } from "./types";
 
-
-// TableRow
-interface rowParams {
+interface RowTableTaskProps {
   tarea: Task;
-  onClictask: () => void;
+  onClick: () => void;
 }
-export function RowTableTask({ tarea, onClictask }: rowParams) {
+
+// Fila de la tabla
+export function RowTableTask({ tarea, onClick }: RowTableTaskProps) {
   return (
     <div
-      className="grid grid-cols-6 justify-between w-full bg-background p-4 border-b gap-3 hover:brightness-95"
-      onClick={onClictask}
+      className={`${TASK_GRID} w-full bg-background p-4 border-b hover:brightness-95 cursor-pointer`}
+      onClick={onClick}
     >
       <span className="truncate">{tarea.title}</span>
       <span className="truncate">{tarea.projectName}</span>
-      <Badge className={statusClass(tarea.status)}>{tarea.status}</Badge>
-      <Badge className={priorityClass(tarea.priority)}>{tarea.priority}</Badge>
-      <span className="truncate">{tarea.assignee?.displayName}</span>
-      <span>{tarea.dueDate}</span>
+      <span>
+        <TaskStatusBadge status={tarea.status} />
+      </span>
+      <span>
+        <TaskPriorityBadge priority={tarea.priority} />
+      </span>
+      <span className="truncate">{tarea.assignee?.displayName ?? "Sin asignar"}</span>
+      <span>{formatDate(tarea.dueDate)}</span>
     </div>
   );
-}
-
-// Badge color prioridad
-function priorityClass(prioridad?: Task["priority"]) {
-  switch (prioridad) {
-    case "High":
-      return "bg-[#FEE2E2] text-[#991B1B]";
-    case "Medium":
-      return "bg-[#FEF3C7] text-[#92400E]";
-    case "Low":
-      return "bg-[#DCFCE7] text-[#166534]";
-    default:
-      return "";
-  }
-}
-// Badge color status
-function statusClass(ststus?: Task["status"]) {
-  switch (ststus) {
-    case "Done":
-      return "bg-[#DCFCE7] text-[#166534]";
-    case "ToDo":
-      return "bg-[#FEF3C7] text-[#92400E]";
-    case "InProgress":
-      return "bg-[#DBEAFE] text-[#1E40AF]";
-    default:
-      return "";
-  }
 }

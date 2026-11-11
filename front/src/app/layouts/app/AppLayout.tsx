@@ -1,3 +1,4 @@
+import { Outlet, useLocation } from "@tanstack/react-router";
 import {
   Sidebar,
   SidebarContent,
@@ -7,19 +8,20 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarProvider,
-} from "../../../components/index.comp";
+} from "@/components/index.comp";
 import {
   FooterSidebar,
+  getActiveNavItem,
   HeaderSiderBar,
-  StickyHeader,
-  personalNav,
   NavSection,
+  personalNav,
+  StickyHeader,
 } from "./components";
-import { Outlet, useLocation } from "@tanstack/react-router";
 
+// Layout principal: sidebar + header fijos, la feat activa se pinta en <Outlet />
 export function AppLayout() {
   const { pathname } = useLocation();
-  const title = personalNav.find((item) => item.to === pathname)?.label ?? "";
+  const title = getActiveNavItem(pathname)?.label ?? "";
 
   return (
     <SidebarProvider>

@@ -1,19 +1,15 @@
-// Iconos
-import {ArrowBigLeftDashIcon} from "lucide-react"
+import { Link } from "@tanstack/react-router";
+import { ArrowBigLeftDashIcon } from "lucide-react";
 
-// Parametro
-interface param {
-    navBack: () => void
-}
-
-// Componente
-export function BackButton({navBack}: param) {
+// Volver al listado de proyectos
+export function BackButton() {
   return (
-    <div
-      className="absolute top-3 left-17 p-1 rounded-full  border shadow-black z-50"
-      onClick={navBack}
+    <Link
+      to="/projects"
+      aria-label="Volver a proyectos"
+      className="absolute top-3 left-17 p-1 rounded-full border shadow-black z-50 hover:bg-black/5"
     >
       <ArrowBigLeftDashIcon />
-    </div>
+    </Link>
   );
 }

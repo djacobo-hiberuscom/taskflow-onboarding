@@ -17,12 +17,18 @@ export const initKeycloak = () =>
     silentCheckSsoRedirectUri: `${origin}/silent-check-sso.html`,
   });
 
+// Acciones de sesión
 export const login = () =>
   keycloak.login({ redirectUri: `${origin}/callback` });
 export const register = () =>
   keycloak.register({ redirectUri: `${origin}/callback` });
 export const logout = () => keycloak.logout({ redirectUri: `${origin}/` });
 
+// Roles
+export const ADMIN_ROLE = "Admin";
+export const isAdmin = () => keycloak.hasRealmRole(ADMIN_ROLE);
+
+// Token siempre fresco para las peticiones
 export async function getAccessToken() {
   try {
     await keycloak.updateToken(30);

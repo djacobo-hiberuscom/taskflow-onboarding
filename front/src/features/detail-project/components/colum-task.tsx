@@ -1,71 +1,45 @@
-import { createColumnHelper } from "@tanstack/react-table"
-import { Button } from "#components/ui/button"
-import { type DataTableFeatures } from "@/components/ui/data-table/data-table-features"
-import type { Task } from "@/lib/api/types"
+import { createColumnHelper, type Column } from "@tanstack/react-table";
+import { Button, TaskPriorityBadge, TaskStatusBadge } from "@/components/index.comp";
+import { type DataTableFeatures } from "@/components/ui/data-table/data-table-features";
+import type { Task } from "@/lib/api/types";
+import { formatDateTime } from "@/lib/format";
 
-const columnHelper = createColumnHelper<DataTableFeatures, Task>()
+const columnHelper = createColumnHelper<DataTableFeatures, Task>();
 
+// Cabecera clicable que ordena la columna
+function sortableHeader(label: string) {
+  return function SortableHeader<TValue>({
+    column,
+  }: {
+    column: Column<DataTableFeatures, Task, TValue>;
+  }) {
+    return (
+      <Button variant="ghost" onClick={column.getToggleSortingHandler()} className="-ml-2.5">
+        {label}
+        {column.getIsSorted() === "asc" && " ↑"}
+        {column.getIsSorted() === "desc" && " ↓"}
+      </Button>
+    );
+  };
+}
 
-
+// Columnas de la tabla de tareas del proyecto
 export const TaskColum = columnHelper.columns([
-  columnHelper.accessor("title", {
-    header: ({
-      column
-    }) => (
-      <Button variant="ghost" onClick={column.getToggleSortingHandler()} className="-ml-2.5">
-        Nombre
-        {column.getIsSorted() === "asc" &&  " ↑"}
-        {column.getIsSorted() === "desc" && " ↓"}
-      </Button>
-    ),
+  columnHelper.accessor("title", { header: sortableHeader("Nombre") }),
+  columnHelper.accessor((t) => t.assignee?.displayName ?? "Sin asignar", {
+    id: "assignee",
+    header: sortableHeader("Usuario asignado"),
   }),
-  columnHelper.accessor("assignee", {
-    header :({
-      column
-    }) => (
-      <Button variant="ghost" onClick={column.getToggleSortingHandler()} className="-ml-2.5">
-        Usuario Asignado
-        {column.getIsSorted() === "asc" &&  " ↑"}
-        {column.getIsSorted() === "desc" && " ↓"}
-      </Button>
-    ),
-    cell: (info) => {
-      const assignee = info.getValue();
-      return <span>{assignee?.displayName ?? "Sin asignar"}</span>
-    }
-  })
-  ,
   columnHelper.accessor("priority", {
-    header: ({
-      column
-    }) => (
-      <Button variant="ghost" onClick={column.getToggleSortingHandler()} className="-ml-2.5">
-        Prioridad
-        {column.getIsSorted() === "asc" &&  " ↑"}
-        {column.getIsSorted() === "desc" && " ↓"}
-      </Button>
-    ),
+    header: sortableHeader("Prioridad"),
+    cell: (info) => <TaskPriorityBadge priority={info.getValue()} />,
   }),
   columnHelper.accessor("status", {
-    header: ({
-      column
-    }) => (
-      <Button variant="ghost" onClick={column.getToggleSortingHandler()} className="-ml-2.5">
-        Estado
-        {column.getIsSorted() === "asc" &&  " ↑"}
-        {column.getIsSorted() === "desc" && " ↓"}
-      </Button>
-    )
+    header: sortableHeader("Estado"),
+    cell: (info) => <TaskStatusBadge status={info.getValue()} />,
   }),
   columnHelper.accessor("updatedAt", {
-    header: ({
-      column
-    }) => (
-      <Button variant="ghost" onClick={column.getToggleSortingHandler()} className="-ml-2.5">
-        Ultimo cambio
-        {column.getIsSorted() === "asc" &&  " ↑"}
-        {column.getIsSorted() === "desc" && " ↓"}
-      </Button>
-    )
-  })
-])
+    header: sortableHeader("Último cambio"),
+    cell: (info) => formatDateTime(info.getValue()),
+  }),
+]);

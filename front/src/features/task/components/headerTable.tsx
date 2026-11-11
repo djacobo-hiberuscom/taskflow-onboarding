@@ -1,16 +1,15 @@
-// Header Table
+import { TASK_GRID } from "./types";
+
+// Cabecera de la tabla
 export function HeaderTableTask() {
   return (
-    <div
-      id="HeaderTable"
-      className="grid grid-cols-6 items-center w-full text-gray-400 border rounded-t-2xl p-5"
-    >
+    <div className={`${TASK_GRID} w-full text-gray-400 border rounded-t-2xl p-5`}>
       <span>Nombre</span>
       <span>Proyecto</span>
       <span>Estado</span>
       <span>Prioridad</span>
       <span>Asignado</span>
-      <span>vencimiento</span>
+      <span>Vencimiento</span>
     </div>
   );
 }

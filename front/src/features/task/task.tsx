@@ -1,139 +1,100 @@
-// COMPONENTS
+import { useState } from "react";
 import {
-  DeailTaskDrawer,
-  BotoneraFooter,
+  Pagination,
+  QueryState,
+  TaskDetailDrawer,
+} from "@/components/index.comp";
+import { useProjects } from "@/hooks/use-project";
+import { useTasks } from "@/hooks/use-task";
+import {
+  EMPTY_FILTERS,
   FiltersTask,
   HeaderTableTask,
   HeaderTask,
   RowTableTask,
+  type TaskFilters,
 } from "./components/index.comp";
-// TYPES
-import type { TaskStatus, TaskPriority } from "@/lib/api/types";
 
-// CONST
+const PAGE_SIZE = 10;
 
-import { useState } from "react";
-import { keycloak } from "#lib/auth/keycloak";
-import { useTasks, useTask } from "#hooks/use-task";
-import { ApiError } from "#lib/api/client";
-import { NotFound } from "@/app/layouts";
-import { useProjects } from "#hooks/use-project";
-
-// FEAT
+// FEAT: Tareas
 export function TaskFeat() {
-  // IS ADMIN
-  const isAdmin = keycloak.hasRealmRole("Admin");
-  // FILTERS
-  const [projectFilter, setProjectFilter] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<TaskStatus | null>(null);
-  const [priorityFilter, setPrirorityFilter] = useState<TaskPriority | null>(
-    null,
-  );
-  const [memberFilter, setMemberFilter] = useState<string | null>(null);
-  // BUSCADOR
-  const [buscador, setbuscador] = useState("");
-
-  // Select task
-  const [selectTaskId, setSelectTaskId] = useState<string | null>(null);
-  const { data: selectTask } = useTask(selectTaskId ?? undefined);
-  // PAGE
-  const PAGE_SIZE = 10;
+  const [filters, setFilters] = useState<TaskFilters>(EMPTY_FILTERS);
+  const [buscador, setBuscador] = useState("");
   const [page, setPage] = useState(1);
-  // PROYECTOS
-  const {
-    data: proyectos,
-    isLoading: proyectosLoading,
-    error: proyectosError,
-  } = useProjects(); // Proyectos
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
-  // TAREAS
-  const {
-    data: tareasFiltradas,
-    isLoading: tareasLoading,
-    error: tareasError,
-  } = useTasks({
-    projectId: projectFilter ?? undefined,
-    status: statusFilter ? [statusFilter] : undefined,
-    priority: priorityFilter ? [priorityFilter] : undefined,
-    assigneeId: memberFilter ?? undefined,
+  const projects = useProjects({ pageSize: 100 });
+  const tasks = useTasks({
+    projectId: filters.project ?? undefined,
+    status: filters.status ? [filters.status] : undefined,
+    priority: filters.priority ? [filters.priority] : undefined,
+    assigneeId: filters.member ?? undefined,
     page,
     pageSize: PAGE_SIZE,
   });
-  if (proyectosLoading) return <h1>Cargando</h1>;
-  if (proyectosError instanceof ApiError && proyectosError.status === 404)
-    return <NotFound />;
-  if (proyectosError) return <h1>{proyectosError.message}</h1>;
-  if (!proyectos) return <NotFound />;
-  if (tareasLoading) return <h1>Cargando</h1>;
-  if (tareasError instanceof ApiError && tareasError.status === 404)
-    return <NotFound />;
-  if (tareasError) return <h1>{tareasError.message}</h1>;
-  if (!tareasFiltradas) return <NotFound />;
-  // CONST
-  const Ntareas = tareasFiltradas.items.length;
-  const Nproyectos = proyectos.items.length;
 
-  const totalPages = Math.ceil(Ntareas / PAGE_SIZE);
-
-  // QUITAR FILTROS
-  const quitarFiltros = () => {
-    setProjectFilter(null);
-    setStatusFilter(null);
-    setPrirorityFilter(null);
-    setMemberFilter(null);
-    setbuscador("");
+  // Al cambiar filtros se vuelve a la primera página
+  const changeFilters = (next: TaskFilters) => {
+    setFilters(next);
+    setPage(1);
   };
+
+  const loading = projects.isLoading || tasks.isLoading;
+  const error = projects.error ?? tasks.error;
+  if (loading || error) return <QueryState isLoading={loading} error={error} />;
+
+  const totalTareas = tasks.data?.totalCount ?? 0;
+  const totalPages = Math.ceil(totalTareas / PAGE_SIZE);
+  // Búsqueda por nombre en cliente (sobre la página actual)
+  const tareas = (tasks.data?.items ?? []).filter((t) =>
+    t.title.toLowerCase().includes(buscador.trim().toLowerCase()),
+  );
 
   return (
     <div className="flex flex-1 flex-col gap-8 justify-start p-3">
-      <DeailTaskDrawer
-        isAdmin={isAdmin}
-        isOpen={selectTaskId !== null}
-        tarea={selectTask}
-        proyecto={selectTask?.projectId}
-        onOpenChange={(open) => {
-          if (!open) setSelectTaskId(null);
-        }}
+      <TaskDetailDrawer
+        taskId={selectedTaskId}
+        onClose={() => setSelectedTaskId(null)}
       />
-      <HeaderTask Ntareas={Ntareas} Nproyectos={Nproyectos} />
+
+      <HeaderTask
+        nTareas={totalTareas}
+        nProyectos={projects.data?.totalCount ?? 0}
+      />
+
       <FiltersTask
-        itemProject={proyectos.items}
-        projectFilter={projectFilter}
-        setProjectFilter={setProjectFilter}
-        statusFilter={statusFilter}
-        setStatusFilter={setStatusFilter}
-        priorityFilter={priorityFilter}
-        setPrirorityFilter={setPrirorityFilter}
-        memberFilter={memberFilter}
-        setMemberFilter={setMemberFilter}
+        proyectos={projects.data?.items ?? []}
+        filters={filters}
+        onFiltersChange={changeFilters}
         buscador={buscador}
-        setbuscador={setbuscador}
-        quitarFiltros={quitarFiltros}
-        setPage={() => setPage(1)}
+        onBuscadorChange={setBuscador}
       />
-      <div className="">
+
+      <div>
         <HeaderTableTask />
-        <div id="Tabla" className=" flex-1">
-          {tareasFiltradas.items.map((t) => {
-            return (
-              <RowTableTask
-                tarea={t}
-                onClictask={() => setSelectTaskId(t.id === selectTaskId ? null : t.id)}
-              />
-            );
-          })}
-        </div>
+        {tareas.length === 0 ? (
+          <p className="p-6 text-center text-muted-foreground bg-background">
+            Sin resultados
+          </p>
+        ) : (
+          tareas.map((t) => (
+            <RowTableTask
+              key={t.id}
+              tarea={t}
+              onClick={() =>
+                setSelectedTaskId(t.id === selectedTaskId ? null : t.id)
+              }
+            />
+          ))
+        )}
       </div>
 
-      <BotoneraFooter
-        nextClic={() => {
-          if (page + 1 <= totalPages) setPage(page + 1);
-        }}
-        previousClic={() => {
-          if (page - 1 > 0) setPage(page - 1);
-        }}
-        actualPage={page}
+      <Pagination
+        className="sticky bottom-5 mt-auto flex justify-end items-center gap-2"
+        page={page}
         totalPages={totalPages}
+        onPageChange={setPage}
       />
     </div>
   );
