@@ -1,4 +1,4 @@
-import { TaskPriorityBadge, TaskStatusBadge } from "@/components/index.comp";
+import { TaskPriorityBadge, TaskStatusBadge } from "@/components";
 import type { Task } from "@/lib/api/types";
 import { formatDate } from "@/lib/format";
 import { TASK_GRID } from "./types";

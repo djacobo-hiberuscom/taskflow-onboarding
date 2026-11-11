@@ -2,7 +2,7 @@
 import { Link } from "@tanstack/react-router";
 
 // Componentes
-import { Button } from "@/components/index.comp";
+import { Button } from "@/components";
 
 // Keycloak
 import { register } from "@/lib/auth/keycloak";

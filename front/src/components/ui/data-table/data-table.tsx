@@ -1,4 +1,5 @@
 import { useTable, type ColumnDef, type RowData } from "@tanstack/react-table";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "../button";
 import {
   Table,
@@ -15,12 +16,15 @@ interface DataTableProps<TData extends RowData> {
   columns: ColumnDef<DataTableFeatures, TData>[];
   data: TData[];
   onClic?: (row: TData) => void
+  // Texto del pie: "Mostrando 1–8 de 8 {itemLabel}"
+  itemLabel?: string
 }
 
 export function DataTable<TData extends RowData>({
   columns,
   data,
-  onClic
+  onClic,
+  itemLabel = "resultados",
 }: DataTableProps<TData>) {
   const table = useTable({
     features,
@@ -28,15 +32,20 @@ export function DataTable<TData extends RowData>({
     columns,
   });
 
+  const { pageIndex, pageSize } = table.state.pagination;
+  const total = data.length;
+  const desde = total === 0 ? 0 : pageIndex * pageSize + 1;
+  const hasta = Math.min((pageIndex + 1) * pageSize, total);
+
   return (
-    <div className="overflow-hidden rounded-md border">
+    <div className="overflow-hidden rounded-xl border bg-card">
       <Table>
-        <TableHeader className="brightness-95" >
+        <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id} className="p-4">
+            <TableRow key={headerGroup.id} className="hover:bg-transparent">
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className="h-11 px-4 text-xs font-medium text-muted-foreground">
                     {header.isPlaceholder ? null : (
                       <table.FlexRender header={header} />
                     )}
@@ -53,9 +62,10 @@ export function DataTable<TData extends RowData>({
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
                 onClick={() => onClic?.(row.original)}
+                className={onClic ? "cursor-pointer" : undefined}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
+                  <TableCell key={cell.id} className="h-14 px-4">
                     <table.FlexRender cell={cell} />
                   </TableCell>
                 ))}
@@ -70,29 +80,34 @@ export function DataTable<TData extends RowData>({
           )}
         </TableBody>
       </Table>
-      <div className="flex items-center justify-end gap-2 p-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t px-4 py-3">
         <span className="text-xs text-muted-foreground">
-          Página {table.state.pagination.pageIndex + 1} de{" "}
-          {table.getPageCount()}
+          Mostrando {desde}–{hasta} de {total} {itemLabel}
         </span>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Anterior
-        </Button>
-
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Siguiente
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            <ChevronLeft />
+            Anterior
+          </Button>
+          <span className="flex size-8 items-center justify-center rounded-md border border-primary/30 bg-primary/10 text-xs font-medium text-primary tabular-nums">
+            {pageIndex + 1}
+          </span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Siguiente
+            <ChevronRight />
+          </Button>
+        </div>
       </div>
     </div>
   );

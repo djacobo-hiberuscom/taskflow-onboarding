@@ -56,7 +56,6 @@ export function ArchiveConfirmPopUp({
             Cancelar
           </Button>
           <Button
-            className="bg-blue-500 text-white hover:bg-blue-600"
             disabled={!proyecto || archiveProject.isPending}
             onClick={handleArchive}
           >

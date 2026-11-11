@@ -4,7 +4,7 @@ import {
   Badge,
   Avatar,
   AvatarFallback,
-} from "@/components/index.comp";
+} from "@/components";
 // iconos
 import { Pencil, Mail, LogOut } from "lucide-react";
 
@@ -29,8 +29,8 @@ export function Header() {
       <div className="flex flex-col gap-4 px-8 pb-5 md:flex-row md:items-end">
         
         <Avatar className="-mt-14 size-28 shrink-0 ring-4 ring-background">
-          <AvatarFallback className="bg-primary/10 text-3xl font-semibold text-primary">
-            {iniciales}
+          <AvatarFallback className="bg-primary text-3xl font-semibold text-primary-foreground">
+            <h1>{iniciales}</h1>
           </AvatarFallback>
         </Avatar>
 

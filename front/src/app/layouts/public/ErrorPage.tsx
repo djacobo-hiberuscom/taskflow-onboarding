@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Button } from "@/components/index.comp";
+import { Button } from "@/components";
 
 // Pantalla completa de error con botón para volver al inicio
 export function ErrorPage({ message }: { message: string }) {

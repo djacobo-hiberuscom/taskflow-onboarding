@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams } from "@tanstack/react-router";
-import { DataTable, QueryState, TaskDetailDrawer } from "@/components/index.comp";
+import { DataTable, QueryState, TaskDetailDrawer } from "@/components";
 import { useProject } from "@/hooks/use-project";
 import { useTasks } from "@/hooks/use-task";
 import {
@@ -45,34 +45,34 @@ export function DetailProjectFeat() {
   );
 
   return (
-    <div>
+    <div className="relative">
       <TaskDetailDrawer taskId={selectedTaskId} onClose={() => setSelectedTaskId(null)} />
       <PopupContainer proyecto={proyecto} popup={popup} close={() => setPopup(null)} />
 
       <BackButton />
 
-      <div className="flex flex-col bg-background items-center justify-center gap-8 p-5 m-5 border rounded-xl">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 p-6">
         <Header proyecto={proyecto} open={setPopup} />
 
-        <div className="flex flex-col overflow-hidden rounded-md bg-background shadow-2xs p-3 gap-4 w-full">
-          <FilterAndSearch
-            filters={filters}
-            onFiltersChange={setFilters}
-            busqueda={busqueda}
-            onBusquedaChange={setBusqueda}
-            miembros={proyecto.members}
-          />
+        <FilterAndSearch
+          filters={filters}
+          onFiltersChange={setFilters}
+          busqueda={busqueda}
+          onBusquedaChange={setBusqueda}
+          miembros={proyecto.members}
+          onNewTask={() => setPopup("create-task")}
+        />
 
-          {tasks.isLoading || tasks.error ? (
-            <QueryState isLoading={tasks.isLoading} error={tasks.error} />
-          ) : (
-            <DataTable
-              columns={TaskColum}
-              data={tareas}
-              onClic={(t) => setSelectedTaskId(t.id === selectedTaskId ? null : t.id)}
-            />
-          )}
-        </div>
+        {tasks.isLoading || tasks.error ? (
+          <QueryState isLoading={tasks.isLoading} error={tasks.error} />
+        ) : (
+          <DataTable
+            columns={TaskColum}
+            data={tareas}
+            itemLabel="tareas"
+            onClic={(t) => setSelectedTaskId(t.id === selectedTaskId ? null : t.id)}
+          />
+        )}
       </div>
     </div>
   );

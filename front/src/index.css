@@ -44,6 +44,48 @@
   --color-overdue-foreground: var(--overdue-foreground);
   --color-archived: var(--archived);
   --color-archived-foreground: var(--archived-foreground);
+
+  /* Semánticos */
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-soft-foreground: var(--danger-soft-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  /* Dominio de tareas */
+  --color-status-todo: var(--status-todo);
+  --color-status-todo-foreground: var(--status-todo-foreground);
+  --color-status-todo-dot: var(--status-todo-dot);
+  --color-status-in-progress: var(--status-in-progress);
+  --color-status-in-progress-foreground: var(--status-in-progress-foreground);
+  --color-status-in-progress-dot: var(--status-in-progress-dot);
+  --color-status-done: var(--status-done);
+  --color-status-done-foreground: var(--status-done-foreground);
+  --color-status-done-dot: var(--status-done-dot);
+  --color-priority-high: var(--priority-high);
+  --color-priority-high-foreground: var(--priority-high-foreground);
+  --color-priority-medium: var(--priority-medium);
+  --color-priority-medium-foreground: var(--priority-medium-foreground);
+  --color-priority-low: var(--priority-low);
+  --color-priority-low-foreground: var(--priority-low-foreground);
+
+  /* Identidad (avatares, iconos de proyecto) y favorito */
+  --color-tone-1: var(--tone-1);
+  --color-tone-1-foreground: var(--tone-1-foreground);
+  --color-tone-2: var(--tone-2);
+  --color-tone-2-foreground: var(--tone-2-foreground);
+  --color-tone-3: var(--tone-3);
+  --color-tone-3-foreground: var(--tone-3-foreground);
+  --color-tone-4: var(--tone-4);
+  --color-tone-4-foreground: var(--tone-4-foreground);
+  --color-tone-5: var(--tone-5);
+  --color-tone-5-foreground: var(--tone-5-foreground);
+  --color-tone-6: var(--tone-6);
+  --color-tone-6-foreground: var(--tone-6-foreground);
+  --color-favorite: var(--favorite);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -55,92 +97,209 @@
   --font-sans: 'Inter Variable', sans-serif;
 }
 
+/*
+ * Paleta TaskFlow — índigo sobre neutros fríos.
+ * Leyenda de comentarios (auditoría de uso en front/src, *.ts/*.tsx):
+ *   SIN USO     → 0 referencias; candidata a eliminar.
+ *   USO PUNTUAL → 1-3 referencias; se indica dónde.
+ *   (sin comentario → uso extendido)
+ */
 :root {
   --radius: 0.625rem;
-  /* Paleta TaskFlow (modo claro) */
-  --background: #fafafa; /* --bg  Fondo de la app */
-  --foreground: #18181b; /* --fg  Texto */
-  --card: #ffffff; /* --sf  Superficie */
-  --card-foreground: #18181b;
+
+  /* Base */
+  --background: #f8f8fa;
+  --foreground: #17171c; /* texto principal */
+  --card: #ffffff; /* USO PUNTUAL: ui/card, data-table, Project-Card, ProjectEmptyState */
+  --card-foreground: #17171c; /* USO PUNTUAL: solo ui/card.tsx */
   --popover: #ffffff;
-  --popover-foreground: #18181b;
-  --primary: #4f46e5; /* --ac  Acento */
+  --popover-foreground: #17171c;
+
+  /* Marca e interacción */
+  --primary: #4f46e5;
   --primary-foreground: #ffffff;
-  --secondary: #f4f4f5; /* --s2  Superficie 2 */
-  --secondary-foreground: #18181b;
-  --muted: #f4f4f5;
-  --muted-foreground: #52525b; /* --f2  Texto secundario */
-  --accent: #eef2ff; /* --as  Acento suave */
-  --accent-foreground: #4338ca; /* --at  Texto sobre acento suave */
-  --destructive: #dc2626; /* --xb  Destructivo */
-  --border: #e4e4e7; /* --bd  Borde */
-  --input: #d4d4d8; /* --b2  Borde fuerte */
-  --ring: #4f46e5;
-  --chart-1: #4f46e5;
-  --chart-2: #4338ca;
-  --chart-3: #52525b;
-  --chart-4: #b91c1c;
-  --chart-5: #92400e;
+  --secondary: #eeeef2; /* USO PUNTUAL: solo variantes de ui/badge y ui/button */
+  --secondary-foreground: #27272f; /* USO PUNTUAL: solo ui/badge y ui/button */
+  --accent: #eef0ff;
+  --accent-foreground: #3730a3;
+  --ring: #6366f1;
+
+  /* Texto secundario */
+  --muted: #f1f1f4;
+  --muted-foreground: #5b5b66;
+
+  /* Bordes */
+  --border: #e4e4ea;
+  --input: #d2d2da;
+
+  /* Estado destructivo */
+  --destructive: #dc2626;
+
+  /* Gráficos */
+  --chart-1: #4f46e5; /* USO PUNTUAL: solo PiChart (estado "Pendiente") */
+  --chart-2: #3b82f6; /* USO PUNTUAL: solo PiChart (estado "En curso") */
+  --chart-3: #16a34a; /* USO PUNTUAL: solo PiChart (estado "Completada") */
+  --chart-4: #d97706; /* SIN USO */
+  --chart-5: #dc2626; /* SIN USO */
+
+  /* Sidebar */
   --sidebar: #ffffff;
-  --sidebar-foreground: #18181b;
-  --sidebar-primary: #4f46e5;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #eef2ff;
-  --sidebar-accent-foreground: #4338ca;
-  --sidebar-border: #e4e4e7;
-  --sidebar-ring: #4f46e5;
+  --sidebar-foreground: #17171c;
+  --sidebar-primary: #4f46e5; /* USO PUNTUAL: indicador activo de navsection */
+  --sidebar-primary-foreground: #ffffff; /* SIN USO */
+  --sidebar-accent: #eef0ff;
+  --sidebar-accent-foreground: #3730a3;
+  --sidebar-border: #e4e4ea;
+  --sidebar-ring: #6366f1;
 
   /* Tokens propios de TaskFlow */
-  --surface-2: #f4f4f5; /* --s2  Superficie 2 */
-  --border-strong: #d4d4d8; /* --b2  Borde fuerte */
-  --subtle-foreground: #63636b; /* --f3  Texto terciario */
-  --overdue: #fef2f2; /* --ob  Vencida · fondo */
-  --overdue-foreground: #b91c1c; /* --of  Vencida · texto */
-  --archived: #fffbeb; /* --rb  Archivado · fondo */
-  --archived-foreground: #92400e; /* --rf  Archivado · texto */
+  --surface-2: #f1f1f4; /* SIN USO */
+  --border-strong: #d2d2da; /* USO PUNTUAL: separador de sticky-header */
+  --subtle-foreground: #6b6b76; /* USO PUNTUAL: cabecera de tabla en features/task */
+  --overdue: #fef2f2; /* SIN USO (duplica --danger-soft) */
+  --overdue-foreground: #b91c1c; /* SIN USO (duplica --danger-soft-foreground) */
+  --archived: #fffbeb; /* USO PUNTUAL: badge de Archive-Projects (duplica --warning) */
+  --archived-foreground: #b45309; /* USO PUNTUAL: badge de Archive-Projects */
+
+  /* Semánticos (fondo suave / texto) */
+  --danger-soft: #fef2f2; /* USO PUNTUAL: Delete-Confirm, FunButtons */
+  --danger-soft-foreground: #b91c1c; /* USO PUNTUAL: Delete-Confirm, FunButtons */
+  --success: #f0fdf4; /* USO PUNTUAL: Stats + status-done */
+  --success-foreground: #15803d; /* USO PUNTUAL: Stats + status-done */
+  --warning: #fffbeb; /* USO PUNTUAL: Stats + priority-high */
+  --warning-foreground: #b45309; /* USO PUNTUAL: Stats + priority-high */
+  --info: #eff6ff; /* vía status-in-progress y priority-medium */
+  --info-foreground: #1d4ed8; /* vía status-in-progress y priority-medium */
+
+  /* Dominio de tareas (sustituirán los colores fijos de lib/constants/task.ts) */
+  --status-todo: #f1f1f4; /* lib/constants/task.ts */
+  --status-todo-foreground: #52525b; /* lib/constants/task.ts */
+  --status-todo-dot: #a1a1aa; /* lib/constants/task.ts */
+  --status-in-progress: var(--info); /* lib/constants/task.ts */
+  --status-in-progress-foreground: var(--info-foreground); /* lib/constants/task.ts */
+  --status-in-progress-dot: #3b82f6; /* lib/constants/task.ts */
+  --status-done: var(--success); /* lib/constants/task.ts */
+  --status-done-foreground: var(--success-foreground); /* lib/constants/task.ts */
+  --status-done-dot: #22c55e; /* lib/constants/task.ts */
+  --priority-high: var(--warning); /* lib/constants/task.ts */
+  --priority-high-foreground: var(--warning-foreground); /* lib/constants/task.ts */
+  --priority-medium: var(--info); /* lib/constants/task.ts */
+  --priority-medium-foreground: var(--info-foreground); /* lib/constants/task.ts */
+  --priority-low: #f4f4f6; /* lib/constants/task.ts */
+  --priority-low-foreground: #5b5b66; /* lib/constants/task.ts */
+
+  /* Identidad: colores decorativos estables por id (MemberAvatars, Project-Card) */
+  --tone-1: #ede9fe; /* violeta */
+  --tone-1-foreground: #6d28d9;
+  --tone-2: #ccfbf1; /* verde azulado */
+  --tone-2-foreground: #0f766e;
+  --tone-3: #dbeafe; /* azul */
+  --tone-3-foreground: #1d4ed8;
+  --tone-4: #fef3c7; /* ámbar */
+  --tone-4-foreground: #b45309;
+  --tone-5: #fce7f3; /* rosa */
+  --tone-5-foreground: #be185d;
+  --tone-6: #d1fae5; /* esmeralda */
+  --tone-6-foreground: #047857;
+  --favorite: #f59e0b; /* USO PUNTUAL: estrella de Project-Card */
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Base */
+  --background: #0e0e12;
+  --foreground: #ededf0;
+  --card: #16161c;
+  --card-foreground: #ededf0;
+  --popover: #1a1a21;
+  --popover-foreground: #ededf0;
 
-  /* Tokens propios de TaskFlow (provisionales hasta tener paleta oscura) */
-  --surface-2: oklch(0.269 0 0);
-  --border-strong: oklch(1 0 0 / 20%);
-  --subtle-foreground: oklch(0.6 0 0);
-  --overdue: oklch(0.704 0.191 22.216 / 15%);
-  --overdue-foreground: oklch(0.808 0.114 19.571);
-  --archived: oklch(0.769 0.188 70.08 / 15%);
-  --archived-foreground: oklch(0.828 0.189 84.429);
+  /* Marca e interacción */
+  --primary: #818cf8;
+  --primary-foreground: #0e0e12;
+  --secondary: #23232c;
+  --secondary-foreground: #e4e4ea;
+  --accent: #24233f;
+  --accent-foreground: #c7d2fe;
+  --ring: #818cf8;
+
+  /* Texto secundario */
+  --muted: #1f1f27;
+  --muted-foreground: #a0a0ab;
+
+  /* Bordes */
+  --border: #26262f;
+  --input: #34343f;
+
+  /* Estado destructivo */
+  --destructive: #f87171;
+
+  /* Gráficos */
+  --chart-1: #818cf8;
+  --chart-2: #60a5fa;
+  --chart-3: #4ade80;
+  --chart-4: #fbbf24;
+  --chart-5: #f87171;
+
+  /* Sidebar */
+  --sidebar: #121217;
+  --sidebar-foreground: #ededf0;
+  --sidebar-primary: #818cf8;
+  --sidebar-primary-foreground: #0e0e12;
+  --sidebar-accent: #24233f;
+  --sidebar-accent-foreground: #c7d2fe;
+  --sidebar-border: #26262f;
+  --sidebar-ring: #818cf8;
+
+  /* Tokens propios de TaskFlow */
+  --surface-2: #1f1f27;
+  --border-strong: #34343f;
+  --subtle-foreground: #7c7c88;
+  --overdue: #2a1215;
+  --overdue-foreground: #fca5a5;
+  --archived: #2a1f0b;
+  --archived-foreground: #fbbf24;
+
+  /* Semánticos */
+  --danger-soft: #2a1215;
+  --danger-soft-foreground: #fca5a5;
+  --success: #0f2a1c;
+  --success-foreground: #4ade80;
+  --warning: #2a1f0b;
+  --warning-foreground: #fbbf24;
+  --info: #0f1e36;
+  --info-foreground: #60a5fa;
+
+  /* Dominio de tareas */
+  --status-todo: #1f1f27;
+  --status-todo-foreground: #a0a0ab;
+  --status-todo-dot: #71717a;
+  --status-in-progress: var(--info);
+  --status-in-progress-foreground: var(--info-foreground);
+  --status-in-progress-dot: #60a5fa;
+  --status-done: var(--success);
+  --status-done-foreground: var(--success-foreground);
+  --status-done-dot: #4ade80;
+  --priority-high: var(--warning);
+  --priority-high-foreground: var(--warning-foreground);
+  --priority-medium: var(--info);
+  --priority-medium-foreground: var(--info-foreground);
+  --priority-low: #1f1f27;
+  --priority-low-foreground: #a0a0ab;
+
+  /* Identidad y favorito */
+  --tone-1: #2a2147;
+  --tone-1-foreground: #c4b5fd;
+  --tone-2: #0f2e2b;
+  --tone-2-foreground: #5eead4;
+  --tone-3: #13233f;
+  --tone-3-foreground: #93c5fd;
+  --tone-4: #2e2410;
+  --tone-4-foreground: #fcd34d;
+  --tone-5: #331526;
+  --tone-5-foreground: #f9a8d4;
+  --tone-6: #0f2c22;
+  --tone-6-foreground: #6ee7b7;
+  --favorite: #fbbf24;
 }
 
 @layer base {

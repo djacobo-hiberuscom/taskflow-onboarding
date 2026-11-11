@@ -3,7 +3,7 @@ import {
   Pagination,
   QueryState,
   TaskDetailDrawer,
-} from "@/components/index.comp";
+} from "@/components";
 import { useProjects } from "@/hooks/use-project";
 import { useTasks } from "@/hooks/use-task";
 import {

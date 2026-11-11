@@ -19,6 +19,8 @@ export function useTasks(params: TaskListParams = {}) {
   });
 }
 
+
+
 // Solo el total de tareas que cumplen unos filtros (pide 1 item)
 export function useTaskCount(
   params: Omit<TaskListParams, "page" | "pageSize"> = {},
@@ -30,6 +32,23 @@ export function useTaskCount(
     queryFn: () => tasksApi.list(listParams),
     select: (page) => page.totalCount,
     ...options,
+  });
+}
+// use all task 
+export function useAllTask (params: Omit<TaskListParams, "page" | "pageSize"> = {}){
+  return useQuery({
+    queryKey: [...taskKeys.list(params), "all"],
+    queryFn: async () => {
+      const pageSize = 100;
+      const first = await tasksApi.list({ ...params, page: 1, pageSize });
+      const totalPages = Math.ceil(first.totalCount / pageSize);
+      const rest = await Promise.all(
+        Array.from({ length: Math.max(totalPages - 1, 0) }, (_, i) =>
+          tasksApi.list({ ...params, page: i + 2, pageSize }),
+        ),
+      );
+      return [first, ...rest].flatMap((p) => p.items);
+    },
   });
 }
 

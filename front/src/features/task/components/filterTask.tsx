@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { Button, FilterSelector, Input } from "@/components/index.comp";
+import { Button, FilterSelector, Input } from "@/components";
 import { useAssignableUsers } from "@/hooks/use-users";
 import type { Project } from "@/lib/api/types";
 import { TASK_PRIORITY_OPTIONS, TASK_STATUS_OPTIONS } from "@/lib/constants/task";

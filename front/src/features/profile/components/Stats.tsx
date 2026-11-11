@@ -21,7 +21,7 @@ interface ProfileStatsCardParams {
 // estats del usuario 
 function ProfileStatsCard ({label, value, icon: Icon, tone, to, linkLabel}: ProfileStatsCardParams) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border bg-background p-4">
+    <div className="flex flex-col gap-3 rounded-2xl border bg-card p-4">
       <div className="flex items-center gap-3">
         <div className={cn("flex size-9 items-center justify-center rounded-lg", tone)}>
           <Icon className="size-5" />
@@ -56,7 +56,7 @@ export function StatsMe() {
         label="Tareas completadas"
         value={completadas}
         icon={CircleCheck}
-        tone="bg-emerald-100 text-emerald-600"
+        tone="bg-success text-success-foreground"
         to="/tasks"
         linkLabel="Ver mis tareas"
       />
@@ -64,7 +64,7 @@ export function StatsMe() {
         label="Tareas pendientes"
         value={pendientes}
         icon={Clock}
-        tone="bg-amber-100 text-amber-600"
+        tone="bg-warning text-warning-foreground"
         to="/tasks"
         linkLabel="Ver mis tareas"
       />
@@ -72,7 +72,7 @@ export function StatsMe() {
         label="Proyectos"
         value={proyectos?.totalCount}
         icon={FolderKanban}
-        tone="bg-violet-100 text-violet-600"
+        tone="bg-accent text-accent-foreground"
         to="/projects"
         linkLabel="Ver proyectos"
       />

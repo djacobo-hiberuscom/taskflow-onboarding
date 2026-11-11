@@ -1,5 +1,5 @@
 // Compoenentes
-import { Button } from "@/components/index.comp";
+import { Button } from "@/components";
 
 // KeyCloak
 import { login } from "@/lib/auth/keycloak";

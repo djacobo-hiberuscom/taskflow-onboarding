@@ -120,10 +120,10 @@ function NewTaskForm({ proyecto, onClose }: { proyecto: ProjectDetail; onClose: 
       </div>
 
       <div className="flex gap-2 justify-end">
-        <Button variant="outline" className="text-red-500 hover:text-red-500" onClick={limpiar}>
+        <Button variant="outline" className="text-destructive hover:text-destructive" onClick={limpiar}>
           <X />
         </Button>
-        <Button variant="outline" className="text-red-500 hover:text-red-500" onClick={onClose}>
+        <Button variant="outline" className="text-destructive hover:text-destructive" onClick={onClose}>
           Cancelar
         </Button>
         <Button disabled={!canSave} onClick={handleSave}>

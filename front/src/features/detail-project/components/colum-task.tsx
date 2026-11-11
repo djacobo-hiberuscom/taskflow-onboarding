@@ -1,8 +1,9 @@
 import { createColumnHelper, type Column } from "@tanstack/react-table";
-import { Button, TaskPriorityBadge, TaskStatusBadge } from "@/components/index.comp";
+import { Button, TaskPriorityBadge, TaskStatusBadge } from "@/components";
 import { type DataTableFeatures } from "@/components/ui/data-table/data-table-features";
 import type { Task } from "@/lib/api/types";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, formatRelative } from "@/lib/format";
+import { UserCell } from "./MemberAvatars";
 
 const columnHelper = createColumnHelper<DataTableFeatures, Task>();
 
@@ -14,7 +15,12 @@ function sortableHeader(label: string) {
     column: Column<DataTableFeatures, Task, TValue>;
   }) {
     return (
-      <Button variant="ghost" onClick={column.getToggleSortingHandler()} className="-ml-2.5">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={column.getToggleSortingHandler()}
+        className="-ml-2.5 h-7 text-xs font-medium text-muted-foreground"
+      >
         {label}
         {column.getIsSorted() === "asc" && " ↑"}
         {column.getIsSorted() === "desc" && " ↓"}
@@ -25,10 +31,14 @@ function sortableHeader(label: string) {
 
 // Columnas de la tabla de tareas del proyecto
 export const TaskColum = columnHelper.columns([
-  columnHelper.accessor("title", { header: sortableHeader("Nombre") }),
-  columnHelper.accessor((t) => t.assignee?.displayName ?? "Sin asignar", {
+  columnHelper.accessor("title", {
+    header: sortableHeader("Nombre"),
+    cell: (info) => <span className="font-medium">{info.getValue()}</span>,
+  }),
+  columnHelper.accessor((t) => t.assignee?.displayName ?? "", {
     id: "assignee",
-    header: sortableHeader("Usuario asignado"),
+    header: sortableHeader("Asignado"),
+    cell: (info) => <UserCell user={info.row.original.assignee} />,
   }),
   columnHelper.accessor("priority", {
     header: sortableHeader("Prioridad"),
@@ -40,6 +50,10 @@ export const TaskColum = columnHelper.columns([
   }),
   columnHelper.accessor("updatedAt", {
     header: sortableHeader("Último cambio"),
-    cell: (info) => formatDateTime(info.getValue()),
+    cell: (info) => (
+      <span className="text-muted-foreground" title={formatDateTime(info.getValue())}>
+        {formatRelative(info.getValue())}
+      </span>
+    ),
   }),
 ]);

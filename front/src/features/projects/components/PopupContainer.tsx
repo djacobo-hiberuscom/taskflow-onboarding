@@ -4,7 +4,7 @@ import {
   DeleteProjectPopUp,
   EditProjectPopUp,
   NewProjectPopup,
-} from "@/components/index.comp";
+} from "@/components";
 import type { Project } from "@/lib/api/types";
 import type { ProjectsPopup } from "./types";
 

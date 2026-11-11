@@ -10,7 +10,7 @@ interface StatCardProps {
 // Tarjeta con un número destacado
 export function StatCard({ name, number, icon: Icon, descripcion }: StatCardProps) {
   return (
-    <div className="flex flex-col border rounded-2xl p-4 gap-10 min-w-2xs bg-background">
+    <div className="flex flex-col border rounded-2xl p-4 gap-10 min-w-2xs bg-card">
       <div className="flex justify-between gap-4">
         <h2 className="text-xl">{name}</h2>
         <Icon />

@@ -11,7 +11,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
   Separator,
-} from "@/components/index.comp";
+} from "@/components";
 import { cn } from "cn";
 import { useProject } from "@/hooks/use-project";
 import { useTaskCount } from "@/hooks/use-task";
@@ -19,12 +19,12 @@ import type { Project, UserSummary } from "@/lib/api/types";
 
 // Color estable por id (el mismo proyecto/usuario -> siempre el mismo color)
 const TONES = [
-  "bg-violet-100 text-violet-600",
-  "bg-teal-100 text-teal-600",
-  "bg-blue-100 text-blue-600",
-  "bg-amber-100 text-amber-600",
-  "bg-pink-100 text-pink-600",
-  "bg-emerald-100 text-emerald-600",
+  "bg-tone-1 text-tone-1-foreground",
+  "bg-tone-2 text-tone-2-foreground",
+  "bg-tone-3 text-tone-3-foreground",
+  "bg-tone-4 text-tone-4-foreground",
+  "bg-tone-5 text-tone-5-foreground",
+  "bg-tone-6 text-tone-6-foreground",
 ];
 function toneFor(id: string) {
   let h = 0;
@@ -98,7 +98,7 @@ export function ProjectCard({ proyecto, isAdmin, onOpen, onEdit, onArchive, onDe
             <Star
               className={cn(
                 "size-5",
-                starred ? "fill-amber-400 text-amber-400" : "text-muted-foreground",
+                starred ? "fill-favorite text-favorite" : "text-muted-foreground",
               )}
             />
           </button>
@@ -134,7 +134,7 @@ export function ProjectCard({ proyecto, isAdmin, onOpen, onEdit, onArchive, onDe
             <Archive />
             Archivar
           </ContextMenuItem>
-          <ContextMenuItem disabled={!isAdmin} className="text-red-600" onClick={() => onDelete(proyecto)}>
+          <ContextMenuItem disabled={!isAdmin} variant="destructive" onClick={() => onDelete(proyecto)}>
             <Trash />
             Eliminar
           </ContextMenuItem>

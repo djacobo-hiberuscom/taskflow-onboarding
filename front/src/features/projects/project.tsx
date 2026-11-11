@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { QueryState } from "@/components/index.comp";
+import { QueryState } from "@/components";
 import { useProjects } from "@/hooks/use-project";
 import type { Project } from "@/lib/api/types";
 import {

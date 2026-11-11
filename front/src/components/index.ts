@@ -1,4 +1,4 @@
-// ---------- UI (shadcn) ----------
+// UI
 export * from "./ui/avatar";
 export * from "./ui/badge";
 export * from "./ui/button";
@@ -19,9 +19,10 @@ export * from "./ui/toast";
 export * from "./ui/tooltip";
 export * from "./ui/label"
 
-// ---------- COMMON (propios, compartidos entre features) ----------
+// COMMON 
 export * from "./common/badges/TaskBadges";
-export * from "./common/chart/PiChart.comp";
+export * from "./common/chart/PiChart";
+export * from "./common/chart/AreaChart"
 export * from "./common/DatePicker";
 export * from "./common/FilterSelector";
 export * from "./common/Pagination";

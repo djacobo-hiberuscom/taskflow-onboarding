@@ -8,7 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarProvider,
-} from "@/components/index.comp";
+} from "@/components";
 import {
   FooterSidebar,
   getActiveNavItem,
@@ -26,7 +26,7 @@ export function AppLayout() {
   return (
     <SidebarProvider>
       <Sidebar>
-        <div className="flex size-full flex-col bg-background text-foreground">
+        <div className="flex size-full flex-col bg-sidebar text-sidebar-foreground">
           <SidebarHeader className="px-4 pt-5 pb-4">
             <HeaderSiderBar />
           </SidebarHeader>
@@ -45,7 +45,7 @@ export function AppLayout() {
         </div>
       </Sidebar>
 
-      <SidebarInset className="min-w-0 bg-[#F3F5F9]">
+      <SidebarInset className="min-w-0 bg-background">
         <StickyHeader title={title} />
         <div className="mx-auto w-full max-w-350 flex-1 flex flex-col">
           <Outlet />

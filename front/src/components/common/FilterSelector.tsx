@@ -20,6 +20,8 @@ interface FilterSelectorProps<T extends string> {
   onChange?: (value: T | null) => void;
   className?: string;
   disabled?: boolean;
+  // Prefijo dentro del trigger, p. ej. "Estado" -> "Estado  Todos"
+  label?: string;
 }
 
 // Select de shadcn simplificado (tipado según los valores de las opciones)
@@ -30,6 +32,7 @@ export function FilterSelector<T extends string>({
   onChange,
   className,
   disabled = false,
+  label,
 }: FilterSelectorProps<T>) {
   return (
     <Select
@@ -39,7 +42,8 @@ export function FilterSelector<T extends string>({
       onValueChange={(v) => onChange?.((v as T | null) ?? null)}
     >
       <SelectTrigger className={cn("w-45", className)}>
-        <SelectValue placeholder={placeholder} />
+        {label && <span className="text-muted-foreground">{label}</span>}
+        <SelectValue placeholder={placeholder} className="font-medium" />
       </SelectTrigger>
       <SelectContent className="max-h-100 w-fit min-w-(--anchor-width) max-w-(--available-width)">
         <SelectGroup>

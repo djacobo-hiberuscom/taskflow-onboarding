@@ -22,7 +22,7 @@ export function ErrorMessage({ error }: { error: unknown }) {
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-2 p-10 text-center">
-      <TriangleAlert className="size-8 text-red-500" />
+      <TriangleAlert className="size-8 text-destructive" />
       <h2 className="text-lg font-semibold">{notFound ? "404" : "Error"}</h2>
       <p className="text-muted-foreground">{message}</p>
     </div>

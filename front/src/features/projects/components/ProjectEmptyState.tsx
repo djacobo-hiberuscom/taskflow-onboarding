@@ -1,5 +1,5 @@
 import { Archive, FolderPlus, Plus } from "lucide-react";
-import { Button } from "@/components/index.comp";
+import { Button } from "@/components";
 import { useAuth } from "@/hooks/use-auth";
 
 interface ProjectsEmptyStateProps {

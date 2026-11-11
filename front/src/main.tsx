@@ -13,7 +13,7 @@ function render() {
   createRoot(document.getElementById("root")!).render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <Toaster>
+        <Toaster timeout={2500}>
           <RouterProvider router={router} />
         </Toaster>
       </QueryClientProvider>

@@ -7,7 +7,7 @@ interface ProjectsTabsProps {
 // Pestañas. "Favoritos" es solo visual hasta que el back lo soporte
 export function ProjectsTabs({ total }: ProjectsTabsProps) {
   return (
-    <div role="tablist" className="flex gap-1 rounded-lg bg-muted p-1">
+    <div role="tablist" className="flex gap-1 rounded-lg bg-muted p-1 max-w-fit">
       <button
         role="tab"
         aria-selected

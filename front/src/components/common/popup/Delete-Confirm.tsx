@@ -38,7 +38,7 @@ export function ConfirmDeletePopUp({
         </div>
 
         {warning && (
-          <div className="flex gap-2 bg-red-200 rounded-xl p-3 text-red-900 items-center">
+          <div className="flex gap-2 bg-danger-soft rounded-xl p-3 text-danger-soft-foreground items-center">
             <TriangleAlertIcon />
             <p>{warning}</p>
           </div>
