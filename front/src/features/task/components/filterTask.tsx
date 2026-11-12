@@ -32,11 +32,12 @@ export function FiltersTask({
     ...usuarios.map((u) => ({ label: u.displayName, value: u.id })),
   ];
 
-  // Cambia un solo filtro
-  const set =
-    <K extends keyof TaskFilters>(key: K) =>
-    (value: TaskFilters[K]) =>
-      onFiltersChange({ ...filters, [key]: value });
+  const hayFiltros =
+    filters.member !== null ||
+    filters.status !== null ||
+    filters.priority !== null ||
+    filters.project !== null ||
+    buscador !== "";
 
   const filterSelectorClasname = "rounded-md bg-card shadow-sm";
   return (
@@ -46,33 +47,33 @@ export function FiltersTask({
         items={projectOptions}
         placeholder="Proyectos"
         value={filters.project}
-        onChange={set("project")}
+        onChange={(value) => onFiltersChange({ ...filters, project: value })}
       />
       <FilterSelector
         className={filterSelectorClasname}
         items={TASK_STATUS_OPTIONS}
         placeholder="Estados"
         value={filters.status}
-        onChange={set("status")}
+        onChange={(value) => onFiltersChange({ ...filters, status: value })}
       />
       <FilterSelector
         className={filterSelectorClasname}
         items={TASK_PRIORITY_OPTIONS}
         placeholder="Prioridad"
         value={filters.priority}
-        onChange={set("priority")}
+        onChange={(value) => onFiltersChange({ ...filters, priority: value })}
       />
       <FilterSelector
         className={filterSelectorClasname}
         items={memberOptions}
         placeholder="Miembros"
         value={filters.member}
-        onChange={set("member")}
+        onChange={(value) => onFiltersChange({ ...filters, member: value })}
       />
-      {
+      {hayFiltros && (
         <Button
           className={filterSelectorClasname}
-          variant="outline"
+          variant="destructive"
           onClick={() => {
             onFiltersChange(EMPTY_FILTERS);
             onBuscadorChange("");
@@ -81,7 +82,7 @@ export function FiltersTask({
           <X />
           Quitar filtros
         </Button>
-      }
+      )}
       <Input
         className={filterSelectorClasname}
         value={buscador}

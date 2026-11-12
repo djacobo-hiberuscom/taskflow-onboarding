@@ -24,18 +24,13 @@ export function FilterAndSearch({
   onNewTask,
 }: FilterAndSearchProps) {
   const { data: usuarios = [] } = useAssignableUsers();
+  
   const memberOptions = usuarios.map((u) => ({
     label: u.displayName,
     value: u.id,
   }));
 
-  const hayFiltros = Object.values(filters).some(Boolean) || busqueda !== "";
-
-  // Cambia un solo filtro
-  const set =
-    <K extends keyof TaskFilters>(key: K) =>
-    (value: TaskFilters[K]) =>
-      onFiltersChange({ ...filters, [key]: value });
+  const hayFiltros = filters.status !== null || filters.priority !== null || filters.member !== null || busqueda !== "";
 
   const filterClasname = "w-auto bg-card shadow-sm";
 
@@ -57,7 +52,7 @@ export function FilterAndSearch({
         className={filterClasname}
         items={TASK_STATUS_OPTIONS}
         value={filters.status}
-        onChange={set("status")}
+        onChange={(value) => onFiltersChange({...filters, status: value})}
       />
       <FilterSelector
         label="Prioridad"
@@ -65,7 +60,7 @@ export function FilterAndSearch({
         className={filterClasname}
         items={TASK_PRIORITY_OPTIONS}
         value={filters.priority}
-        onChange={set("priority")}
+        onChange={(value) => onFiltersChange({...filters, priority: value})}
       />
       <FilterSelector
         label="Asignado"
@@ -73,7 +68,7 @@ export function FilterAndSearch({
         className={filterClasname}
         items={memberOptions}
         value={filters.member}
-        onChange={set("member")}
+        onChange={(value) => onFiltersChange({...filters, member: value})}
       />
 
       {hayFiltros && (
