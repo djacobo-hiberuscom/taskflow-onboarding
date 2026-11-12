@@ -6,95 +6,96 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-surface-2: var(--surface-2);
-  --color-border-strong: var(--border-strong);
-  --color-subtle-foreground: var(--subtle-foreground);
-  --color-overdue: var(--overdue);
-  --color-overdue-foreground: var(--overdue-foreground);
-  --color-archived: var(--archived);
-  --color-archived-foreground: var(--archived-foreground);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-button: var(--button);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-surface-2: var(--surface-2);
+    --color-border-strong: var(--border-strong);
+    --color-subtle-foreground: var(--subtle-foreground);
+    --color-overdue: var(--overdue);
+    --color-overdue-foreground: var(--overdue-foreground);
+    --color-archived: var(--archived);
+    --color-archived-foreground: var(--archived-foreground);
 
-  /* Semánticos */
-  --color-danger-soft: var(--danger-soft);
-  --color-danger-soft-foreground: var(--danger-soft-foreground);
-  --color-success: var(--success);
-  --color-success-foreground: var(--success-foreground);
-  --color-warning: var(--warning);
-  --color-warning-foreground: var(--warning-foreground);
-  --color-info: var(--info);
-  --color-info-foreground: var(--info-foreground);
+    /* Semánticos */
+    --color-danger-soft: var(--danger-soft);
+    --color-danger-soft-foreground: var(--danger-soft-foreground);
+    --color-success: var(--success);
+    --color-success-foreground: var(--success-foreground);
+    --color-warning: var(--warning);
+    --color-warning-foreground: var(--warning-foreground);
+    --color-info: var(--info);
+    --color-info-foreground: var(--info-foreground);
 
-  /* Dominio de tareas */
-  --color-status-todo: var(--status-todo);
-  --color-status-todo-foreground: var(--status-todo-foreground);
-  --color-status-todo-dot: var(--status-todo-dot);
-  --color-status-in-progress: var(--status-in-progress);
-  --color-status-in-progress-foreground: var(--status-in-progress-foreground);
-  --color-status-in-progress-dot: var(--status-in-progress-dot);
-  --color-status-done: var(--status-done);
-  --color-status-done-foreground: var(--status-done-foreground);
-  --color-status-done-dot: var(--status-done-dot);
-  --color-priority-high: var(--priority-high);
-  --color-priority-high-foreground: var(--priority-high-foreground);
-  --color-priority-medium: var(--priority-medium);
-  --color-priority-medium-foreground: var(--priority-medium-foreground);
-  --color-priority-low: var(--priority-low);
-  --color-priority-low-foreground: var(--priority-low-foreground);
+    /* Dominio de tareas */
+    --color-status-todo: var(--status-todo);
+    --color-status-todo-foreground: var(--status-todo-foreground);
+    --color-status-todo-dot: var(--status-todo-dot);
+    --color-status-in-progress: var(--status-in-progress);
+    --color-status-in-progress-foreground: var(--status-in-progress-foreground);
+    --color-status-in-progress-dot: var(--status-in-progress-dot);
+    --color-status-done: var(--status-done);
+    --color-status-done-foreground: var(--status-done-foreground);
+    --color-status-done-dot: var(--status-done-dot);
+    --color-priority-high: var(--priority-high);
+    --color-priority-high-foreground: var(--priority-high-foreground);
+    --color-priority-medium: var(--priority-medium);
+    --color-priority-medium-foreground: var(--priority-medium-foreground);
+    --color-priority-low: var(--priority-low);
+    --color-priority-low-foreground: var(--priority-low-foreground);
 
-  /* Identidad (avatares, iconos de proyecto) y favorito */
-  --color-tone-1: var(--tone-1);
-  --color-tone-1-foreground: var(--tone-1-foreground);
-  --color-tone-2: var(--tone-2);
-  --color-tone-2-foreground: var(--tone-2-foreground);
-  --color-tone-3: var(--tone-3);
-  --color-tone-3-foreground: var(--tone-3-foreground);
-  --color-tone-4: var(--tone-4);
-  --color-tone-4-foreground: var(--tone-4-foreground);
-  --color-tone-5: var(--tone-5);
-  --color-tone-5-foreground: var(--tone-5-foreground);
-  --color-tone-6: var(--tone-6);
-  --color-tone-6-foreground: var(--tone-6-foreground);
-  --color-favorite: var(--favorite);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
-  --font-heading: var(--font-sans);
-  --font-sans: 'Inter Variable', sans-serif;
+    /* Identidad (avatares, iconos de proyecto) y favorito */
+    --color-tone-1: var(--tone-1);
+    --color-tone-1-foreground: var(--tone-1-foreground);
+    --color-tone-2: var(--tone-2);
+    --color-tone-2-foreground: var(--tone-2-foreground);
+    --color-tone-3: var(--tone-3);
+    --color-tone-3-foreground: var(--tone-3-foreground);
+    --color-tone-4: var(--tone-4);
+    --color-tone-4-foreground: var(--tone-4-foreground);
+    --color-tone-5: var(--tone-5);
+    --color-tone-5-foreground: var(--tone-5-foreground);
+    --color-tone-6: var(--tone-6);
+    --color-tone-6-foreground: var(--tone-6-foreground);
+    --color-favorite: var(--favorite);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+    --font-heading: var(--font-sans);
+    --font-sans: "Inter Variable", sans-serif;
 }
 
 /*
@@ -105,212 +106,222 @@
  *   (sin comentario → uso extendido)
  */
 :root {
-  --radius: 0.625rem;
+    --radius: 0.625rem;
 
-  /* Base */
-  --background: #f8f8fa;
-  --foreground: #17171c; /* texto principal */
-  --card: #ffffff; /* USO PUNTUAL: ui/card, data-table, Project-Card, ProjectEmptyState */
-  --card-foreground: #17171c; /* USO PUNTUAL: solo ui/card.tsx */
-  --popover: #ffffff;
-  --popover-foreground: #17171c;
+    /* Base */
+    --background: #f8f8fa;
+    --foreground: #17171c; /* texto principal */
+    --card: #ffffff; /* USO PUNTUAL: ui/card, data-table, Project-Card, ProjectEmptyState */
+    --card-foreground: #17171c; /* USO PUNTUAL: solo ui/card.tsx */
+    --button: #ffffff;
+    --popover: #ffffff;
+    --popover-foreground: #17171c;
 
-  /* Marca e interacción */
-  --primary: #4f46e5;
-  --primary-foreground: #ffffff;
-  --secondary: #eeeef2; /* USO PUNTUAL: solo variantes de ui/badge y ui/button */
-  --secondary-foreground: #27272f; /* USO PUNTUAL: solo ui/badge y ui/button */
-  --accent: #eef0ff;
-  --accent-foreground: #3730a3;
-  --ring: #6366f1;
+    /* Marca e interacción */
+    --primary: #4f46e5;
+    --primary-foreground: #ffffff;
+    --secondary: #eeeef2; /* USO PUNTUAL: solo variantes de ui/badge y ui/button */
+    --secondary-foreground: #27272f; /* USO PUNTUAL: solo ui/badge y ui/button */
+    --accent: #eef0ff;
+    --accent-foreground: #3730a3;
+    --ring: #6366f1;
 
-  /* Texto secundario */
-  --muted: #f1f1f4;
-  --muted-foreground: #5b5b66;
+    /* Texto secundario */
+    --muted: #f1f1f4;
+    --muted-foreground: #5b5b66;
 
-  /* Bordes */
-  --border: #e4e4ea;
-  --input: #d2d2da;
+    /* Bordes */
+    --border: #e4e4ea;
+    --input: #d2d2da;
 
-  /* Estado destructivo */
-  --destructive: #dc2626;
+    /* Estado destructivo */
+    --destructive: #dc2626;
 
-  /* Gráficos */
-  --chart-1: #4f46e5; /* USO PUNTUAL: solo PiChart (estado "Pendiente") */
-  --chart-2: #3b82f6; /* USO PUNTUAL: solo PiChart (estado "En curso") */
-  --chart-3: #16a34a; /* USO PUNTUAL: solo PiChart (estado "Completada") */
-  --chart-4: #d97706; /* SIN USO */
-  --chart-5: #dc2626; /* SIN USO */
+    /* Gráficos */
+    --chart-1: #4f46e5; /* USO PUNTUAL: solo PiChart (estado "Pendiente") */
+    --chart-2: #3b82f6; /* USO PUNTUAL: solo PiChart (estado "En curso") */
+    --chart-3: #16a34a; /* USO PUNTUAL: solo PiChart (estado "Completada") */
+    --chart-4: #d97706; /* SIN USO */
+    --chart-5: #dc2626; /* SIN USO */
 
-  /* Sidebar */
-  --sidebar: #ffffff;
-  --sidebar-foreground: #17171c;
-  --sidebar-primary: #4f46e5; /* USO PUNTUAL: indicador activo de navsection */
-  --sidebar-primary-foreground: #ffffff; /* SIN USO */
-  --sidebar-accent: #eef0ff;
-  --sidebar-accent-foreground: #3730a3;
-  --sidebar-border: #e4e4ea;
-  --sidebar-ring: #6366f1;
+    /* Sidebar */
+    --sidebar: #ffffff;
+    --sidebar-foreground: #17171c;
+    --sidebar-primary: #4f46e5; /* USO PUNTUAL: indicador activo de navsection */
+    --sidebar-primary-foreground: #ffffff; /* SIN USO */
+    --sidebar-accent: #eef0ff;
+    --sidebar-accent-foreground: #3730a3;
+    --sidebar-border: #e4e4ea;
+    --sidebar-ring: #6366f1;
 
-  /* Tokens propios de TaskFlow */
-  --surface-2: #f1f1f4; /* SIN USO */
-  --border-strong: #d2d2da; /* USO PUNTUAL: separador de sticky-header */
-  --subtle-foreground: #6b6b76; /* USO PUNTUAL: cabecera de tabla en features/task */
-  --overdue: #fef2f2; /* SIN USO (duplica --danger-soft) */
-  --overdue-foreground: #b91c1c; /* SIN USO (duplica --danger-soft-foreground) */
-  --archived: #fffbeb; /* USO PUNTUAL: badge de Archive-Projects (duplica --warning) */
-  --archived-foreground: #b45309; /* USO PUNTUAL: badge de Archive-Projects */
+    /* Tokens propios de TaskFlow */
+    --surface-2: #f1f1f4; /* SIN USO */
+    --border-strong: #d2d2da; /* USO PUNTUAL: separador de sticky-header */
+    --subtle-foreground: #6b6b76; /* USO PUNTUAL: cabecera de tabla en features/task */
+    --overdue: #fef2f2; /* SIN USO (duplica --danger-soft) */
+    --overdue-foreground: #b91c1c; /* SIN USO (duplica --danger-soft-foreground) */
+    --archived: #fffbeb; /* USO PUNTUAL: badge de Archive-Projects (duplica --warning) */
+    --archived-foreground: #b45309; /* USO PUNTUAL: badge de Archive-Projects */
 
-  /* Semánticos (fondo suave / texto) */
-  --danger-soft: #fef2f2; /* USO PUNTUAL: Delete-Confirm, FunButtons */
-  --danger-soft-foreground: #b91c1c; /* USO PUNTUAL: Delete-Confirm, FunButtons */
-  --success: #f0fdf4; /* USO PUNTUAL: Stats + status-done */
-  --success-foreground: #15803d; /* USO PUNTUAL: Stats + status-done */
-  --warning: #fffbeb; /* USO PUNTUAL: Stats + priority-high */
-  --warning-foreground: #b45309; /* USO PUNTUAL: Stats + priority-high */
-  --info: #eff6ff; /* vía status-in-progress y priority-medium */
-  --info-foreground: #1d4ed8; /* vía status-in-progress y priority-medium */
+    /* Semánticos (fondo suave / texto) */
+    --danger-soft: #fef2f2; /* USO PUNTUAL: Delete-Confirm, FunButtons */
+    --danger-soft-foreground: #b91c1c; /* USO PUNTUAL: Delete-Confirm, FunButtons */
+    --success: #f0fdf4; /* USO PUNTUAL: Stats + status-done */
+    --success-foreground: #15803d; /* USO PUNTUAL: Stats + status-done */
+    --warning: #fffbeb; /* USO PUNTUAL: Stats + priority-high */
+    --warning-foreground: #b45309; /* USO PUNTUAL: Stats + priority-high */
+    --info: #eff6ff; /* vía status-in-progress y priority-medium */
+    --info-foreground: #1d4ed8; /* vía status-in-progress y priority-medium */
 
-  /* Dominio de tareas (sustituirán los colores fijos de lib/constants/task.ts) */
-  --status-todo: #f1f1f4; /* lib/constants/task.ts */
-  --status-todo-foreground: #52525b; /* lib/constants/task.ts */
-  --status-todo-dot: #a1a1aa; /* lib/constants/task.ts */
-  --status-in-progress: var(--info); /* lib/constants/task.ts */
-  --status-in-progress-foreground: var(--info-foreground); /* lib/constants/task.ts */
-  --status-in-progress-dot: #3b82f6; /* lib/constants/task.ts */
-  --status-done: var(--success); /* lib/constants/task.ts */
-  --status-done-foreground: var(--success-foreground); /* lib/constants/task.ts */
-  --status-done-dot: #22c55e; /* lib/constants/task.ts */
-  --priority-high: var(--warning); /* lib/constants/task.ts */
-  --priority-high-foreground: var(--warning-foreground); /* lib/constants/task.ts */
-  --priority-medium: var(--info); /* lib/constants/task.ts */
-  --priority-medium-foreground: var(--info-foreground); /* lib/constants/task.ts */
-  --priority-low: #f4f4f6; /* lib/constants/task.ts */
-  --priority-low-foreground: #5b5b66; /* lib/constants/task.ts */
+    /* Dominio de tareas (sustituirán los colores fijos de lib/constants/task.ts) */
+    --status-todo: #f1f1f4; /* lib/constants/task.ts */
+    --status-todo-foreground: #52525b; /* lib/constants/task.ts */
+    --status-todo-dot: #a1a1aa; /* lib/constants/task.ts */
+    --status-in-progress: var(--info); /* lib/constants/task.ts */
+    --status-in-progress-foreground: var(
+        --info-foreground
+    ); /* lib/constants/task.ts */
+    --status-in-progress-dot: #3b82f6; /* lib/constants/task.ts */
+    --status-done: var(--success); /* lib/constants/task.ts */
+    --status-done-foreground: var(
+        --success-foreground
+    ); /* lib/constants/task.ts */
+    --status-done-dot: #22c55e; /* lib/constants/task.ts */
+    --priority-high: var(--warning); /* lib/constants/task.ts */
+    --priority-high-foreground: var(
+        --warning-foreground
+    ); /* lib/constants/task.ts */
+    --priority-medium: var(--info); /* lib/constants/task.ts */
+    --priority-medium-foreground: var(
+        --info-foreground
+    ); /* lib/constants/task.ts */
+    --priority-low: #f4f4f6; /* lib/constants/task.ts */
+    --priority-low-foreground: #5b5b66; /* lib/constants/task.ts */
 
-  /* Identidad: colores decorativos estables por id (MemberAvatars, Project-Card) */
-  --tone-1: #ede9fe; /* violeta */
-  --tone-1-foreground: #6d28d9;
-  --tone-2: #ccfbf1; /* verde azulado */
-  --tone-2-foreground: #0f766e;
-  --tone-3: #dbeafe; /* azul */
-  --tone-3-foreground: #1d4ed8;
-  --tone-4: #fef3c7; /* ámbar */
-  --tone-4-foreground: #b45309;
-  --tone-5: #fce7f3; /* rosa */
-  --tone-5-foreground: #be185d;
-  --tone-6: #d1fae5; /* esmeralda */
-  --tone-6-foreground: #047857;
-  --favorite: #f59e0b; /* USO PUNTUAL: estrella de Project-Card */
+    /* Identidad: colores decorativos estables por id (MemberAvatars, Project-Card) */
+    --tone-1: #ede9fe; /* violeta */
+    --tone-1-foreground: #6d28d9;
+    --tone-2: #ccfbf1; /* verde azulado */
+    --tone-2-foreground: #0f766e;
+    --tone-3: #dbeafe; /* azul */
+    --tone-3-foreground: #1d4ed8;
+    --tone-4: #fef3c7; /* ámbar */
+    --tone-4-foreground: #b45309;
+    --tone-5: #fce7f3; /* rosa */
+    --tone-5-foreground: #be185d;
+    --tone-6: #d1fae5; /* esmeralda */
+    --tone-6-foreground: #047857;
+    --favorite: #f59e0b; /* USO PUNTUAL: estrella de Project-Card */
 }
 
 .dark {
-  /* Base */
-  --background: #0e0e12;
-  --foreground: #ededf0;
-  --card: #16161c;
-  --card-foreground: #ededf0;
-  --popover: #1a1a21;
-  --popover-foreground: #ededf0;
+    /* Base */
+    --background: #0e0e12;
+    --foreground: #ededf0;
+    --card: #16161c;
+    --card-foreground: #ededf0;
+    --button: #16161c;
+    --popover: #1a1a21;
+    --popover-foreground: #ededf0;
 
-  /* Marca e interacción */
-  --primary: #818cf8;
-  --primary-foreground: #0e0e12;
-  --secondary: #23232c;
-  --secondary-foreground: #e4e4ea;
-  --accent: #24233f;
-  --accent-foreground: #c7d2fe;
-  --ring: #818cf8;
+    /* Marca e interacción */
+    --primary: #818cf8;
+    --primary-foreground: #0e0e12;
+    --secondary: #23232c;
+    --secondary-foreground: #e4e4ea;
+    --accent: #24233f;
+    --accent-foreground: #c7d2fe;
+    --ring: #818cf8;
 
-  /* Texto secundario */
-  --muted: #1f1f27;
-  --muted-foreground: #a0a0ab;
+    /* Texto secundario */
+    --muted: #1f1f27;
+    --muted-foreground: #a0a0ab;
 
-  /* Bordes */
-  --border: #26262f;
-  --input: #34343f;
+    /* Bordes */
+    --border: #26262f;
+    --input: #34343f;
 
-  /* Estado destructivo */
-  --destructive: #f87171;
+    /* Estado destructivo */
+    --destructive: #f87171;
 
-  /* Gráficos */
-  --chart-1: #818cf8;
-  --chart-2: #60a5fa;
-  --chart-3: #4ade80;
-  --chart-4: #fbbf24;
-  --chart-5: #f87171;
+    /* Gráficos */
+    --chart-1: #818cf8;
+    --chart-2: #60a5fa;
+    --chart-3: #4ade80;
+    --chart-4: #fbbf24;
+    --chart-5: #f87171;
 
-  /* Sidebar */
-  --sidebar: #121217;
-  --sidebar-foreground: #ededf0;
-  --sidebar-primary: #818cf8;
-  --sidebar-primary-foreground: #0e0e12;
-  --sidebar-accent: #24233f;
-  --sidebar-accent-foreground: #c7d2fe;
-  --sidebar-border: #26262f;
-  --sidebar-ring: #818cf8;
+    /* Sidebar */
+    --sidebar: #121217;
+    --sidebar-foreground: #ededf0;
+    --sidebar-primary: #818cf8;
+    --sidebar-primary-foreground: #0e0e12;
+    --sidebar-accent: #24233f;
+    --sidebar-accent-foreground: #c7d2fe;
+    --sidebar-border: #26262f;
+    --sidebar-ring: #818cf8;
 
-  /* Tokens propios de TaskFlow */
-  --surface-2: #1f1f27;
-  --border-strong: #34343f;
-  --subtle-foreground: #7c7c88;
-  --overdue: #2a1215;
-  --overdue-foreground: #fca5a5;
-  --archived: #2a1f0b;
-  --archived-foreground: #fbbf24;
+    /* Tokens propios de TaskFlow */
+    --surface-2: #1f1f27;
+    --border-strong: #34343f;
+    --subtle-foreground: #7c7c88;
+    --overdue: #2a1215;
+    --overdue-foreground: #fca5a5;
+    --archived: #2a1f0b;
+    --archived-foreground: #fbbf24;
 
-  /* Semánticos */
-  --danger-soft: #2a1215;
-  --danger-soft-foreground: #fca5a5;
-  --success: #0f2a1c;
-  --success-foreground: #4ade80;
-  --warning: #2a1f0b;
-  --warning-foreground: #fbbf24;
-  --info: #0f1e36;
-  --info-foreground: #60a5fa;
+    /* Semánticos */
+    --danger-soft: #2a1215;
+    --danger-soft-foreground: #fca5a5;
+    --success: #0f2a1c;
+    --success-foreground: #4ade80;
+    --warning: #2a1f0b;
+    --warning-foreground: #fbbf24;
+    --info: #0f1e36;
+    --info-foreground: #60a5fa;
 
-  /* Dominio de tareas */
-  --status-todo: #1f1f27;
-  --status-todo-foreground: #a0a0ab;
-  --status-todo-dot: #71717a;
-  --status-in-progress: var(--info);
-  --status-in-progress-foreground: var(--info-foreground);
-  --status-in-progress-dot: #60a5fa;
-  --status-done: var(--success);
-  --status-done-foreground: var(--success-foreground);
-  --status-done-dot: #4ade80;
-  --priority-high: var(--warning);
-  --priority-high-foreground: var(--warning-foreground);
-  --priority-medium: var(--info);
-  --priority-medium-foreground: var(--info-foreground);
-  --priority-low: #1f1f27;
-  --priority-low-foreground: #a0a0ab;
+    /* Dominio de tareas */
+    --status-todo: #1f1f27;
+    --status-todo-foreground: #a0a0ab;
+    --status-todo-dot: #71717a;
+    --status-in-progress: var(--info);
+    --status-in-progress-foreground: var(--info-foreground);
+    --status-in-progress-dot: #60a5fa;
+    --status-done: var(--success);
+    --status-done-foreground: var(--success-foreground);
+    --status-done-dot: #4ade80;
+    --priority-high: var(--warning);
+    --priority-high-foreground: var(--warning-foreground);
+    --priority-medium: var(--info);
+    --priority-medium-foreground: var(--info-foreground);
+    --priority-low: #1f1f27;
+    --priority-low-foreground: #a0a0ab;
 
-  /* Identidad y favorito */
-  --tone-1: #2a2147;
-  --tone-1-foreground: #c4b5fd;
-  --tone-2: #0f2e2b;
-  --tone-2-foreground: #5eead4;
-  --tone-3: #13233f;
-  --tone-3-foreground: #93c5fd;
-  --tone-4: #2e2410;
-  --tone-4-foreground: #fcd34d;
-  --tone-5: #331526;
-  --tone-5-foreground: #f9a8d4;
-  --tone-6: #0f2c22;
-  --tone-6-foreground: #6ee7b7;
-  --favorite: #fbbf24;
+    /* Identidad y favorito */
+    --tone-1: #2a2147;
+    --tone-1-foreground: #c4b5fd;
+    --tone-2: #0f2e2b;
+    --tone-2-foreground: #5eead4;
+    --tone-3: #13233f;
+    --tone-3-foreground: #93c5fd;
+    --tone-4: #2e2410;
+    --tone-4-foreground: #fcd34d;
+    --tone-5: #331526;
+    --tone-5-foreground: #f9a8d4;
+    --tone-6: #0f2c22;
+    --tone-6-foreground: #6ee7b7;
+    --favorite: #fbbf24;
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
+    * {
+        @apply border-border outline-ring/50;
+    }
 
-  body {
-    @apply bg-background text-foreground;
-  }
-  html {
-    @apply font-sans;
-  }
+    body {
+        @apply bg-background text-foreground;
+    }
+    html {
+        @apply font-sans;
+    }
 }

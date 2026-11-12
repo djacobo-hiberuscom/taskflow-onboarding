@@ -38,7 +38,7 @@ export function FiltersTask({
     (value: TaskFilters[K]) =>
       onFiltersChange({ ...filters, [key]: value });
 
-  const filterSelectorClasname = "rounded-md bg-background shadow-sm";
+  const filterSelectorClasname = "rounded-md bg-card shadow-sm";
   return (
     <div className="flex gap-2 bg-muted p-1 rounded-lg items-center">
       <FilterSelector
@@ -69,24 +69,25 @@ export function FiltersTask({
         value={filters.member}
         onChange={set("member")}
       />
-      <Button
-        className={filterSelectorClasname}
-        variant="outline"
-        onClick={() => {
-          onFiltersChange(EMPTY_FILTERS);
-          onBuscadorChange("");
-        }}
-      >
-        <X />
-        Quitar filtros
-      </Button>
+      {
+        <Button
+          className={filterSelectorClasname}
+          variant="outline"
+          onClick={() => {
+            onFiltersChange(EMPTY_FILTERS);
+            onBuscadorChange("");
+          }}
+        >
+          <X />
+          Quitar filtros
+        </Button>
+      }
       <Input
         className={filterSelectorClasname}
         value={buscador}
         onChange={(e) => onBuscadorChange(e.target.value)}
         placeholder="Buscar por nombre"
-      >
-      </Input>
+      ></Input>
     </div>
   );
 }

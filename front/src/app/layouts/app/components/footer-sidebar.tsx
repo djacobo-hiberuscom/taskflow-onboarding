@@ -10,11 +10,11 @@ import { initials } from "#lib/format";
 // Compoenente
 export function FooterSidebar() {
   const { data: me } = useMe();
-  const nombre = me?.displayName ?? "Cargando..."
+  const nombre = me?.displayName ?? "Cargando...";
   return (
     <Link
       to="/me"
-      className="flex justify-start items-center h-12 gap-3 rounded-xl px-2 text-sidebar-foreground transition-colors hover:bg-sidebar-accent active:bg-sidebar-accent/80 cursor-pointer"
+      className="flex justify-start items-center border h-12 gap-3 rounded-xl px-2 text-sidebar-foreground transition-colors hover:bg-sidebar-accent active:bg-sidebar-accent/80 cursor-pointer"
     >
       <Avatar className="size-8 shrink-0">
         <AvatarFallback className="bg-primary text-xs font-semibold text-primary-foreground">

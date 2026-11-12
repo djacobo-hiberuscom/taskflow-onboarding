@@ -8,6 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarProvider,
+  BackGroundPatern,
 } from "@/components";
 import {
   FooterSidebar,
@@ -48,7 +49,10 @@ export function AppLayout() {
       <SidebarInset className="min-w-0 bg-background">
         <StickyHeader title={title} />
         <div className="mx-auto w-full max-w-350 flex-1 flex flex-col">
-          <Outlet />
+          <BackGroundPatern />
+          <div className="relative z-10">
+            <Outlet />
+          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>

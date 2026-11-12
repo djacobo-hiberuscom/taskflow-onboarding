@@ -1,6 +1,5 @@
 import { Plus, Search, X } from "lucide-react";
 import { Button, FilterSelector, Input } from "@/components";
-import type { UserSummary } from "@/lib/api/types";
 import { useAssignableUsers } from "@/hooks/use-users";
 import {
   TASK_PRIORITY_OPTIONS,
@@ -38,9 +37,11 @@ export function FilterAndSearch({
     (value: TaskFilters[K]) =>
       onFiltersChange({ ...filters, [key]: value });
 
+  const filterClasname = "w-auto bg-card shadow-sm";
+
   return (
-    <div className="flex w-full flex-wrap items-center gap-2">
-      <div className="relative w-full sm:w-64">
+    <div className="flex w-full flex-wrap items-center gap-2 bg-muted p-1 rounded-md">
+      <div className="relative w-full sm:w-64 bg-card rounded-md overflow-hidden shadow-sm">
         <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           value={busqueda}
@@ -53,7 +54,7 @@ export function FilterAndSearch({
       <FilterSelector
         label="Estado"
         placeholder="Todos"
-        className="w-auto"
+        className={filterClasname}
         items={TASK_STATUS_OPTIONS}
         value={filters.status}
         onChange={set("status")}
@@ -61,7 +62,7 @@ export function FilterAndSearch({
       <FilterSelector
         label="Prioridad"
         placeholder="Todos"
-        className="w-auto"
+        className={filterClasname}
         items={TASK_PRIORITY_OPTIONS}
         value={filters.priority}
         onChange={set("priority")}
@@ -69,7 +70,7 @@ export function FilterAndSearch({
       <FilterSelector
         label="Asignado"
         placeholder="Todos"
-        className="w-auto"
+        className={filterClasname}
         items={memberOptions}
         value={filters.member}
         onChange={set("member")}
@@ -77,7 +78,7 @@ export function FilterAndSearch({
 
       {hayFiltros && (
         <Button
-          variant="ghost"
+          variant="destructive"
           size="sm"
           className="text-muted-foreground"
           onClick={() => {

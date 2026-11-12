@@ -1,9 +1,5 @@
 import { useState } from "react";
-import {
-  Pagination,
-  QueryState,
-  TaskDetailDrawer,
-} from "@/components";
+import { Pagination, QueryState, TaskDetailDrawer } from "@/components";
 import { useProjects } from "@/hooks/use-project";
 import { useTasks } from "@/hooks/use-task";
 import {
@@ -70,8 +66,8 @@ export function TaskFeat() {
         buscador={buscador}
         onBuscadorChange={setBuscador}
       />
-  
-      <div >
+
+      <div>
         <HeaderTableTask />
         {tareas.length === 0 ? (
           <p className="p-6 text-center text-muted-foreground bg-background">
