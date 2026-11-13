@@ -9,15 +9,26 @@ interface ProjectsPaginationProps {
 }
 
 // "Página X de Y · N proyectos" + Anterior / números / Siguiente
-export function ProjectsPagination({ page, totalPages, total, onChange }: ProjectsPaginationProps) {
+export function ProjectsPagination({
+  page,
+  totalPages,
+  total,
+  onChange,
+}: ProjectsPaginationProps) {
   return (
     <footer className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
       <span>
-        Página {page} de {totalPages} · {total} proyecto{total === 1 ? "" : "s"}
+        Página {page} de {totalPages} - {total} proyecto{total === 1 ? "" : "s"}
       </span>
 
       <nav className="flex items-center gap-1" aria-label="Paginación">
-        <Button variant="outline" size="sm" disabled={page === 1} onClick={() => onChange(page - 1)}>
+        <Button
+          className="disabled:opacity-100 disabled:text-muted-foreground"
+          variant="outline"
+          size="sm"
+          disabled={page === 1}
+          onClick={() => onChange(page - 1)}
+        >
           <ChevronLeft />
           Anterior
         </Button>
@@ -35,6 +46,7 @@ export function ProjectsPagination({ page, totalPages, total, onChange }: Projec
         ))}
 
         <Button
+          className="disabled:opacity-100 disabled:text-muted-foreground"
           variant="outline"
           size="sm"
           disabled={page === totalPages}

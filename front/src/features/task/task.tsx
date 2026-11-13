@@ -87,7 +87,7 @@ export function TaskFeat() {
       </div>
 
       <Pagination
-        className="sticky bottom-5 mt-auto flex justify-end items-center gap-2"
+        className="relateive z-10 sticky bottom-5 mt-auto flex justify-end items-center gap-2"
         page={page}
         totalPages={totalPages}
         onPageChange={setPage}

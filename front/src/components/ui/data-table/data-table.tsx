@@ -11,13 +11,12 @@ import {
 } from "../../../components/ui/table";
 import { features, type DataTableFeatures } from "./data-table-features";
 
-
 interface DataTableProps<TData extends RowData> {
   columns: ColumnDef<DataTableFeatures, TData>[];
   data: TData[];
-  onClic?: (row: TData) => void
+  onClic?: (row: TData) => void;
   // Texto del pie: "Mostrando 1–8 de 8 {itemLabel}"
-  itemLabel?: string
+  itemLabel?: string;
 }
 
 export function DataTable<TData extends RowData>({
@@ -45,7 +44,10 @@ export function DataTable<TData extends RowData>({
             <TableRow key={headerGroup.id} className="hover:bg-transparent">
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id} className="h-11 px-4 text-xs font-medium text-muted-foreground">
+                  <TableHead
+                    key={header.id}
+                    className="h-11 px-4 text-xs font-medium text-muted-foreground"
+                  >
                     {header.isPlaceholder ? null : (
                       <table.FlexRender header={header} />
                     )}

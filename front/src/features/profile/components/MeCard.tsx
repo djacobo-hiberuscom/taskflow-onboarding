@@ -1,5 +1,5 @@
 // componentes
-import {Header, DetallesMe} from "./index"
+import { Header, DetallesMe } from "./index";
 
 // Tarjeta con avatar, usuario y cerrar sesión
 export function MeCard() {

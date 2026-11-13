@@ -24,18 +24,22 @@ export function FilterAndSearch({
   onNewTask,
 }: FilterAndSearchProps) {
   const { data: usuarios = [] } = useAssignableUsers();
-  
+
   const memberOptions = usuarios.map((u) => ({
     label: u.displayName,
     value: u.id,
   }));
 
-  const hayFiltros = filters.status !== null || filters.priority !== null || filters.member !== null || busqueda !== "";
+  const hayFiltros =
+    filters.status !== null ||
+    filters.priority !== null ||
+    filters.member !== null ||
+    busqueda !== "";
 
   const filterClasname = "w-auto bg-card shadow-sm";
 
   return (
-    <div className="flex w-full flex-wrap items-center gap-2 bg-muted p-1 rounded-md">
+    <div className="flex w-full flex-wrap items-center gap-2 bg-muted p-1 rounded-md shadow-sm">
       <div className="relative w-full sm:w-64 bg-card rounded-md overflow-hidden shadow-sm">
         <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
@@ -52,7 +56,7 @@ export function FilterAndSearch({
         className={filterClasname}
         items={TASK_STATUS_OPTIONS}
         value={filters.status}
-        onChange={(value) => onFiltersChange({...filters, status: value})}
+        onChange={(value) => onFiltersChange({ ...filters, status: value })}
       />
       <FilterSelector
         label="Prioridad"
@@ -60,7 +64,7 @@ export function FilterAndSearch({
         className={filterClasname}
         items={TASK_PRIORITY_OPTIONS}
         value={filters.priority}
-        onChange={(value) => onFiltersChange({...filters, priority: value})}
+        onChange={(value) => onFiltersChange({ ...filters, priority: value })}
       />
       <FilterSelector
         label="Asignado"
@@ -68,7 +72,7 @@ export function FilterAndSearch({
         className={filterClasname}
         items={memberOptions}
         value={filters.member}
-        onChange={(value) => onFiltersChange({...filters, member: value})}
+        onChange={(value) => onFiltersChange({ ...filters, member: value })}
       />
 
       {hayFiltros && (
